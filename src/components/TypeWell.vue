@@ -9,7 +9,10 @@
     </div>
 
     <div class="text">
-      {{ text }}
+      <div class="textLine" v-for="text in prevNextTextList" :key="text.key">
+        <div class="prevText">{{ text.prev }}</div>
+        <div class="nextText">{{ text.next }}</div>
+      </div>
     </div>
 
     <div class="missCount">
@@ -49,6 +52,7 @@ export default class TypeWell extends Vue {
   public prevRoman: string = "";
   public nextRoman: string = "";
   public missCount: number = 0;
+  public prevNextTextList: {} = {};
   public prevRomanList: Array<string> = [];
   public nextRomanList: Array<string> = [];
   public prevNextRomanList: {} = {};
@@ -56,6 +60,7 @@ export default class TypeWell extends Vue {
   private updateVariables() {
     if(this.typingGame === undefined)return;
     this.text = this.typingGame.text;
+    this.prevNextTextList = this.typingGame.prevNextTextList;
     this.prevRoman = this.typingGame.prevRoman;
     this.nextRoman = this.typingGame.nextRoman;
     this.prevRomanList = this.typingGame.prevRomanList;
@@ -66,11 +71,12 @@ export default class TypeWell extends Vue {
 
   private resetVariables() {
     this.text = "";
+    this.prevNextTextList = {};
     this.prevRoman = "";
     this.nextRoman = "";
     this.prevRomanList = [];
     this.nextRomanList = [];
-    this.prevNextRomanList = [];
+    this.prevNextRomanList = {};
     this.missCount = 0;
   }
 
@@ -161,10 +167,30 @@ $roman-frame-width: $roman-font-size / 2 * 50 + 20;
   //flex-direction: row; /* 子要素をflexboxにより横方向に揃える */
   //justify-content: center; /* 子要素をflexboxにより中央に配置する */
   //align-items: center;  /* 子要素をflexboxにより中央に配置する */
-  width: $roman-frame-width; /* 見た目用 */
+  width: 600px; /* 見た目用 */
   height: 200px; /* 見た目用 */
   border: 1px solid; /* 見た目用 */;
   font-size: $text-font-size;
+}
+.textLine {
+  margin-top: 2px;
+  margin-right: 10px;
+  margin-bottom: 2px;
+  margin-left: 10px;
+
+  display: flex; /* 子要素をflexboxで揃える */
+  flex-direction: row; /* 子要素をflexboxにより横方向に揃える */
+  justify-content: flex-start; /* 子要素をflexboxにより左に配置する */
+  align-items: center;  /* 子要素をflexboxにより中央に配置する */
+  white-space: pre;
+}
+.prevText {
+  word-break: break-all;
+  color: #CCCCCC;
+}
+.nextText {
+  word-break: break-all;
+  color: #000000;
 }
 .missCount {
   margin-top: 10px;
