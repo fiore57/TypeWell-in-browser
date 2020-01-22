@@ -18,6 +18,7 @@
 
 import TypingWords from '@/lib/word';
 
+// 全入力パターンのmapを保持するクラス
 class ChunkPattern {
   static list = new Map([
     ['あ', [['a']]],
@@ -258,54 +259,55 @@ class ChunkPattern {
   })();
 }
 
-function devideIntoChunk(text: string): Array<Chunk> {
+// かなをチャンクに分割
+function devideIntoChunk(kana: string): Array<Chunk> {
   let ret: Array<Chunk> = [];
-  for (let i = 0; i < text.length; ++i) {
+  for (let i = 0; i < kana.length; ++i) {
     // 最後の1文字の場合、必ずその文字が1チャンク
-    if (i >= text.length - 1) {
-      ret.push(new Chunk(text[i]));
+    if (i >= kana.length - 1) {
+      ret.push(new Chunk(kana[i]));
       break;
     }
 
     // 「っ」でも「ん」でもないとき
-    if (text[i] !== 'っ' && text[i] !== 'ん') {
+    if (kana[i] !== 'っ' && kana[i] !== 'ん') {
       // その文字から2文字がチャンクパターンに存在しない場合、その文字が1チャンク
-      if (!ChunkPattern.list.has(text[i] + text[i + 1])) {
-        ret.push(new Chunk(text[i]));
+      if (!ChunkPattern.list.has(kana[i] + kana[i + 1])) {
+        ret.push(new Chunk(kana[i]));
       }
       // その文字から2文字がチャンクパターンに存在する場合、2文字で1チャンク
       else {
-        ret.push(new Chunk(text[i] + text[i + 1]));
+        ret.push(new Chunk(kana[i] + kana[i + 1]));
         ++i;
       }
     }
     // 「っ」か「ん」のとき
     else {
       // 最後から2番目の文字の場合
-      if (i >= text.length - 2) {
+      if (i >= kana.length - 2) {
         // かつ、次の文字がスペースでない場合、2文字で1チャンク
-        if (text[i + 1] !== '　') {
-          ret.push(new Chunk(text[i] + text[i + 1]));
+        if (kana[i + 1] !== '　') {
+          ret.push(new Chunk(kana[i] + kana[i + 1]));
           break;
         }
         // 次の文字がスペースの場合、2文字で2チャンク
         else {
-          ret.push(new Chunk(text[i]));
-          ret.push(new Chunk(text[i + 1]));
+          ret.push(new Chunk(kana[i]));
+          ret.push(new Chunk(kana[i + 1]));
           break;
         }
       }
 
       // 「っ」「ん」の後ろの2文字がチャンクパターンに存在しない場合
       // 「っ」「ん」を含めて2文字で1チャンク
-      if (!ChunkPattern.list.has(text[i + 1] + text[i + 2])) {
-        ret.push(new Chunk(text[i] + text[i + 1]));
+      if (!ChunkPattern.list.has(kana[i + 1] + kana[i + 2])) {
+        ret.push(new Chunk(kana[i] + kana[i + 1]));
         ++i;
       }
       // 「っ」「ん」の後ろの2文字がチャンクパターンに存在する場合
       // 「っ」「ん」を含めて3文字で1チャンク
       else {
-        ret.push(new Chunk(text[i] + text[i + 1] + text[i + 2]));
+        ret.push(new Chunk(kana[i] + kana[i + 1] + kana[i + 2]));
         i += 2;
       }
     }
@@ -314,38 +316,47 @@ function devideIntoChunk(text: string): Array<Chunk> {
   return ret;
 }
 
+// 入力パターンを持つクラス
 class TypePattern {
   private _roman: string;
   private _isValid: boolean = true;
   private _romanCount: number = 0;
+
   private _kanaRomanList: Array<string> = [];
-  private _kanaRomanListCount: number = 0;
-  private _kanaRomanCount: number = 0;
+
+  /** 現在見ている_kanaRomanListのindex */
+  private _curKanaRomanIndex: number = 0;
+
+  /** _kanaRomanList[_curKanaRomanIndex]の中で、何文字目を見ているか */
+  private _curKanaRomanCount: number = 0;
+
   public constructor(romanList: Array<string>) {
     this._kanaRomanList = romanList;
     this._roman = romanList.join('');
   }
-  public get isValid() {
-    return this._isValid;
-  }
   public getCurChar() {
     return this._roman[this._romanCount];
   }
-  // このメソッドを呼んだ後に isKanaFinished() と isChunkFinished() を呼ぶ
-  public increment() {
+  // このメソッドを呼んだ後に isChunkFinished() を呼ぶ
+  public increment(kanaFinished: (newKanaCount: number) => void) {
     ++this._romanCount;
-    ++this._kanaRomanCount;
-  }
-  // increment -> isKanaFinished -> isChunkFinished の順に呼ぶ
-  public isKanaFinished(): boolean {
-    const isKanaFinished = this._kanaRomanCount >= this._kanaRomanList[this._kanaRomanListCount].length;
-    if (isKanaFinished) {
-      ++this._kanaRomanListCount;
-      this._kanaRomanCount = 0;
+    ++this._curKanaRomanCount;
+
+    // かなが終了したかを判定
+    if (this._curKanaRomanCount >= this._curKanaRoman.length) {
+      ++this._curKanaRomanIndex;
+      this._curKanaRomanCount = 0;
+      kanaFinished(this._curKanaRomanIndex);
     }
-    return isKanaFinished;
   }
-  // isKanaFinished()
+
+  private get _curKanaRoman(): string {
+    return this._kanaRomanList[this._curKanaRomanIndex];
+  }
+
+  public get isValid() {
+    return this._isValid;
+  }
   public isChunkFinished(): boolean {
     return this._romanCount >= this._roman.length;
   }
@@ -367,10 +378,11 @@ class TypePatternList {
   private _displayPatternNum = 0;
   private _typePatternList: Array<TypePattern>;
   private _isChunkFinished: boolean = false;
-  private _isKanaFinished: boolean = false;
+
   public constructor(romanLists: Array<Array<string>>) {
     this._typePatternList = romanLists.map(romanList => new TypePattern(romanList));
   }
+
   private isCorrectInput(inputChar: string): boolean {
     for (const typePattern of this._typePatternList) {
       if (typePattern.isValid && typePattern.getCurChar() === inputChar)
@@ -378,24 +390,22 @@ class TypePatternList {
     }
     return false;
   }
-  // 正しい入力であればtrue、そうでなければfalseを返す
-  public update(inputChar: string): boolean {
+
+  /** 正しい入力であればtrue、そうでなければfalseを返す */
+  public update(inputChar: string, kanaFinished: (newKanaCount: number) => void): boolean {
     // 正しい入力でない場合、即return
     window.console.log(inputChar);
     if (!this.isCorrectInput(inputChar)) {
       return false;
     }
     // 正しい入力の場合
-    this._typePatternList.forEach(typePattern => {
-      if (!typePattern.isValid) return;
+    for (const typePattern of this._typePatternList) {
+      if (!typePattern.isValid) continue;
       if (inputChar === typePattern.getCurChar()) {
-        typePattern.increment()
-        if (typePattern.isKanaFinished()) {
-          this._isKanaFinished = true;
-        }
+        typePattern.increment(kanaFinished);
         if (typePattern.isChunkFinished()) {
           this._isChunkFinished = true;
-          return;
+          continue;
         }
       }
       else {
@@ -404,8 +414,9 @@ class TypePatternList {
         }
         typePattern.invalidate();
       }
-    });
+    }
 
+    // 表示するローマ字パターン番号を再設定
     if (this._displayPatternNum === -1) {
       for (let i = 0; i < this._typePatternList.length; ++i) {
         if (this._typePatternList[i].isValid) {
@@ -428,25 +439,26 @@ class TypePatternList {
   public get isChunkFinished(): boolean {
     return this._isChunkFinished;
   }
-  public get isKanaFinished(): boolean {
-    return this._isKanaFinished;
-  }
 }
 
 class Chunk {
   private _kana: string;
+  private _kanaCount: number = 0;
+
   private _roman: string;
   private _prevRoman: string;
   private _nextRoman: string;
   private _typePatternList: TypePatternList;
+
   private readonly _vowels: Array<string> = ['a', 'i', 'u', 'e', 'o', 'n'];
-  private _isNextVowel: boolean = false;  // 次のチャンクがa/i/u/e/o/nから始まるか否か
+
   public constructor(kana: string) {
     this._kana = kana;
+
     if (kana.length == 1) {
       this._typePatternList = new TypePatternList(ChunkPattern.list.get(kana)!);
     }
-    else {
+    else { // かなが2文字以上の場合
       if (kana[0] === 'っ') { // チャンクの1文字目が「っ」
         // 「っ」を除いた場合のパターン
         const curPatterns: Array<Array<string>> = ChunkPattern.list.get(kana.substr(1))!;
@@ -501,19 +513,28 @@ class Chunk {
     this._prevRoman = this._typePatternList.displayPrevRoman;
     this._nextRoman = this._typePatternList.displayNextRoman;
   }
-  // 入力が正しければtrue、そうでなければfalseを返す
+
+  /** 入力が正しければtrue、そうでなければfalseを返す */
   public update(inputChar: string): boolean {
-    const ret = this._typePatternList.update(inputChar);
+    /** かなが終わった場合の処理 */
+    const kanaFinished = (newKanaCount: number) => {
+      this._kanaCount = newKanaCount;
+    };
+    const ret = this._typePatternList.update(inputChar, kanaFinished);
+
+    if (this._typePatternList.isChunkFinished) {
+      this._kanaCount = this._kana.length;
+    }
     this._roman = this._typePatternList.displayRoman;
     this._prevRoman = this._typePatternList.displayPrevRoman;
     this._nextRoman = this._typePatternList.displayNextRoman;
     return ret;
   }
+  public get kanaCount(): number {
+    return this._kanaCount;
+  }
   public get isChunkFinished(): boolean {
     return this._typePatternList.isChunkFinished;
-  }
-  public get isKanaFinished(): boolean {
-    return this._typePatternList.isKanaFinished;
   }
   public get roman(): string {
     return this._roman;
@@ -527,21 +548,23 @@ class Chunk {
 }
 
 export default class TypingGame {
-  private _text: string = ""; // 漢字かな交じり
+  /** 漢字かな交じり */
+  private _text: string = "";
   private _prevTextList: Array<string> = [];
 
   private _kanaList: Array<string> = [];
-  private _kana: string = ""; // かな
+  private _kana: string = "";
   private _kanaCount: number = 0;
 
   private _chunkList: Array<Chunk>;
   public _chunkCount: number = 0;
 
-  private _prevRoman: string = "";  //
+  private _prevRoman: string = "";
   private _nextRoman: string = "";
 
   private _missCount: number = 0;
-  m_is_finished: boolean = false;
+  private _isFinished: boolean = false;
+
   constructor() {
     for (let romanCount: number = 0; romanCount < 400;) {
       const word = TypingWords.getWord();
@@ -559,14 +582,13 @@ export default class TypingGame {
     }
 
     // ローマ字の準備
-    window.console.log(this._kana);
-
     this._chunkList = devideIntoChunk(this._kana);
     for (const chunk of this._chunkList) {
       this._prevRoman += chunk.prevRoman;
       this._nextRoman += chunk.nextRoman;
     }
   }
+
   public update(inputChar: string) {
     const result = this._chunkList[this._chunkCount].update(inputChar);
     if (result) { // 正しい入力の場合
@@ -581,18 +603,17 @@ export default class TypingGame {
       this._prevRoman += chunk.prevRoman;
       this._nextRoman += chunk.nextRoman;
     }
-    if (this._chunkList[this._chunkCount].isKanaFinished) {
-      ++this._kanaCount;
-    }
+    this._kanaCount = this._chunkList.reduce((acc, cur) => acc + cur.kanaCount, 0);
     if (this._chunkList[this._chunkCount].isChunkFinished) {
       ++this._chunkCount;
       if (this._chunkCount >= this._chunkList.length) {
-        this.m_is_finished = true;
+        this._isFinished = true;
       }
     }
   }
+
   public isFinished(): boolean {
-    return this.m_is_finished;
+    return this._isFinished;
   }
 
   public get text(): string {
