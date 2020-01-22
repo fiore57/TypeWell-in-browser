@@ -1,6 +1,6 @@
 <template>
   <div class="timer">
-    <p>{{ Math.floor(elapsedTime / 100) / 10 }}</p>
+    <p>Time: {{ (Math.floor(elapsedTime / 100) / 10).toFixed(1) }}</p>
   </div>
 </template>
 
@@ -44,37 +44,16 @@ export default class Timer extends Vue {
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped lang="scss">
-h3 {
-  margin: 40px 0 0;
+.timer {
+  font-size: 22px;
 }
-ul {
-  list-style-type: none;
-  padding: 0;
-}
-li {
-  display: inline-block;
-  margin: 0 10px;
-}
-a {
-  color: #42b983;
-}
-.roman {
-  margin-top: 20px;
-  margin-left: auto;
-  margin-right: auto;
-  display: flex; /* 子要素をflexboxで揃える */
-  flex-direction: row; /* 子要素をflexboxにより横方向に揃える */
-  justify-content: center; /* 子要素をflexboxにより中央に配置する */
-  align-items: center;  /* 子要素をflexboxにより中央に配置する */
-  width: 200px; /* 見た目用 */
-  height: 50px; /* 見た目用 */
-  border: 1px solid; /* 見た目用 */;
-}
-.prevRoman {
-  color: #CCCCCC;
-}
-.nextRoman {
-  color: #000000;
-
+p {
+  border: 1px solid;
+  padding: 2px 10px;
+  margin-top: 10px;
+  margin-right: 10px;
+  margin-bottom: 10px;
+  margin-left: 10px;
+  width: 130px;
 }
 </style>
