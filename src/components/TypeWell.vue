@@ -167,16 +167,14 @@ $roman-frame-width: $roman-font-size / 2 * 50 + 20;
   //flex-direction: row; /* 子要素をflexboxにより横方向に揃える */
   //justify-content: center; /* 子要素をflexboxにより中央に配置する */
   //align-items: center;  /* 子要素をflexboxにより中央に配置する */
-  width: 600px; /* 見た目用 */
+  width: 800px; /* 見た目用 */
   height: 200px; /* 見た目用 */
   border: 1px solid; /* 見た目用 */;
   font-size: $text-font-size;
 }
 .textLine {
-  margin-top: 2px;
-  margin-right: 10px;
-  margin-bottom: 2px;
-  margin-left: 10px;
+  margin-top: 1px;
+  margin-bottom: 1px;
 
   display: flex; /* 子要素をflexboxで揃える */
   flex-direction: row; /* 子要素をflexboxにより横方向に揃える */
@@ -187,10 +185,12 @@ $roman-frame-width: $roman-font-size / 2 * 50 + 20;
 .prevText {
   word-break: break-all;
   color: #CCCCCC;
+  margin-left: auto;
 }
 .nextText {
   word-break: break-all;
   color: #000000;
+  margin-right: auto;
 }
 .missCount {
   margin-top: 10px;

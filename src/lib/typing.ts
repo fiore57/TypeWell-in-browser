@@ -565,8 +565,15 @@ export default class TypingGame {
   private _missCount: number = 0;
   private _isFinished: boolean = false;
 
+  /** text1行あたりの文字数 */
+  private readonly _textLineLength: number = 40;
+  /** roman1行あたりの文字数 */
+  private readonly _romanLineLength: number = 50;
+  /** romanの行数 */
+  private readonly _romanLineNum: number = 8;
+
   constructor() {
-    for (let romanCount: number = 0; romanCount < 400;) {
+    for (let romanCount: number = 0; romanCount < this._romanLength;) {
       const word = TypingWords.getWord();
       const text: string = word.text + "　";
       const kanaList: Array<string> = word.kana.concat(["　"]);
@@ -616,6 +623,9 @@ export default class TypingGame {
     return this._isFinished;
   }
 
+  private get _romanLength(): number {
+    return this._romanLineLength * this._romanLineNum;
+  }
   public get text(): string {
     return this._text;
   }
@@ -633,7 +643,7 @@ export default class TypingGame {
     for (let i = 0, kanaCount = 0; i < this._text.length; ++i) {
       kanaCount += this._kanaList[i].length;
       if (kanaCount <= this._kanaCount) {
-        if (ret.length === 0 || ret[ret.length - 1].length >= 30) {
+        if (ret.length === 0 || ret[ret.length - 1].length >= this._textLineLength) {
           ret.push(this._text[i]);
         }
         else {
@@ -646,14 +656,20 @@ export default class TypingGame {
   }
   public get nextTextList(): Array<string> {
     let ret: Array<string> = [];
-    const prevTextLength = this._prevTextList.join('').length;
+    const prevTextLength = this._prevTextList.join("").length;
     for (let i = 0; i < this._text.length; ++i) {
-      if (i % 30 === 0) {
+      if (i % this._textLineLength === 0) {
         ret.push("");
       }
       if (i >= prevTextLength) {
         ret[ret.length - 1] += this._text[i];
       }
+    }
+    // 最後を空白で埋める
+    const prevTextLastLine: string | undefined = this._prevTextList[ret.length - 1];
+    const prevTextLastLineLength: number = (prevTextLastLine === undefined ? 0 : this._prevTextList[ret.length - 1].length);
+    while ((prevTextLastLineLength + ret[ret.length - 1].length) % this._textLineLength !== 0) {
+      ret[ret.length - 1] += "　";
     }
     return ret;
   }
@@ -670,12 +686,12 @@ export default class TypingGame {
   }
   public get prevRomanList(): Array<string> {
     let ret: Array<string> = [];
-    for (let i = 0; i < 8; ++i) {
-      if (this._prevRoman.length >= (i + 1) * 50) {
-        ret.push(this._prevRoman.substr(i * 50, 50));
+    for (let i = 0; i < this._romanLineNum; ++i) {
+      if (this._prevRoman.length >= (i + 1) * this._romanLineLength) {
+        ret.push(this._prevRoman.substr(i * this._romanLineLength, this._romanLineLength));
       }
-      else if (this._prevRoman.length >= i * 50) {
-        ret.push(this._prevRoman.substr(i * 50));
+      else if (this._prevRoman.length >= i * this._romanLineLength) {
+        ret.push(this._prevRoman.substr(i * this._romanLineLength));
       }
       else {
         ret.push('');
@@ -686,16 +702,16 @@ export default class TypingGame {
   public get nextRomanList(): Array<string> {
     let ret: Array<string> = [];
     let tmp: number = 0;
-    for (let i = 0; i < 8; ++i) {
-      if (this._prevRoman.length >= (i + 1) * 50) {
+    for (let i = 0; i < this._romanLineNum; ++i) {
+      if (this._prevRoman.length >= (i + 1) * this._romanLineLength) {
         ret.push("");
       }
-      else if (this._prevRoman.length >= i * 50) {
-        tmp = (i + 1) * 50 - this._prevRoman.length;
+      else if (this._prevRoman.length >= i * this._romanLineLength) {
+        tmp = (i + 1) * this._romanLineLength - this._prevRoman.length;
         ret.push(this._nextRoman.substr(0, tmp));
       }
       else {
-        ret.push(this._nextRoman.substr(tmp, 50));
+        ret.push(this._nextRoman.substr(tmp, this._romanLineLength));
         tmp += 50;
       }
       /*
@@ -714,7 +730,7 @@ export default class TypingGame {
   }
   public get prevNextRomanList() {
     let ret: Array<{}> = [];
-    for (let i = 0; i < 8; ++i) {
+    for (let i = 0; i < this._romanLineNum; ++i) {
       ret.push({
         "prev": this.prevRomanList[i],
         "next": this.nextRomanList[i],
