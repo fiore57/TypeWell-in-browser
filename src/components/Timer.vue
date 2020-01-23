@@ -1,6 +1,6 @@
 <template>
   <div class="timer">
-    <p>Time: {{ (Math.floor(elapsedTime / 100) / 10).toFixed(1) }}</p>
+    Time: {{ (Math.floor(elapsedTime / 100) / 10).toFixed(1) }}
   </div>
 </template>
 
@@ -46,8 +46,6 @@ export default class Timer extends Vue {
 <style scoped lang="scss">
 .timer {
   font-size: 22px;
-}
-p {
   border: 1px solid;
   padding: 2px 10px;
   margin-top: 10px;
