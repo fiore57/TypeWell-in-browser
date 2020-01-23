@@ -17,23 +17,19 @@ export default class Timer extends Vue {
   @Watch('isValid')
   public onIsValidChanged(newValue: boolean, oldValue: boolean){
     this._isValid = newValue;
-    if(newValue === true){
-      window.console.log("onIsValidChanged");
+    if(newValue === true && oldValue === false){
       this._startTime = Date.now();
-      window.console.log(this._startTime);
       this.startRAFLoop();
     }
   }
 
   private startRAFLoop() {
     window.requestAnimationFrame(this.calcTime);
-    window.console.log('RAF loop start');
   }
 
   public calcTime() {
     const nowTime = Date.now();
     this.elapsedTime = nowTime - this._startTime;
-    window.console.log(this._isValid);
     if(this._isValid){
       window.requestAnimationFrame(this.calcTime);
     }
