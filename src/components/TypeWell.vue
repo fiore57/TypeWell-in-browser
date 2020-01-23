@@ -42,7 +42,7 @@ import Timer from './Timer.vue';
 })
 export default class TypeWell extends Vue {
   @Prop() private msg!: string;
-  public readonly title: string = "基本常用語";
+  public readonly title: string = "ブラウザ版 タイプウェル国語R";
   public readonly description: string = "※このアプリは非公式です"
   public readonly gameMode: string = "基本常用語";
   public inGame: boolean = false;

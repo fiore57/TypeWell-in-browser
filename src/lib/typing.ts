@@ -142,7 +142,7 @@ class ChunkPattern {
     ['どぅ', [['dwu']]],
     ['どぇ', [['dwe']]],
     ['どぉ', [['dwo']]],
-    ['っ', [['ltu'], ['xtu'], ['ltsu']]],
+    ['っ', [['ltu'], ['xtu'], ['ltsu'], ['xtsu']]],
     ['な', [['na']]],
     ['に', [['ni']]],
     ['ぬ', [['nu']]],
@@ -467,9 +467,9 @@ class Chunk {
 
         // 子音の繰り返し
         for (const roman of curPatterns) {
-          window.console.log(roman);
-          if (!this._vowels.includes(roman[0][0])) {
-            newPatterns.push([roman[0]].concat(roman));
+          const romanFirstChar: string = roman[0][0];
+          if (!this._vowels.includes(romanFirstChar)) {
+            newPatterns.push([romanFirstChar].concat(roman));
           }
         }
 
@@ -566,7 +566,7 @@ export default class TypingGame {
   private _isFinished: boolean = false;
 
   /** text1行あたりの文字数 */
-  private readonly _textLineLength: number = 40;
+  private readonly _textLineLength: number = 43;
   /** roman1行あたりの文字数 */
   private readonly _romanLineLength: number = 50;
   /** romanの行数 */
