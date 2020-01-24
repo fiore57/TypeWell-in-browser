@@ -1,5 +1,5 @@
 <template>
-  <div class="type-well">
+  <div id="type-well">
     <h2>{{ title }}</h2>
     <p>{{ description }}</p>
     <div class="header">
@@ -25,6 +25,8 @@
         <div class="nextRoman">{{ roman.next }}</div>
       </div>
     </div>
+
+
   </div>
 </template>
 
@@ -78,6 +80,7 @@ export default class TypeWell extends Vue {
     this.nextRomanList = [];
     this.prevNextRomanList = {};
     this.missCount = 0;
+    this.typingGame = undefined;
   }
 
   public gameStart() {
@@ -118,6 +121,9 @@ export default class TypeWell extends Vue {
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped lang="scss">
+#type-well{
+
+}
 h3 {
   margin: 40px 0 0;
 }
@@ -135,7 +141,6 @@ a {
 
 $text-font-size: 18px;
 $roman-font-size: 20px;
-$roman-frame-width: $roman-font-size / 2 * 50 + 20;
 
 .header {
   display: flex; /* 子要素をflexboxで揃える */
@@ -202,10 +207,11 @@ $roman-frame-width: $roman-font-size / 2 * 50 + 20;
   margin-bottom: 10px;
   margin-left: auto;
 
-  width: $roman-frame-width; /* 見た目用 */
+  width: 600px; /* 見た目用 */
   height: 200px; /* 見た目用 */
   border: 1px solid; /* 見た目用 */;
   font-size: $roman-font-size;
+  font-family: 'Consolas',sans-serif;
 }
 .romanLine {
   margin-top: 2px;

@@ -27,8 +27,8 @@ class ChunkPattern {
     ['え', [['e']]],
     ['お', [['o']]],
     ['うぁ', [['wha']]],
-    ['うぃ', [['whi'], ['wi']]],
-    ['うぇ', [['whe'], ['we']]],
+    ['うぃ', [['wi'], ['whi']]],
+    ['うぇ', [['we'], ['whe']]],
     ['うぉ', [['who']]],
     ['ゐ', [['wi']]],
     ['ゑ', [['we']]],
@@ -51,11 +51,11 @@ class ChunkPattern {
     ['くゃ', [['qya']]],
     ['くゅ', [['qyu']]],
     ['くょ', [['qyo']]],
-    ['くぁ', [['qwa'], ['qa'], ['kwa']]],
-    ['くぃ', [['qwi'], ['qi'], ['qyi']]],
+    ['くぁ', [['qa'], ['qwa'], ['kwa']]],
+    ['くぃ', [['qi'], ['qwi'], ['qyi']]],
     ['くぅ', [['qwu']]],
-    ['くぇ', [['qwe'], ['qe'], ['qye']]],
-    ['くぉ', [['qwo'], ['qo']]],
+    ['くぇ', [['qe'], ['qwe'], ['qye']]],
+    ['くぉ', [['qo'], ['qwo']]],
     ['が', [['ga']]],
     ['ぎ', [['gi']]],
     ['ぐ', [['gu']]],
@@ -93,11 +93,11 @@ class ChunkPattern {
     ['ず', [['zu']]],
     ['ぜ', [['ze']]],
     ['ぞ', [['zo']]],
-    ['じゃ', [['zya'], ['ja'], ['jya']]],
+    ['じゃ', [['ja'], ['zya'], ['jya']]],
     ['じぃ', [['zyi'], ['jyi']]],
-    ['じゅ', [['zyu'], ['ju'], ['jyu']]],
-    ['じぇ', [['zye'], ['je'], ['jye']]],
-    ['じょ', [['zyo'], ['jo'], ['jyo']]],
+    ['じゅ', [['ju'], ['zyu'], ['jyu']]],
+    ['じぇ', [['je'], ['zye'], ['jye']]],
+    ['じょ', [['jo'], ['zyo'], ['jyo']]],
     ['た', [['ta']]],
     ['ち', [['ti'], ['chi']]],
     ['つ', [['tu'], ['tsu']]],
@@ -163,11 +163,11 @@ class ChunkPattern {
     ['ひゅ', [['hyu']]],
     ['ひぇ', [['hye']]],
     ['ひょ', [['hyo']]],
-    ['ふぁ', [['fwa'], ['fa']]],
-    ['ふぃ', [['fwi'], ['fi'], ['fyi']]],
+    ['ふぁ', [['fa'], ['fwa']]],
+    ['ふぃ', [['fi'], ['fwi'], ['fyi']]],
     ['ふぅ', [['fwu']]],
-    ['ふぇ', [['fwe'], ['fe'], ['fye']]],
-    ['ふぉ', [['fwo'], ['fo']]],
+    ['ふぇ', [['fe'], ['fwe'], ['fye']]],
+    ['ふぉ', [['fo'], ['fwo']]],
     ['ふゃ', [['fya']]],
     ['ふゅ', [['fyu']]],
     ['ふょ', [['fyo']]],
@@ -378,6 +378,12 @@ class TypePatternList {
   private _displayPatternNum = 0;
   private _typePatternList: Array<TypePattern>;
   private _isChunkFinished: boolean = false;
+  /**
+   * 最初のTypePatternから増えたローマ字の数
+   *
+   * ex) ssa -> xtusa ならば _additionalRomanCount = 2
+   */
+  private _additionalRomanCount: number = 0;
 
   public constructor(romanLists: Array<Array<string>>) {
     this._typePatternList = romanLists.map(romanList => new TypePattern(romanList));
@@ -398,6 +404,7 @@ class TypePatternList {
     if (!this.isCorrectInput(inputChar)) {
       return false;
     }
+    const prevDisplayRoman = this.displayRoman;
     // 正しい入力の場合
     for (const typePattern of this._typePatternList) {
       if (!typePattern.isValid) continue;
@@ -425,6 +432,8 @@ class TypePatternList {
         }
       }
     }
+    const curDisplayRoman = this.displayRoman;
+    this._additionalRomanCount += curDisplayRoman.length - prevDisplayRoman.length;
     return true;
   }
   public get displayRoman(): string {
@@ -439,6 +448,9 @@ class TypePatternList {
   public get isChunkFinished(): boolean {
     return this._isChunkFinished;
   }
+  public get additionalRomanCount(): number {
+    return this._additionalRomanCount;
+  }
 }
 
 class Chunk {
@@ -452,6 +464,7 @@ class Chunk {
 
   private readonly _vowels: Array<string> = ['a', 'i', 'u', 'e', 'o', 'n'];
 
+  /** かなをチャンクに分割し、打鍵パターンを準備する */
   public constructor(kana: string) {
     this._kana = kana;
 
@@ -545,6 +558,9 @@ class Chunk {
   public get nextRoman(): string {
     return this._nextRoman;
   }
+  public get additionalRomanCount(): number {
+    return this._typePatternList.additionalRomanCount;
+  }
 }
 
 export default class TypingGame {
@@ -556,14 +572,17 @@ export default class TypingGame {
   private _kana: string = "";
   private _kanaCount: number = 0;
 
-  private _chunkList: Array<Chunk>;
+  private _chunkList: Chunk[];
   public _chunkCount: number = 0;
 
   private _prevRoman: string = "";
   private _nextRoman: string = "";
 
+  private _typeCount: number = 0;
   private _missCount: number = 0;
   private _isFinished: boolean = false;
+
+  private _additionalRomanCountSum: number = 0;
 
   /** text1行あたりの文字数 */
   private readonly _textLineLength: number = 43;
@@ -572,8 +591,21 @@ export default class TypingGame {
   /** romanの行数 */
   private readonly _romanLineNum: number = 8;
 
-  constructor() {
-    for (let romanCount: number = 0; romanCount < this._romanLength;) {
+
+  public constructor() {
+    this._generateWords();
+
+    // ローマ字の準備
+    this._chunkList = devideIntoChunk(this._kana);
+    for (const chunk of this._chunkList) {
+      this._prevRoman += chunk.prevRoman;
+      this._nextRoman += chunk.nextRoman;
+    }
+  }
+
+  private _generateWords() {
+    // ローマ字が400字ジャストのときは、もう1単語追加する
+    for (let romanCount: number = 0; romanCount <= this._romanLength;) {
       const word = TypingWords.getWord();
       const text: string = word.text + "　";
       const kanaList: Array<string> = word.kana.concat(["　"]);
@@ -586,20 +618,19 @@ export default class TypingGame {
 
       this._text += text;
       this._kana += kanaStr;
-    }
 
-    // ローマ字の準備
-    this._chunkList = devideIntoChunk(this._kana);
-    for (const chunk of this._chunkList) {
-      this._prevRoman += chunk.prevRoman;
-      this._nextRoman += chunk.nextRoman;
+      window.console.log(romanCount);
     }
   }
 
   public update(inputChar: string) {
     const result = this._chunkList[this._chunkCount].update(inputChar);
     if (result) { // 正しい入力の場合
-
+      ++this._typeCount;
+      // 終了判定
+      if (this._typeCount >= this._romanLength + this._additionalRomanCountSum) {
+        this._isFinished = true;
+      }
     }
     else { // 入力が正しくない場合
       ++this._missCount;
@@ -614,9 +645,12 @@ export default class TypingGame {
     if (this._chunkList[this._chunkCount].isChunkFinished) {
       ++this._chunkCount;
       if (this._chunkCount >= this._chunkList.length) {
+        // TODO:消す
         this._isFinished = true;
       }
     }
+
+    this._additionalRomanCountSum = this._chunkList.reduce((acc, cur) => acc += cur.additionalRomanCount, 0);
   }
 
   public isFinished(): boolean {
@@ -675,39 +709,48 @@ export default class TypingGame {
   }
   public get prevNextTextList() {
     let ret: Array<{}> = [];
+    const prevTextList = this.prevTextList;
+    const nextTextList = this.nextTextList;
     for (let i = 0; i < 8; ++i) {
       ret.push({
-        "prev": this.prevTextList[i],
-        "next": this.nextTextList[i],
+        "prev": prevTextList[i],
+        "next": nextTextList[i],
         "key": `prevNextTextList${i}`
       });
     }
     return ret;
   }
-  public get prevRomanList(): Array<string> {
-    let ret: Array<string> = [];
+  public get prevRomanList(): string[] {
+    let ret: string[] = [];
     for (let i = 0; i < this._romanLineNum; ++i) {
-      if (this._prevRoman.length >= (i + 1) * this._romanLineLength) {
-        ret.push(this._prevRoman.substr(i * this._romanLineLength, this._romanLineLength));
+      const lineBeginIndex: number = i * this._romanLineLength + this._additionalRomanCountSum;
+      // 入力済みの行
+      if (this._prevRoman.length >= lineBeginIndex + this._romanLineLength) {
+        ret.push(this._prevRoman.substr(lineBeginIndex, this._romanLineLength));
       }
-      else if (this._prevRoman.length >= i * this._romanLineLength) {
-        ret.push(this._prevRoman.substr(i * this._romanLineLength));
+      // 入力中の行
+      else if (this._prevRoman.length >= lineBeginIndex) {
+        ret.push(this._prevRoman.substr(lineBeginIndex));
       }
+      // 未入力の行
       else {
-        ret.push('');
+        ret.push("");
       }
     }
     return ret;
   }
-  public get nextRomanList(): Array<string> {
-    let ret: Array<string> = [];
+  public get nextRomanList(): string[] {
+    let ret: string[] = [];
     let tmp: number = 0;
     for (let i = 0; i < this._romanLineNum; ++i) {
-      if (this._prevRoman.length >= (i + 1) * this._romanLineLength) {
+      const lineBeginIndex: number = i * this._romanLineLength + this._additionalRomanCountSum;
+      // 入力済みの行
+      if (this._prevRoman.length >= lineBeginIndex + this._romanLineLength) {
         ret.push("");
       }
-      else if (this._prevRoman.length >= i * this._romanLineLength) {
-        tmp = (i + 1) * this._romanLineLength - this._prevRoman.length;
+      // 入力中の行
+      else if (this._prevRoman.length >= lineBeginIndex) {
+        tmp = lineBeginIndex + this._romanLineLength - this._prevRoman.length;
         ret.push(this._nextRoman.substr(0, tmp));
       }
       else {
@@ -729,11 +772,13 @@ export default class TypingGame {
     return ret;
   }
   public get prevNextRomanList() {
-    let ret: Array<{}> = [];
+    let ret: {}[] = [];
+    const prevRomanList: string[] = this.prevRomanList;
+    const nextRomanList: string[] = this.nextRomanList;
     for (let i = 0; i < this._romanLineNum; ++i) {
       ret.push({
-        "prev": this.prevRomanList[i],
-        "next": this.nextRomanList[i],
+        "prev": prevRomanList[i],
+        "next": nextRomanList[i],
         "key": `prevNextRomanList${i}`
       });
     }
