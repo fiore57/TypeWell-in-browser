@@ -549,6 +549,9 @@ class Chunk {
   public get isChunkFinished(): boolean {
     return this._typePatternList.isChunkFinished;
   }
+  public get kana(): string {
+    return this._kana;
+  }
   public get roman(): string {
     return this._roman;
   }
@@ -566,9 +569,9 @@ class Chunk {
 export default class TypingGame {
   /** 漢字かな交じり */
   private _text: string = "";
-  private _prevTextList: Array<string> = [];
+  private _prevTextList: string[] = [];
 
-  private _kanaList: Array<string> = [];
+  private _kanaList: string[] = [];
   private _kana: string = "";
   private _kanaCount: number = 0;
 
@@ -583,6 +586,8 @@ export default class TypingGame {
   private _isFinished: boolean = false;
 
   private _additionalRomanCountSum: number = 0;
+  /** 無効なtextは _text.substr(index) */
+  private _invalidTextIndex: number = 0;
 
   /** text1行あたりの文字数 */
   private readonly _textLineLength: number = 43;
@@ -600,6 +605,34 @@ export default class TypingGame {
     for (const chunk of this._chunkList) {
       this._prevRoman += chunk.prevRoman;
       this._nextRoman += chunk.nextRoman;
+    }
+
+    // 入力の必要がないtextのindexを求める
+    let invalidTextKanaIndex: number = 0;
+    {
+      let romanCount: number = 0;
+      let kanaCount: number = 0;
+      for (const chunk of this._chunkList) {
+        if (romanCount >= 400) {
+          invalidTextKanaIndex = kanaCount;
+          break;
+        }
+        romanCount += chunk.roman.length;
+        kanaCount += chunk.kana.length;
+      }
+    }
+
+    {
+      let kanaCount: number = 0;
+      let textCount: number = 0;
+      for (const kana of this._kanaList) {
+        kanaCount += kana.length;
+        if (kanaCount >= invalidTextKanaIndex) {
+          this._invalidTextIndex = textCount;
+          break;
+        }
+        ++textCount;
+      }
     }
   }
 
@@ -672,49 +705,70 @@ export default class TypingGame {
   public get missCount(): number {
     return this._missCount;
   }
-  public get prevTextList(): Array<string> {
-    let ret: Array<string> = [];
+  /** 入力済みのテキスト */
+  public get prevTextList(): string[] {
+    let ret: string[] = [];
     for (let i = 0, kanaCount = 0; i < this._text.length; ++i) {
       kanaCount += this._kanaList[i].length;
+      // this._textLineLength文字ごとに改行
+      if (i % this._textLineLength === 0) {
+        ret.push("");
+      } // fall through
       if (kanaCount <= this._kanaCount) {
-        if (ret.length === 0 || ret[ret.length - 1].length >= this._textLineLength) {
-          ret.push(this._text[i]);
-        }
-        else {
-          ret[ret.length - 1] += this._text[i];
-        }
+        ret[ret.length - 1] += this._text[i];
       }
     }
     this._prevTextList = ret;
     return ret;
   }
-  public get nextTextList(): Array<string> {
-    let ret: Array<string> = [];
+  public get nextTextList(): string[] {
+    let ret: string[] = [];
     const prevTextLength = this._prevTextList.join("").length;
+    for (let i = 0; i < this._text.length; ++i) {
+      // this._textLineLength文字ごとに改行
+      if (i % this._textLineLength === 0) {
+        ret.push("");
+      } // fall through
+      if (i >= prevTextLength && i <= this._invalidTextIndex) {
+        ret[ret.length - 1] += this._text[i];
+      }
+    }
+
+    return ret;
+  }
+  public get invalidTextList(): string[] {
+    let ret: string[] = [];
     for (let i = 0; i < this._text.length; ++i) {
       if (i % this._textLineLength === 0) {
         ret.push("");
       }
-      if (i >= prevTextLength) {
+      if (i > this._invalidTextIndex) {
         ret[ret.length - 1] += this._text[i];
       }
     }
+
     // 最後を空白で埋める
-    const prevTextLastLine: string | undefined = this._prevTextList[ret.length - 1];
-    const prevTextLastLineLength: number = (prevTextLastLine === undefined ? 0 : this._prevTextList[ret.length - 1].length);
-    while ((prevTextLastLineLength + ret[ret.length - 1].length) % this._textLineLength !== 0) {
+    const prevTextList = this.prevTextList;
+    const prevTextLastLine: string | undefined = prevTextList[ret.length - 1];
+    const prevTextLastLineLength: number = (prevTextLastLine === undefined ? 0 : prevTextList[ret.length - 1].length);
+    const nextTextList = this.nextTextList;
+    const nextTextLastLine: string | undefined = nextTextList[ret.length - 1];
+    const nextTextLastLineLength: number = (nextTextLastLine === undefined ? 0 : nextTextList[ret.length - 1].length);
+    while ((prevTextLastLineLength + nextTextLastLineLength + ret[ret.length - 1].length) % this._textLineLength !== 0) {
       ret[ret.length - 1] += "　";
     }
     return ret;
   }
-  public get prevNextTextList() {
-    let ret: Array<{}> = [];
-    const prevTextList = this.prevTextList;
-    const nextTextList = this.nextTextList;
+  public get textDataList() {
+    let ret: {}[] = [];
+    const prevTextList: string[] = this.prevTextList;
+    const nextTextList: string[] = this.nextTextList;
+    const invalidTextList: string[] = this.invalidTextList;
     for (let i = 0; i < 8; ++i) {
       ret.push({
         "prev": prevTextList[i],
         "next": nextTextList[i],
+        "invalid": invalidTextList[i],
         "key": `prevNextTextList${i}`
       });
     }

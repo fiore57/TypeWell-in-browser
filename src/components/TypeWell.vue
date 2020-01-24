@@ -9,9 +9,10 @@
     </div>
 
     <div class="text">
-      <div class="textLine" v-for="text in prevNextTextList" :key="text.key">
+      <div class="textLine" v-for="text in textDataList" :key="text.key">
         <div class="prevText">{{ text.prev }}</div>
         <div class="nextText">{{ text.next }}</div>
+        <div class="invalid-text">{{ text.invalid }}</div>
       </div>
     </div>
 
@@ -54,7 +55,7 @@ export default class TypeWell extends Vue {
   public prevRoman: string = "";
   public nextRoman: string = "";
   public missCount: number = 0;
-  public prevNextTextList: {} = {};
+  public textDataList: {} = {};
   public prevRomanList: Array<string> = [];
   public nextRomanList: Array<string> = [];
   public prevNextRomanList: {} = {};
@@ -62,7 +63,7 @@ export default class TypeWell extends Vue {
   private updateVariables() {
     if(this.typingGame === undefined)return;
     this.text = this.typingGame.text;
-    this.prevNextTextList = this.typingGame.prevNextTextList;
+    this.textDataList = this.typingGame.textDataList;
     this.prevRoman = this.typingGame.prevRoman;
     this.nextRoman = this.typingGame.nextRoman;
     this.prevRomanList = this.typingGame.prevRomanList;
@@ -73,7 +74,7 @@ export default class TypeWell extends Vue {
 
   private resetVariables() {
     this.text = "";
-    this.prevNextTextList = {};
+    this.textDataList = {};
     this.prevRoman = "";
     this.nextRoman = "";
     this.prevRomanList = [];
@@ -195,6 +196,10 @@ $roman-font-size: 20px;
 .nextText {
   word-break: break-all;
   color: #000000;
+}
+.invalid-text {
+  word-break: break-all;
+  color: #CCCCCC;
   margin-right: auto;
 }
 .missCount {
