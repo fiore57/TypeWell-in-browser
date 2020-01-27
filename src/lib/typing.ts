@@ -678,10 +678,6 @@ export default class TypingGame {
     this._kanaCount = this._chunkList.reduce((acc, cur) => acc + cur.kanaCount, 0);
     if (this._chunkList[this._chunkCount].isChunkFinished) {
       ++this._chunkCount;
-      if (this._chunkCount >= this._chunkList.length) {
-        // TODO:消す
-        this._isFinished = true;
-      }
     }
 
     this._additionalRomanCountSum = this._chunkList.reduce((acc, cur) => acc += cur.additionalRomanCount, 0);
@@ -765,6 +761,9 @@ export default class TypingGame {
     const prevTextList: string[] = this.prevTextList;
     const nextTextList: string[] = this.nextTextList;
     const invalidTextList: string[] = this.invalidTextList;
+    window.console.log(prevTextList);
+    window.console.log(nextTextList);
+    window.console.log(invalidTextList);
     for (let i = 0; i < 8; ++i) {
       ret.push({
         "prev": prevTextList[i],
@@ -775,64 +774,41 @@ export default class TypingGame {
     }
     return ret;
   }
-  public get prevRomanList(): string[] {
-    let ret: string[] = [];
-    for (let i = 0; i < this._romanLineNum; ++i) {
-      const lineBeginIndex: number = i * this._romanLineLength + this._additionalRomanCountSum;
-      // 入力済みの行
-      if (this._prevRoman.length >= lineBeginIndex + this._romanLineLength) {
-        ret.push(this._prevRoman.substr(lineBeginIndex, this._romanLineLength));
+  /** 入力済み・入力中・未入力のローマ字に関するデータ */
+  public get romanDataList() {
+    const roman = this._prevRoman + this.nextRoman;
+    let prevRomanList: string[] = [];
+    let curRomanList: string[] = [];
+    let nextRomanList: string[] = [];
+    for (let i = this._additionalRomanCountSum; i < this.romanLength + this._additionalRomanCountSum; ++i) {
+      if ((i - this._additionalRomanCountSum) % this._romanLineLength === 0) {
+        prevRomanList.push("");
+        curRomanList.push("");
+        nextRomanList.push("");
       }
-      // 入力中の行
-      else if (this._prevRoman.length >= lineBeginIndex) {
-        ret.push(this._prevRoman.substr(lineBeginIndex));
+
+      let c: string = roman[i];
+      if (i < this._prevRoman.length) {
+        if (c === " ") c = "_";
+        prevRomanList[prevRomanList.length - 1] += c;
       }
-      // 未入力の行
+      else if (i === this._prevRoman.length) {
+        if (c === " ") c = "_";
+        curRomanList[curRomanList.length - 1] += c;
+      }
       else {
-        ret.push("");
+        nextRomanList[nextRomanList.length - 1] += c;
       }
     }
-    return ret;
-  }
-  public get nextRomanList(): string[] {
-    let ret: string[] = [];
-    let tmp: number = 0;
-    for (let i = 0; i < this._romanLineNum; ++i) {
-      const lineBeginIndex: number = i * this._romanLineLength + this._additionalRomanCountSum;
-      // 入力済みの行
-      if (this._prevRoman.length >= lineBeginIndex + this._romanLineLength) {
-        ret.push("");
-      }
-      // 入力中の行
-      else if (this._prevRoman.length >= lineBeginIndex) {
-        tmp = lineBeginIndex + this._romanLineLength - this._prevRoman.length;
-        ret.push(this._nextRoman.substr(0, tmp));
-      }
-      else {
-        ret.push(this._nextRoman.substr(tmp, this._romanLineLength));
-        tmp += 50;
-      }
-      /*
-      if (this._nextRoman.length >= (i + 1) * 50) {
-        ret.push(this._nextRoman.substr(i * 50, 50));
-      }
-      else if (this._nextRoman.length >= i * 50) {
-        ret.push(this._nextRoman.substr(i * 50));
-      }
-      else {
-        ret.push('');
-      }
-      */
-    }
-    return ret;
-  }
-  public get prevNextRomanList() {
+
     let ret: {}[] = [];
-    const prevRomanList: string[] = this.prevRomanList;
-    const nextRomanList: string[] = this.nextRomanList;
     for (let i = 0; i < this._romanLineNum; ++i) {
+      window.console.log(prevRomanList[i]);
+      window.console.log(curRomanList[i]);
+      window.console.log(nextRomanList[i]);
       ret.push({
         "prev": prevRomanList[i],
+        "cur": curRomanList[i],
         "next": nextRomanList[i],
         "key": `prevNextRomanList${i}`
       });

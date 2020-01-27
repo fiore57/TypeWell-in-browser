@@ -31,10 +31,7 @@
 import { Component, Prop, Vue } from 'vue-property-decorator';
 
 @Component
-export default class Help extends Vue {
-  public thanks: string = "タイプウェルという素晴らしいソフトを開発してくださったGANGAS氏に深くお礼申し上げます。\n ※このアプリに関する問い合わせは、GANGAS氏ではなく、私(fiore)までお願いします。"
-
-}
+export default class Help extends Vue {}
 </script>
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->

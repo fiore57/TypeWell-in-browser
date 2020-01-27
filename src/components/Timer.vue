@@ -42,6 +42,7 @@ export default class Timer extends Vue {
     this.m_isFinished = newValue;
     // false -> true（終了）
     if(newValue === true && oldValue === false){
+      window.console.log(this.m_elapsedTimeMs);
       this.emitTime(this.m_elapsedTimeMs);
       if(!this.isValid){
         // reset
@@ -51,9 +52,7 @@ export default class Timer extends Vue {
   }
 
   @Emit()
-  public emitTime(timeMs: number){
-    window.console.log("Emit Time");
-  }
+  public emitTime(timeMs: number){}
 
   private startRAFLoop() {
     window.requestAnimationFrame(this.calcTime);

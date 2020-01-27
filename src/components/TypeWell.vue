@@ -22,21 +22,25 @@
     </div>
 
     <div class="roman">
-      <div class="roman-line" v-for="roman in prevNextRomanList" :key="roman.key">
+      <div class="roman-line" v-for="roman in romanDataList" :key="roman.key">
         <div class="prev-roman">{{ roman.prev }}</div>
+        <div class="cur-roman">{{ roman.cur }}</div>
         <div class="next-roman">{{ roman.next }}</div>
       </div>
     </div>
 
-    <!--<div class="result" v-if="isFinished">-->
-    <div class="result">
+    <div class="result" v-if="isFinished">
       <h3>結果</h3>
-      <p>Time: {{ time }}</p>
+      <p>Time: {{ time }} 秒</p>
       <p>Level: {{ level }}</p>
       <p>Miss: {{ missCount }}</p>
 
-      <p>{{ tpm }} 打鍵/分</p>
-      <p>{{ tps }} 打鍵/秒</p>
+      <div class="inline-block-list">
+        <ul>
+          <li>{{ tpm }} 打/分</li>
+          <li>{{ tps }} 打/秒</li>
+        </ul>
+      </div>
     </div>
 
 
@@ -48,8 +52,9 @@ import { Component, Prop, Vue } from 'vue-property-decorator';
 import TypingGame from '@/lib/typing';
 import EnterButton from './EnterButton.vue';
 import Timer from './Timer.vue';
+import { getLevelStr } from '@/lib/typeWell';
 
-enum Status {
+const enum Status {
   Ready, Game, Result
 }
 
@@ -95,6 +100,9 @@ export default class TypeWell extends Vue {
     this.timeMs = timeMs;
   }
 
+  public get isReady(): boolean{
+    return this.m_status === Status.Ready;
+  }
   public get inGame(): boolean {
     return this.m_status === Status.Game;
   }
@@ -103,21 +111,20 @@ export default class TypeWell extends Vue {
   }
 
   public get text(): string {
-    return this.inGame ? this.m_typingGame.text : "";
+    return this.isReady ? "" : this.m_typingGame.text;
   }
   public get textDataList(): {} {
-    return this.inGame ? this.m_typingGame.textDataList : {};
+    return this.isReady ? {} : this.m_typingGame.textDataList;
   }
-  public get prevNextRomanList(): {} {
-    return this.inGame ? this.m_typingGame.prevNextRomanList : {};
+  public get romanDataList(): {} {
+    return this.isReady ? {} : this.m_typingGame.romanDataList;
   }
   public get missCount(): number {
-    window.console.log("missCount");
     return this.m_typingGame.missCount;
   }
 
   public get time(): string {
-    return (Math.floor(this.timeMs / 100) / 10).toFixed(1);
+    return (this.timeMs / 1000).toFixed(3);
   }
   public get tpm(): string {
     return this.m_tpm.toFixed(2);
@@ -133,7 +140,7 @@ export default class TypeWell extends Vue {
   }
 
   public get level(): string {
-    return "-";
+    return getLevelStr(this.timeMs);
   }
 
   beforeMount() {
@@ -254,13 +261,33 @@ $roman-font-size: 20px;
   justify-content: flex-start; /* 子要素をflexboxにより左に配置する */
   align-items: center;  /* 子要素をflexboxにより中央に配置する */
   white-space: pre;
+  word-break: break-all;
 }
 .prev-roman {
-  word-break: break-all;
   color: #CCCCCC;
 }
+.cur-roman{
+  color: #FF0000;
+}
 .next-roman {
-  word-break: break-all;
   color: #000000;
+}
+.inline-block-list {
+  li {
+    display: inline-block;
+    margin: 0 10px;
+  }
+}
+.result {
+  h3{
+    font-size: 20px;
+    margin-top: 10px;
+  }
+  font-size: 20px;
+
+  padding: 0.5em 1em;
+  margin: 2em auto;
+  border: double 5px #4689FF;
+  width: 300px;
 }
 </style>
