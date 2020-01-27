@@ -497,15 +497,15 @@ class Chunk {
       }
       else if (kana[0] === 'ん') { // チャンクの1文字目が「ん」
         // 「ん」を除いた場合のパターン
-        const curPatterns: Array<Array<string>> = ChunkPattern.list.get(kana.substr(1))!;
+        const curPatterns: string[][] = ChunkPattern.list.get(kana.substr(1))!;
 
-        let newPatterns: Array<Array<string>> = [];
+        let newPatterns: string[][] = [];
 
-        const xnPatterns: Array<Array<string>> = ChunkPattern.list.get('ん')!;
+        const xnPatterns: string[][] = ChunkPattern.list.get('ん')!;
         // 「n」をつける場合
         for (const roman of curPatterns) {
           for (const xn of xnPatterns) {
-            if (xn !== ['n']) {
+            if (xn[0] !== "n") {
               newPatterns.push(xn.concat(roman));
             }
             else {
