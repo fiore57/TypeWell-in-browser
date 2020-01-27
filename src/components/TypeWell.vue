@@ -2,39 +2,41 @@
   <div id="type-well">
     <h2>{{ title }}</h2>
     <p>{{ description }}</p>
+
     <div class="header">
-      <EnterButton @click="gameStart" text="READY" :isValid="!inGame"/>
-      <h3 class="gameMode">{{ gameMode }}</h3>
-      <Timer :isValid="inGame" :isFinished="isFinished" @emit-time="calcTime"/>
+      <EnterButton @click="gameStart" text="READY" :isValid="!(inGame || isFinished)"/>
+      <h3 class="game-mode">{{ gameMode }}</h3>
+      <Timer :isValid="inGame" :isFinished="isFinished" @emit-time="setTime"/>
     </div>
 
     <div class="text">
-      <div class="textLine" v-for="text in textDataList" :key="text.key">
-        <div class="prevText">{{ text.prev }}</div>
-        <div class="nextText">{{ text.next }}</div>
+      <div class="text-line" v-for="text in textDataList" :key="text.key">
+        <div class="prev-text">{{ text.prev }}</div>
+        <div class="next-text">{{ text.next }}</div>
         <div class="invalid-text">{{ text.invalid }}</div>
       </div>
     </div>
 
-    <div class="missCount">
+    <div class="miss-count">
       <p>Miss: {{ missCount }}</p>
     </div>
 
     <div class="roman">
-      <div class="romanLine" v-for="roman in prevNextRomanList" :key="roman.key">
-        <div class="prevRoman">{{ roman.prev }}</div>
-        <div class="nextRoman">{{ roman.next }}</div>
+      <div class="roman-line" v-for="roman in prevNextRomanList" :key="roman.key">
+        <div class="prev-roman">{{ roman.prev }}</div>
+        <div class="next-roman">{{ roman.next }}</div>
       </div>
     </div>
 
-  <!--<div class="result" v-if="isFinished">-->
-  <div class="result">
+    <!--<div class="result" v-if="isFinished">-->
+    <div class="result">
       <h3>結果</h3>
-      <p>{{ time }}</p>
-      <p>{{ level }}</p>
-      <p>{{ missCount }}</p>
-      <p>{{ tps }}</p>
-      <p>{{ tpm }}</p>
+      <p>Time: {{ time }}</p>
+      <p>Level: {{ level }}</p>
+      <p>Miss: {{ missCount }}</p>
+
+      <p>{{ tpm }} 打鍵/分</p>
+      <p>{{ tps }} 打鍵/秒</p>
     </div>
 
 
@@ -47,6 +49,10 @@ import TypingGame from '@/lib/typing';
 import EnterButton from './EnterButton.vue';
 import Timer from './Timer.vue';
 
+enum Status {
+  Ready, Game, Result
+}
+
 @Component({
   components: {
     EnterButton,
@@ -58,97 +64,84 @@ export default class TypeWell extends Vue {
   public readonly title: string = "ブラウザ版 タイプウェル国語R";
   public readonly description: string = "※このアプリは非公式です"
   public readonly gameMode: string = "基本常用語";
-  public inGame: boolean = false;
-  public isFinished: boolean = false;
-  public typingGame?: TypingGame;
 
-  public text: string = "";
-  public prevRoman: string = "";
-  public nextRoman: string = "";
-  public missCount: number = 0;
-  public textDataList: {} = {};
-  public prevRomanList: Array<string> = [];
-  public nextRomanList: Array<string> = [];
-  public prevNextRomanList: {} = {};
+  private m_status: Status = Status.Ready;
+  private m_typingGame: TypingGame = new TypingGame();
 
-  public time: number = 0;
-
-  private updateVariables() {
-    if(this.typingGame === undefined)return;
-    this.text = this.typingGame.text;
-    this.textDataList = this.typingGame.textDataList;
-    this.prevRoman = this.typingGame.prevRoman;
-    this.nextRoman = this.typingGame.nextRoman;
-    this.prevRomanList = this.typingGame.prevRomanList;
-    this.nextRomanList = this.typingGame.nextRomanList;
-    this.prevNextRomanList = this.typingGame.prevNextRomanList;
-    this.missCount = this.typingGame.missCount;
-  }
-
-  private resetVariables() {
-    this.text = "";
-    this.textDataList = {};
-    this.prevRoman = "";
-    this.nextRoman = "";
-    this.prevRomanList = [];
-    this.nextRomanList = [];
-    this.prevNextRomanList = {};
-    this.missCount = 0;
-    this.typingGame = undefined;
-  }
+  public timeMs: number = 0;
 
   public gameStart() {
     window.console.log("Game Start");
-    this.inGame = true;
-    this.isFinished = false;
-    this.typingGame = new TypingGame();
-    this.updateVariables();
+    this.m_status = Status.Game;
+    this.m_typingGame = new TypingGame();
   }
 
   public keyInput(event: KeyboardEvent) {
     // Escapeで中断
     if(event.key === "Escape"){
-      this.inGame = false;
-      this.isFinished = false;
-      this.resetVariables();
+      this.m_status = Status.Ready;
       return;
     }
-    if(this.typingGame === undefined) return;
-    this.typingGame.update(event.key);
-    this.updateVariables();
-    if(this.typingGame.isFinished()){
-      this.inGame = false;
-      this.isFinished = true;
-      this.typingGame = undefined;
-      //this.prevRoman = "";
-      //this.nextRoman = "";
+    if(!this.inGame) return;
+    this.m_typingGame.update(event.key);
+
+    // 終了時の処理
+    if(this.m_typingGame.isFinished()){
+      this.m_status = Status.Result;
     }
   }
 
-  public calcTime(timeMs: number) {
-    window.console.log("calcTime");
-    window.console.log(timeMs);
-    this.time = timeMs;
+  public setTime(timeMs: number) {
+    this.timeMs = timeMs;
+  }
+
+  public get inGame(): boolean {
+    return this.m_status === Status.Game;
+  }
+  public get isFinished(): boolean {
+    return this.m_status === Status.Result;
+  }
+
+  public get text(): string {
+    return this.inGame ? this.m_typingGame.text : "";
+  }
+  public get textDataList(): {} {
+    return this.inGame ? this.m_typingGame.textDataList : {};
+  }
+  public get prevNextRomanList(): {} {
+    return this.inGame ? this.m_typingGame.prevNextRomanList : {};
+  }
+  public get missCount(): number {
+    window.console.log("missCount");
+    return this.m_typingGame.missCount;
+  }
+
+  public get time(): string {
+    return (Math.floor(this.timeMs / 100) / 10).toFixed(1);
+  }
+  public get tpm(): string {
+    return this.m_tpm.toFixed(2);
+  }
+  public get tps(): string {
+    return this.m_tps.toFixed(3);
+  }
+  private get m_tpm(): number {
+    return this.m_tps * 60;
+  }
+  private get m_tps(): number {
+    return this.timeMs === 0 ? 0 : this.m_typingGame.romanLength / this.timeMs * 1000;
   }
 
   public get level(): string {
     return "-";
   }
-  public get tps(): number {
-    return 0;
-  }
-  public get tpm(): number {
-    return 0;
-  }
 
   beforeMount() {
     window.addEventListener('keydown', this.keyInput, true);
   }
-
   beforeDestroy() {
     window.removeEventListener('keydown', this.keyInput, true);
   }
-
 }
 </script>
 
@@ -190,7 +183,7 @@ $roman-font-size: 20px;
   margin-bottom: 10px;
   margin-left: 20px;
 }
-.gameMode {
+.game-mode {
   margin-top: 10px;
   margin-left: 50px;
   margin-right: 50px;
@@ -210,7 +203,7 @@ $roman-font-size: 20px;
   border: 1px solid; /* 見た目用 */;
   font-size: $text-font-size;
 }
-.textLine {
+.text-line {
   margin-top: 1px;
   margin-bottom: 1px;
 
@@ -220,12 +213,12 @@ $roman-font-size: 20px;
   align-items: center;  /* 子要素をflexboxにより中央に配置する */
   white-space: pre;
 }
-.prevText {
+.prev-text {
   word-break: break-all;
   color: #CCCCCC;
   margin-left: auto;
 }
-.nextText {
+.next-text {
   word-break: break-all;
   color: #000000;
 }
@@ -234,7 +227,7 @@ $roman-font-size: 20px;
   color: #CCCCCC;
   margin-right: auto;
 }
-.missCount {
+.miss-count {
   margin-top: 10px;
   margin-bottom: 10px;
 }
@@ -250,7 +243,7 @@ $roman-font-size: 20px;
   font-size: $roman-font-size;
   font-family: 'Consolas',sans-serif;
 }
-.romanLine {
+.roman-line {
   margin-top: 2px;
   margin-right: 10px;
   margin-bottom: 2px;
@@ -262,11 +255,11 @@ $roman-font-size: 20px;
   align-items: center;  /* 子要素をflexboxにより中央に配置する */
   white-space: pre;
 }
-.prevRoman {
+.prev-roman {
   word-break: break-all;
   color: #CCCCCC;
 }
-.nextRoman {
+.next-roman {
   word-break: break-all;
   color: #000000;
 }

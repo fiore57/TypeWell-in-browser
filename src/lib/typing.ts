@@ -639,7 +639,7 @@ export default class TypingGame {
 
   private _generateWords() {
     // ローマ字が400字ジャストのときは、もう1単語追加する
-    for (let romanCount: number = 0; romanCount <= this._romanLength;) {
+    for (let romanCount: number = 0; romanCount <= this.romanLength;) {
       const word = TypingWords.getWord();
       const text: string = word.text + "　";
       const kanaList: Array<string> = word.kana.concat(["　"]);
@@ -662,7 +662,7 @@ export default class TypingGame {
     if (result) { // 正しい入力の場合
       ++this._typeCount;
       // 終了判定
-      if (this._typeCount >= this._romanLength + this._additionalRomanCountSum) {
+      if (this._typeCount >= this.romanLength + this._additionalRomanCountSum) {
         this._isFinished = true;
       }
     }
@@ -691,7 +691,7 @@ export default class TypingGame {
     return this._isFinished;
   }
 
-  private get _romanLength(): number {
+  public get romanLength(): number {
     return this._romanLineLength * this._romanLineNum;
   }
   public get text(): string {
