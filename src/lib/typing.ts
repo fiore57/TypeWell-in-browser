@@ -474,9 +474,9 @@ class Chunk {
     else { // かなが2文字以上の場合
       if (kana[0] === 'っ') { // チャンクの1文字目が「っ」
         // 「っ」を除いた場合のパターン
-        const curPatterns: Array<Array<string>> = ChunkPattern.list.get(kana.substr(1))!;
+        const curPatterns: string[][] = ChunkPattern.list.get(kana.substr(1))!;
 
-        let newPatterns: Array<Array<string>> = [];
+        let newPatterns: string[][] = [];
 
         // 子音の繰り返し
         for (const roman of curPatterns) {
@@ -578,9 +578,6 @@ export default class TypingGame {
   private _chunkList: Chunk[];
   public _chunkCount: number = 0;
 
-  private _prevRoman: string = "";
-  private _nextRoman: string = "";
-
   private _typeCount: number = 0;
   private _missCount: number = 0;
   private _isFinished: boolean = false;
@@ -603,10 +600,6 @@ export default class TypingGame {
 
     // ローマ字の準備
     this._chunkList = devideIntoChunk(this._kana);
-    for (const chunk of this._chunkList) {
-      this._prevRoman += chunk.prevRoman;
-      this._nextRoman += chunk.nextRoman;
-    }
 
     // 入力の必要がないtextのindexを求める
     let invalidTextKanaIndex: number = 0;
@@ -614,7 +607,7 @@ export default class TypingGame {
       let romanCount: number = 0;
       let kanaCount: number = 0;
       for (const chunk of this._chunkList) {
-        if (romanCount >= 400) {
+        if (romanCount >= this.romanLength) {
           invalidTextKanaIndex = kanaCount;
           break;
         }
@@ -669,12 +662,6 @@ export default class TypingGame {
     else { // 入力が正しくない場合
       ++this._missCount;
     }
-    this._prevRoman = "";
-    this._nextRoman = "";
-    for (const chunk of this._chunkList) {
-      this._prevRoman += chunk.prevRoman;
-      this._nextRoman += chunk.nextRoman;
-    }
     this._kanaCount = this._chunkList.reduce((acc, cur) => acc + cur.kanaCount, 0);
     if (this._chunkList[this._chunkCount].isChunkFinished) {
       ++this._chunkCount;
@@ -694,89 +681,81 @@ export default class TypingGame {
     return this._text;
   }
   public get prevRoman(): string {
-    return this._prevRoman;
+    let ret: string = "";
+    for (const chunk of this._chunkList) {
+      ret += chunk.prevRoman;
+    }
+    return ret;
   }
   public get nextRoman(): string {
-    return this._nextRoman;
+    let ret: string = "";
+    for (const chunk of this._chunkList) {
+      ret += chunk.nextRoman;
+    }
+    return ret;
   }
   public get missCount(): number {
     return this._missCount;
   }
-  /** 入力済みのテキスト */
-  public get prevTextList(): string[] {
-    let ret: string[] = [];
+  /** 入力済み・入力中・未入力・範囲外のテキストに関するデータ */
+  public get textDataList() {
+    let prevTextList: string[] = [];
+    let curTextList: string[] = [];
+    let nextTextList: string[] = [];
+    let invalidTextList: string[] = [];
+    let isCurText: boolean = true;
+
     for (let i = 0, kanaCount = 0; i < this._text.length; ++i) {
       kanaCount += this._kanaList[i].length;
       // this._textLineLength文字ごとに改行
       if (i % this._textLineLength === 0) {
-        ret.push("");
-      } // fall through
-      if (kanaCount <= this._kanaCount) {
-        ret[ret.length - 1] += this._text[i];
+        prevTextList.push("");
+        curTextList.push("");
+        nextTextList.push("");
+        invalidTextList.push("");
       }
-    }
-    this._prevTextList = ret;
-    return ret;
-  }
-  public get nextTextList(): string[] {
-    let ret: string[] = [];
-    const prevTextLength = this._prevTextList.join("").length;
-    for (let i = 0; i < this._text.length; ++i) {
-      // this._textLineLength文字ごとに改行
-      if (i % this._textLineLength === 0) {
-        ret.push("");
-      } // fall through
-      if (i >= prevTextLength && i <= this._invalidTextIndex) {
-        ret[ret.length - 1] += this._text[i];
-      }
-    }
 
-    return ret;
-  }
-  public get invalidTextList(): string[] {
-    let ret: string[] = [];
-    for (let i = 0; i < this._text.length; ++i) {
-      if (i % this._textLineLength === 0) {
-        ret.push("");
+      let c: string = this._text[i];
+      if (kanaCount <= this._kanaCount) {
+        if (c === "　") c = "＿";
+        prevTextList[prevTextList.length - 1] += c;
       }
-      if (i > this._invalidTextIndex) {
-        ret[ret.length - 1] += this._text[i];
+      else if (isCurText) {
+        if (c === "　") c = "＿";
+        curTextList[curTextList.length - 1] += c;
+        isCurText = false;
+      }
+      else if (i <= this._invalidTextIndex) {
+        nextTextList[nextTextList.length - 1] += c;
+      }
+      else {
+        invalidTextList[invalidTextList.length - 1] += c;
       }
     }
 
     // 最後を空白で埋める
-    const prevTextList = this.prevTextList;
-    const prevTextLastLine: string | undefined = prevTextList[ret.length - 1];
-    const prevTextLastLineLength: number = (prevTextLastLine === undefined ? 0 : prevTextList[ret.length - 1].length);
-    const nextTextList = this.nextTextList;
-    const nextTextLastLine: string | undefined = nextTextList[ret.length - 1];
-    const nextTextLastLineLength: number = (nextTextLastLine === undefined ? 0 : nextTextList[ret.length - 1].length);
-    while ((prevTextLastLineLength + nextTextLastLineLength + ret[ret.length - 1].length) % this._textLineLength !== 0) {
-      ret[ret.length - 1] += "　";
+    while ((prevTextList.back().length + curTextList.back().length + nextTextList.back().length + invalidTextList.back().length) % this._textLineLength !== 0) {
+      invalidTextList[invalidTextList.length - 1] += "　";
     }
-    return ret;
-  }
-  public get textDataList() {
+
     let ret: {}[] = [];
-    const prevTextList: string[] = this.prevTextList;
-    const nextTextList: string[] = this.nextTextList;
-    const invalidTextList: string[] = this.invalidTextList;
-    window.console.log(prevTextList);
-    window.console.log(nextTextList);
-    window.console.log(invalidTextList);
-    for (let i = 0; i < 8; ++i) {
+    for (let i = 0; i < prevTextList.length; ++i) {
       ret.push({
         "prev": prevTextList[i],
+        "cur": curTextList[i],
         "next": nextTextList[i],
         "invalid": invalidTextList[i],
-        "key": `prevNextTextList${i}`
+        "key": `textDataList${i}`
       });
     }
     return ret;
   }
   /** 入力済み・入力中・未入力のローマ字に関するデータ */
   public get romanDataList() {
-    const roman = this._prevRoman + this.nextRoman;
+    const prevRoman = this.prevRoman;
+    const nextRoman = this.nextRoman;
+    const roman = prevRoman + nextRoman;
+
     let prevRomanList: string[] = [];
     let curRomanList: string[] = [];
     let nextRomanList: string[] = [];
@@ -788,11 +767,11 @@ export default class TypingGame {
       }
 
       let c: string = roman[i];
-      if (i < this._prevRoman.length) {
+      if (i < prevRoman.length) {
         if (c === " ") c = "_";
         prevRomanList[prevRomanList.length - 1] += c;
       }
-      else if (i === this._prevRoman.length) {
+      else if (i === prevRoman.length) {
         if (c === " ") c = "_";
         curRomanList[curRomanList.length - 1] += c;
       }
@@ -803,14 +782,11 @@ export default class TypingGame {
 
     let ret: {}[] = [];
     for (let i = 0; i < this._romanLineNum; ++i) {
-      window.console.log(prevRomanList[i]);
-      window.console.log(curRomanList[i]);
-      window.console.log(nextRomanList[i]);
       ret.push({
         "prev": prevRomanList[i],
         "cur": curRomanList[i],
         "next": nextRomanList[i],
-        "key": `prevNextRomanList${i}`
+        "key": `romanDataList${i}`
       });
     }
     return ret;

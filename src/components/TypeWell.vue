@@ -12,6 +12,7 @@
     <div class="text">
       <div class="text-line" v-for="text in textDataList" :key="text.key">
         <div class="prev-text">{{ text.prev }}</div>
+        <div class="cur-text">{{ text.cur }}</div>
         <div class="next-text">{{ text.next }}</div>
         <div class="invalid-text">{{ text.invalid }}</div>
       </div>
@@ -219,18 +220,19 @@ $roman-font-size: 20px;
   justify-content: flex-start; /* 子要素をflexboxにより左に配置する */
   align-items: center;  /* 子要素をflexboxにより中央に配置する */
   white-space: pre;
+  word-break: break-all;
 }
 .prev-text {
-  word-break: break-all;
   color: #CCCCCC;
   margin-left: auto;
 }
+.cur-text {
+  color: #FF0000;
+}
 .next-text {
-  word-break: break-all;
   color: #000000;
 }
 .invalid-text {
-  word-break: break-all;
   color: #CCCCCC;
   margin-right: auto;
 }
