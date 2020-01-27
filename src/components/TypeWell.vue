@@ -5,7 +5,7 @@
     <div class="header">
       <EnterButton @click="gameStart" text="READY" :isValid="!inGame"/>
       <h3 class="gameMode">{{ gameMode }}</h3>
-      <Timer :isValid="inGame"/>
+      <Timer :isValid="inGame" :isFinished="isFinished" @emit-time="calcTime"/>
     </div>
 
     <div class="text">
@@ -25,6 +25,16 @@
         <div class="prevRoman">{{ roman.prev }}</div>
         <div class="nextRoman">{{ roman.next }}</div>
       </div>
+    </div>
+
+  <!--<div class="result" v-if="isFinished">-->
+  <div class="result">
+      <h3>結果</h3>
+      <p>{{ time }}</p>
+      <p>{{ level }}</p>
+      <p>{{ missCount }}</p>
+      <p>{{ tps }}</p>
+      <p>{{ tpm }}</p>
     </div>
 
 
@@ -49,6 +59,7 @@ export default class TypeWell extends Vue {
   public readonly description: string = "※このアプリは非公式です"
   public readonly gameMode: string = "基本常用語";
   public inGame: boolean = false;
+  public isFinished: boolean = false;
   public typingGame?: TypingGame;
 
   public text: string = "";
@@ -59,6 +70,8 @@ export default class TypeWell extends Vue {
   public prevRomanList: Array<string> = [];
   public nextRomanList: Array<string> = [];
   public prevNextRomanList: {} = {};
+
+  public time: number = 0;
 
   private updateVariables() {
     if(this.typingGame === undefined)return;
@@ -87,6 +100,7 @@ export default class TypeWell extends Vue {
   public gameStart() {
     window.console.log("Game Start");
     this.inGame = true;
+    this.isFinished = false;
     this.typingGame = new TypingGame();
     this.updateVariables();
   }
@@ -95,6 +109,7 @@ export default class TypeWell extends Vue {
     // Escapeで中断
     if(event.key === "Escape"){
       this.inGame = false;
+      this.isFinished = false;
       this.resetVariables();
       return;
     }
@@ -103,10 +118,27 @@ export default class TypeWell extends Vue {
     this.updateVariables();
     if(this.typingGame.isFinished()){
       this.inGame = false;
+      this.isFinished = true;
       this.typingGame = undefined;
       //this.prevRoman = "";
       //this.nextRoman = "";
     }
+  }
+
+  public calcTime(timeMs: number) {
+    window.console.log("calcTime");
+    window.console.log(timeMs);
+    this.time = timeMs;
+  }
+
+  public get level(): string {
+    return "-";
+  }
+  public get tps(): number {
+    return 0;
+  }
+  public get tpm(): number {
+    return 0;
   }
 
   beforeMount() {
