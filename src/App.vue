@@ -19,9 +19,13 @@ import Help from './components/Help.vue';
 })
 export default class App extends Vue {
   public keyInput(event: KeyboardEvent) {
-    // スペースでスクロールするのを止める
-    if(event.key === " "){
-      event.preventDefault(); // デフォルトアクションを止める
+    const ignoreKeyList: string[] = [
+      " ", "F1", "F2", "F3", "F4"
+    ];
+    for(const ignoreKey of ignoreKeyList){
+      if(event.key === ignoreKey){
+        event.preventDefault(); // デフォルトアクションを止める
+      }
     }
   }
 
