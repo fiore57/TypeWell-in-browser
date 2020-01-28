@@ -4,7 +4,8 @@
     <p>{{ description }}</p>
 
     <div class="header">
-      <EnterButton @click="gameStart" text="READY" :isValid="!(inGame || isFinished)"/>
+      <div :class="{ 'countdown': true, 'go': inGame || inResult }">{{ countdown }}</div>
+      <EnterButton @click="startCountdown" text="READY" :isValid="isReady"/>
       <h3 class="game-mode">{{ modeStr }}</h3>
       <Timer :timerStatus="timerStatus" @emit-time="setTime"/>
     </div>
@@ -30,7 +31,7 @@
       </div>
     </div>
 
-    <div class="result" v-if="isFinished">
+    <div class="result" v-if="inResult">
       <h3>結果</h3>
       <p>Time: {{ time }} 秒</p>
       <p>Level: {{ level }}</p>
@@ -56,7 +57,7 @@ import Timer, { eTimerStatus } from './Timer.vue';
 import { eMode, getLevelStr } from '@/lib/typeWell';
 
 const enum eStatus {
-  Ready, Game, Result
+  Ready, Countdown, Game, Result
 }
 
 @Component({
@@ -76,14 +77,33 @@ export default class TypeWell extends Vue {
 
   public timeMs: number = 0;
 
-  public gameStart() {
+  // カウントダウン関係
+  private m_countdown: number = 0;
+  private m_countdownId: number = 0;
+  private countdownFunc(){
+    --this.m_countdown;
+    if(this.m_countdown === 0){
+      this.gameStart();
+    }
+    else {
+      this.m_countdownId = window.setTimeout(this.countdownFunc, 1000);
+    }
+  }
+  public startCountdown() {
+    this.m_status = eStatus.Countdown;
+    this.m_countdown = 3;
+    this.m_countdownId = window.setTimeout(this.countdownFunc, 1000);
+  }
+  private gameStart() {
     this.m_status = eStatus.Game;
     this.m_typingGame = new TypingGame(this.m_mode);
   }
 
+  // 入力を処理
   public keyInput(event: KeyboardEvent) {
     // Escapeで中断
     if(event.key === "Escape"){
+      if(this.inCountdown) window.clearTimeout(this.m_countdownId);
       this.m_status = eStatus.Ready;
       return;
     }
@@ -102,7 +122,6 @@ export default class TypeWell extends Vue {
           this.m_mode = eMode.Ktwz;
           break;
       }
-
     }
     if(!this.inGame) return;
     this.m_typingGame.update(event.key);
@@ -117,49 +136,57 @@ export default class TypeWell extends Vue {
     this.timeMs = timeMs;
   }
 
-  public get modeStr(): string {
-    const modeStrList = ["基本常用語", "カタカナ語", "漢字", "慣用句・ことわざ"];
-    return modeStrList[this.m_mode];
-  }
+  // モード判定
   public get isReady(): boolean{
     return this.m_status === eStatus.Ready;
+  }
+  public get inCountdown(): boolean {
+    return this.m_status === eStatus.Countdown;
   }
   public get inGame(): boolean {
     return this.m_status === eStatus.Game;
   }
-  public get isFinished(): boolean {
+  public get inResult(): boolean {
     return this.m_status === eStatus.Result;
+  }
+  // ヘッダ
+  public get countdown(): string {
+    if(this.inCountdown) return "" + this.m_countdown;
+    else if(!this.isReady) return "GO!"
+    return "";
+  }
+  public get modeStr(): string {
+    const modeStrList = ["基本常用語", "カタカナ語", "漢字", "慣用句・ことわざ"];
+    return modeStrList[this.m_mode];
   }
   public get timerStatus(): eTimerStatus {
     switch(this.m_status) {
-      case eStatus.Ready: return eTimerStatus.Reset;
+      case eStatus.Ready: // fall through
+      case eStatus.Countdown: return eTimerStatus.Reset;
       case eStatus.Game: return eTimerStatus.Start;
       case eStatus.Result: return eTimerStatus.Stop;
       default: throw new Error("Unknown status");
     }
   }
-
+  // テキスト
   public get text(): string {
-    return this.isReady ? "" : this.m_typingGame.text;
+    return this.isReady || this.inCountdown ? "" : this.m_typingGame.text;
   }
   public get textDataList(): {} {
-    return this.isReady ? {} : this.m_typingGame.textDataList;
-  }
-  public get romanDataList(): {} {
-    return this.isReady ? {} : this.m_typingGame.romanDataList;
+    return this.isReady || this.inCountdown ? {} : this.m_typingGame.textDataList;
   }
   public get missCount(): number {
-    return this.isReady ? 0 : this.m_typingGame.missCount;
+    return this.isReady || this.inCountdown ? 0 : this.m_typingGame.missCount;
   }
-
+  public get romanDataList(): {} {
+    return this.isReady || this.inCountdown ? {} : this.m_typingGame.romanDataList;
+  }
+  // 結果
   public get time(): string {
     return (this.timeMs / 1000).toFixed(3);
   }
-  public get tpm(): string {
-    return this.m_tpm.toFixed(2);
-  }
-  public get tps(): string {
-    return this.m_tps.toFixed(3);
+  public get level(): string {
+    return getLevelStr(this.timeMs);
   }
   private get m_tpm(): number {
     return this.m_tps * 60;
@@ -167,9 +194,11 @@ export default class TypeWell extends Vue {
   private get m_tps(): number {
     return this.timeMs === 0 ? 0 : this.m_typingGame.romanLength / this.timeMs * 1000;
   }
-
-  public get level(): string {
-    return getLevelStr(this.timeMs);
+  public get tpm(): string {
+    return this.m_tpm.toFixed(2);
+  }
+  public get tps(): string {
+    return this.m_tps.toFixed(3);
   }
 
   beforeMount() {
@@ -210,19 +239,25 @@ $roman-font-size: 20px;
   justify-content: center; /* 子要素をflexboxにより中央に配置する */
   align-items: center;  /* 子要素をflexboxにより中央に配置する */
 }
-.readyButton {
-  width: 100px;
-  height: 30px;
-  font-size: 18px;
+.countdown{
+  font-size: 22px;
+  border: 1px solid;
+  border-color: #000000;
+  padding: 2px 10px;
   margin-top: 10px;
-  margin-right: 20px;
+  margin-right: 10px;
   margin-bottom: 10px;
-  margin-left: 20px;
+  margin-left: 10px;
+  width: 40px;
+  height: 24px;
+}
+.go {
+  color: #FF0000;
 }
 .game-mode {
   margin-top: 10px;
   margin-left: 50px;
-  margin-right: 50px;
+  margin-right: 100px;
   margin-bottom: 10px;
 }
 .text {

@@ -19,6 +19,7 @@
       <ul>
         <li>Windows 10</li>
         <ul>
+          <li>Chrome</li>
           <li>Vivaldi</li>
         </ul>
       </ul>
