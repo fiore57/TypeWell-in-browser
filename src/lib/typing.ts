@@ -462,7 +462,8 @@ class Chunk {
   private _nextRoman: string;
   private _typePatternList: TypePatternList;
 
-  private readonly _vowels: Array<string> = ['a', 'i', 'u', 'e', 'o', 'n'];
+  private readonly _xtuVowels: string[] = ['a', 'i', 'u', 'e', 'o', 'n'];
+  private readonly _xnVowels: string[] = this._xtuVowels.concat(['y']);
 
   /** かなをチャンクに分割し、打鍵パターンを準備する */
   public constructor(kana: string) {
@@ -481,7 +482,8 @@ class Chunk {
         // 子音の繰り返し
         for (const roman of curPatterns) {
           const romanFirstChar: string = roman[0][0];
-          if (!this._vowels.includes(romanFirstChar)) {
+          // 次の文字がa/i/u/e/o/nでないなら子音の繰り返しが使える
+          if (!this._xtuVowels.includes(romanFirstChar)) {
             newPatterns.push([romanFirstChar].concat(roman));
           }
         }
@@ -509,8 +511,8 @@ class Chunk {
               newPatterns.push(xn.concat(roman));
             }
             else {
-              // 次の文字がa/i/u/e/o/nでないなら「n」が使える
-              if (!this._vowels.includes(roman[0][0])) {
+              // 次の文字がa/i/u/e/o/n/yでないなら「n」が使える
+              if (!this._xnVowels.includes(roman[0][0])) {
                 newPatterns.push(xn.concat(roman));
               }
             }
