@@ -1,3 +1,7 @@
+export const enum eMode {
+  Khjy, Ktkn, Knj, Ktwz
+}
+
 enum eLevel {
   None,
   J, I, H, G, F, E, D, C, B, A,
@@ -22,16 +26,12 @@ export function getLevel(timeMs: number): eLevel {
   if (time > 80) return eLevel.B;
   if (time > 76) return eLevel.A;
   const levelNum: number = Math.floor(eLevel.SJ + (76 - time) / 2);
-  window.console.log(levelNum);
   const level: eLevel = levelNum;
-  window.console.log(level);
   return level;
 }
 
 export function getLevelStr(timeMs: number): string {
   const level: eLevel = getLevel(timeMs);
-  window.console.log(level);
   const levelStr: string = eLevel[level];
-  window.console.log(levelStr);
   return levelStr === eLevel[eLevel.None] ? "-" : levelStr;
 }

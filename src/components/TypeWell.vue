@@ -5,8 +5,8 @@
 
     <div class="header">
       <EnterButton @click="gameStart" text="READY" :isValid="!(inGame || isFinished)"/>
-      <h3 class="game-mode">{{ gameMode }}</h3>
-      <Timer :isValid="inGame" :isFinished="isFinished" @emit-time="setTime"/>
+      <h3 class="game-mode">{{ modeStr }}</h3>
+      <Timer :timerStatus="timerStatus" @emit-time="setTime"/>
     </div>
 
     <div class="text">
@@ -52,10 +52,10 @@
 import { Component, Prop, Vue } from 'vue-property-decorator';
 import TypingGame from '@/lib/typing';
 import EnterButton from './EnterButton.vue';
-import Timer from './Timer.vue';
-import { getLevelStr } from '@/lib/typeWell';
+import Timer, { eTimerStatus } from './Timer.vue';
+import { eMode, getLevelStr } from '@/lib/typeWell';
 
-const enum Status {
+const enum eStatus {
   Ready, Game, Result
 }
 
@@ -69,31 +69,47 @@ export default class TypeWell extends Vue {
   @Prop() private msg!: string;
   public readonly title: string = "ブラウザ版 タイプウェル国語R";
   public readonly description: string = "※このアプリは非公式です"
-  public readonly gameMode: string = "基本常用語";
 
-  private m_status: Status = Status.Ready;
-  private m_typingGame: TypingGame = new TypingGame();
+  private m_mode: eMode = eMode.Khjy;
+  private m_status: eStatus = eStatus.Ready;
+  private m_typingGame: TypingGame = new TypingGame(this.m_mode);
 
   public timeMs: number = 0;
 
   public gameStart() {
-    window.console.log("Game Start");
-    this.m_status = Status.Game;
-    this.m_typingGame = new TypingGame();
+    this.m_status = eStatus.Game;
+    this.m_typingGame = new TypingGame(this.m_mode);
   }
 
   public keyInput(event: KeyboardEvent) {
     // Escapeで中断
     if(event.key === "Escape"){
-      this.m_status = Status.Ready;
+      this.m_status = eStatus.Ready;
       return;
+    }
+    if(this.isReady){
+      switch(event.key){
+        case "F1":
+          this.m_mode = eMode.Khjy;
+          break;
+        case "F2":
+          this.m_mode = eMode.Ktkn;
+          break;
+        case "F3":
+          this.m_mode = eMode.Knj;
+          break;
+        case "F4":
+          this.m_mode = eMode.Ktwz;
+          break;
+      }
+
     }
     if(!this.inGame) return;
     this.m_typingGame.update(event.key);
 
     // 終了時の処理
     if(this.m_typingGame.isFinished()){
-      this.m_status = Status.Result;
+      this.m_status = eStatus.Result;
     }
   }
 
@@ -101,14 +117,26 @@ export default class TypeWell extends Vue {
     this.timeMs = timeMs;
   }
 
+  public get modeStr(): string {
+    const modeStrList = ["基本常用語", "カタカナ語", "漢字", "慣用句・ことわざ"];
+    return modeStrList[this.m_mode];
+  }
   public get isReady(): boolean{
-    return this.m_status === Status.Ready;
+    return this.m_status === eStatus.Ready;
   }
   public get inGame(): boolean {
-    return this.m_status === Status.Game;
+    return this.m_status === eStatus.Game;
   }
   public get isFinished(): boolean {
-    return this.m_status === Status.Result;
+    return this.m_status === eStatus.Result;
+  }
+  public get timerStatus(): eTimerStatus {
+    switch(this.m_status) {
+      case eStatus.Ready: return eTimerStatus.Reset;
+      case eStatus.Game: return eTimerStatus.Start;
+      case eStatus.Result: return eTimerStatus.Stop;
+      default: throw new Error("Unknown status");
+    }
   }
 
   public get text(): string {

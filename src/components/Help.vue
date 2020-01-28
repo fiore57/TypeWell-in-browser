@@ -6,6 +6,7 @@
       <ul>
         <li>Enter: スタート</li>
         <li>Esc: リセット</li>
+        <li>F1-F4: モード変更</li>
       </ul>
     </div>
 

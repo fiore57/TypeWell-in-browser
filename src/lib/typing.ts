@@ -17,6 +17,7 @@
 // MIT
 
 import TypingWords from '@/lib/word';
+import { eMode } from './typeWell';
 
 // 全入力パターンのmapを保持するクラス
 class ChunkPattern {
@@ -270,7 +271,7 @@ function devideIntoChunk(kana: string): Array<Chunk> {
     }
 
     // 「っ」でも「ん」でもないとき
-    if (kana[i] !== 'っ' && kana[i] !== 'ん') {
+    if (kana[i] !== "っ" && kana[i] !== "ん") {
       // その文字から2文字がチャンクパターンに存在しない場合、その文字が1チャンク
       if (!ChunkPattern.list.has(kana[i] + kana[i + 1])) {
         ret.push(new Chunk(kana[i]));
@@ -322,7 +323,7 @@ class TypePattern {
   private _isValid: boolean = true;
   private _romanCount: number = 0;
 
-  private _kanaRomanList: Array<string> = [];
+  private _kanaRomanList: string[] = [];
 
   /** 現在見ている_kanaRomanListのindex */
   private _curKanaRomanIndex: number = 0;
@@ -330,9 +331,9 @@ class TypePattern {
   /** _kanaRomanList[_curKanaRomanIndex]の中で、何文字目を見ているか */
   private _curKanaRomanCount: number = 0;
 
-  public constructor(romanList: Array<string>) {
+  public constructor(romanList: string[]) {
     this._kanaRomanList = romanList;
-    this._roman = romanList.join('');
+    this._roman = romanList.join("");
   }
   public getCurChar() {
     return this._roman[this._romanCount];
@@ -376,7 +377,7 @@ class TypePattern {
 
 class TypePatternList {
   private _displayPatternNum = 0;
-  private _typePatternList: Array<TypePattern>;
+  private _typePatternList: TypePattern[];
   private _isChunkFinished: boolean = false;
   /**
    * 最初のTypePatternから増えたローマ字の数
@@ -385,7 +386,7 @@ class TypePatternList {
    */
   private _additionalRomanCount: number = 0;
 
-  public constructor(romanLists: Array<Array<string>>) {
+  public constructor(romanLists: string[][]) {
     this._typePatternList = romanLists.map(romanList => new TypePattern(romanList));
   }
 
@@ -462,8 +463,8 @@ class Chunk {
   private _nextRoman: string;
   private _typePatternList: TypePatternList;
 
-  private readonly _xtuVowels: string[] = ['a', 'i', 'u', 'e', 'o', 'n'];
-  private readonly _xnVowels: string[] = this._xtuVowels.concat(['y']);
+  private readonly _xtuVowels: string[] = ["a", "i", "u", "e", "o", "n"];
+  private readonly _xnVowels: string[] = this._xtuVowels.concat(["y"]);
 
   /** かなをチャンクに分割し、打鍵パターンを準備する */
   public constructor(kana: string) {
@@ -490,20 +491,20 @@ class Chunk {
 
         // 「っ」単体
         for (const roman of curPatterns) {
-          for (const xtu of ChunkPattern.list.get('っ')!) {
+          for (const xtu of ChunkPattern.list.get("っ")!) {
             newPatterns.push(xtu.concat(roman));
           }
         }
 
         this._typePatternList = new TypePatternList(newPatterns);
       }
-      else if (kana[0] === 'ん') { // チャンクの1文字目が「ん」
+      else if (kana[0] === "ん") { // チャンクの1文字目が「ん」
         // 「ん」を除いた場合のパターン
         const curPatterns: string[][] = ChunkPattern.list.get(kana.substr(1))!;
 
         let newPatterns: string[][] = [];
 
-        const xnPatterns: string[][] = ChunkPattern.list.get('ん')!;
+        const xnPatterns: string[][] = ChunkPattern.list.get("ん")!;
         // 「n」をつける場合
         for (const roman of curPatterns) {
           for (const xn of xnPatterns) {
@@ -597,8 +598,8 @@ export default class TypingGame {
   private readonly _romanLineNum: number = 8;
 
 
-  public constructor() {
-    this._generateWords();
+  public constructor(mode: eMode) {
+    this._generateWords(mode);
 
     // ローマ字の準備
     this._chunkList = devideIntoChunk(this._kana);
@@ -632,10 +633,10 @@ export default class TypingGame {
     }
   }
 
-  private _generateWords() {
+  private _generateWords(mode: eMode) {
     // ローマ字が400字ジャストのときは、もう1単語追加する
     for (let romanCount: number = 0; romanCount <= this.romanLength;) {
-      const word = TypingWords.getWord();
+      const word = TypingWords.getWord(mode);
       const text: string = word.text + "　";
       const kanaList: Array<string> = word.kana.concat(["　"]);
       this._kanaList = this._kanaList.concat(kanaList);
@@ -647,8 +648,6 @@ export default class TypingGame {
 
       this._text += text;
       this._kana += kanaStr;
-
-      window.console.log(romanCount);
     }
   }
 

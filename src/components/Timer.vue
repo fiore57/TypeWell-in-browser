@@ -7,47 +7,44 @@
 <script lang="ts">
 import { Component, Prop, Emit, Watch, Vue } from 'vue-property-decorator';
 
+export const enum eTimerStatus{
+  Reset, Start, Stop
+}
+
 @Component
 export default class Timer extends Vue {
-  @Prop({ default: false})
-  private isValid!: boolean;
+  @Prop({ default: eTimerStatus.Reset })
+  private timerStatus!: eTimerStatus;
 
-  @Prop({ default: false})
-  private isFinished!: boolean;
-
-  private m_isValid: boolean = false;
-  private m_isFinished: boolean = false;
+  private m_timerStatus: eTimerStatus = eTimerStatus.Reset;
 
   private m_startTime: number = 0;
   private m_elapsedTimeMs: number = 0;
 
-  @Watch('isValid')
-  public onIsValidChanged(newValue: boolean, oldValue: boolean){
-    this.m_isValid = newValue;
-    window.console.log(this.m_isValid);
-    // false -> true（起動）
-    if(newValue === true && oldValue === false){
+  @Watch('timerStatus')
+  public onTimerStatusChanged(newValue: eTimerStatus, oldValue: eTimerStatus){
+    this.m_timerStatus = newValue;
+    // Reset -> Start (0秒から起動)
+    if(newValue === eTimerStatus.Start && oldValue === eTimerStatus.Reset){
       this.m_startTime = Date.now();
       this.startRAFLoop();
     }
-    // true -> false && 終了ではない （リセット）
-    else if(newValue === false && oldValue === true && this.isFinished === false){
-      // reset
+    // Stop -> Start (現在の秒数から再開)
+    else if(newValue === eTimerStatus.Start && oldValue === eTimerStatus.Stop){
+      this.m_startTime = Date.now() - this.m_elapsedTimeMs;
+      this.startRAFLoop();
+    }
+    // Start -> Stop (中断・タイムを送信)
+    else if(newValue === eTimerStatus.Stop && oldValue === eTimerStatus.Start){
+      this.emitTime(this.m_elapsedTimeMs);
+    }
+    // * -> Reset (リセット)
+    else if(newValue === eTimerStatus.Reset){
       this.m_elapsedTimeMs = 0;
     }
-  }
-
-  @Watch('isFinished')
-  public onIsFinishedChanged(newValue: boolean, oldValue: boolean){
-    this.m_isFinished = newValue;
-    // false -> true（終了）
-    if(newValue === true && oldValue === false){
-      window.console.log(this.m_elapsedTimeMs);
-      this.emitTime(this.m_elapsedTimeMs);
-      if(!this.isValid){
-        // reset
-        this.m_elapsedTimeMs = 0;
-      }
+    // ???
+    else {
+      throw new Error("Unknown status");
     }
   }
 
@@ -59,7 +56,7 @@ export default class Timer extends Vue {
   }
 
   private calcTime() {
-    if(this.m_isValid){
+    if(this.m_timerStatus === eTimerStatus.Start){
       const nowTime = Date.now();
       this.m_elapsedTimeMs = nowTime - this.m_startTime;
       window.requestAnimationFrame(this.calcTime);
