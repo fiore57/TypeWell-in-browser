@@ -12,20 +12,20 @@
     <div class="text">
       <div class="text-line" v-for="text in textDataList" :key="text.key">
         <div class="prev-text">{{ text.prev }}</div>
-        <div class="cur-text">{{ text.cur }}</div>
+        <div :class="{ 'cur-text': true, 'miss-text': text.missFlag }">{{ text.cur }}</div>
         <div class="next-text">{{ text.next }}</div>
         <div class="invalid-text">{{ text.invalid }}</div>
       </div>
     </div>
 
     <div class="miss-count">
-      <p>Miss: {{ missCount }}</p>
+      Miss: {{ missCount }}
     </div>
 
     <div class="roman">
       <div class="roman-line" v-for="roman in romanDataList" :key="roman.key">
         <div class="prev-roman">{{ roman.prev }}</div>
-        <div class="cur-roman">{{ roman.cur }}</div>
+        <div :class="{ 'cur-roman': true, 'miss-roman': text.missFlag }">{{ roman.cur }}</div>
         <div class="next-roman">{{ roman.next }}</div>
       </div>
     </div>
@@ -149,7 +149,7 @@ export default class TypeWell extends Vue {
     return this.isReady ? {} : this.m_typingGame.romanDataList;
   }
   public get missCount(): number {
-    return this.m_typingGame.missCount;
+    return this.isReady ? 0 : this.m_typingGame.missCount;
   }
 
   public get time(): string {
@@ -255,6 +255,9 @@ $roman-font-size: 20px;
   margin-left: auto;
 }
 .cur-text {
+  color: #000000;
+}
+.miss-text {
   color: #FF0000;
 }
 .next-text {
@@ -265,8 +268,9 @@ $roman-font-size: 20px;
   margin-right: auto;
 }
 .miss-count {
-  margin-top: 10px;
-  margin-bottom: 10px;
+  margin-top: 4px;
+  margin-bottom: 4px;
+  font-size: 18px;
 }
 .roman {
   margin-top: 10px;
@@ -297,6 +301,9 @@ $roman-font-size: 20px;
   color: #CCCCCC;
 }
 .cur-roman{
+  color: #000000;
+}
+.miss-roman{
   color: #FF0000;
 }
 .next-roman {

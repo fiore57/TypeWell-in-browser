@@ -10,7 +10,7 @@
 // （私がタイピングゲームを作るときは、だいたいこのサイトのような処理を書いています）
 //
 // 既知の不具合
-// ・「んん」のあとにa/i/u/e/o/nが来る場合でも「nnn」で「んん」と入力できてしまう（対応が面倒なので保留）
+// ・「んん」のあとにa/i/u/e/o/n/yが来る場合でも「nnn」で「んん」と入力できてしまう（対応が面倒なので保留）
 // ・「っっっｋ」のように、子音字を連打することで「っ」を並べる入力ができない（同上）
 //
 // ライセンス
@@ -239,13 +239,13 @@ class ChunkPattern {
     for (const chunkPattern of ChunkPattern.list) {
       const kana = chunkPattern[0];
       if (kana.length >= 2) {
-        let multiPattern: Array<Array<string>> = [];
+        let multiPattern: string[][] = [];
         for (const c of kana) {
           if (multiPattern.length === 0) {
             multiPattern = ChunkPattern.list.get(c)!;
           }
           else {
-            let tmp: Array<Array<string>> = [];
+            let tmp: string[][] = [];
             for (const p1 of multiPattern) {
               for (const p2 of ChunkPattern.list.get(c)!) {
                 tmp.push(p1.concat(p2));
@@ -261,8 +261,8 @@ class ChunkPattern {
 }
 
 // かなをチャンクに分割
-function devideIntoChunk(kana: string): Array<Chunk> {
-  let ret: Array<Chunk> = [];
+function devideIntoChunk(kana: string): Chunk[] {
+  let ret: Chunk[] = [];
   for (let i = 0; i < kana.length; ++i) {
     // 最後の1文字の場合、必ずその文字が1チャンク
     if (i >= kana.length - 1) {
@@ -572,7 +572,6 @@ class Chunk {
 export default class TypingGame {
   /** 漢字かな交じり */
   private _text: string = "";
-  private _prevTextList: string[] = [];
 
   private _kanaList: string[] = [];
   private _kana: string = "";
@@ -584,6 +583,8 @@ export default class TypingGame {
   private _typeCount: number = 0;
   private _missCount: number = 0;
   private _isFinished: boolean = false;
+  /** 現在の文字をミスしたか否か */
+  private _missFlag: boolean = false;
 
   private _additionalRomanCountSum: number = 0;
   /** 無効なtextは _text.substr(index) */
@@ -638,11 +639,11 @@ export default class TypingGame {
     for (let romanCount: number = 0; romanCount <= this.romanLength;) {
       const word = TypingWords.getWord(mode);
       const text: string = word.text + "　";
-      const kanaList: Array<string> = word.kana.concat(["　"]);
+      const kanaList: string[] = word.kana.concat(["　"]);
       this._kanaList = this._kanaList.concat(kanaList);
 
       const kanaStr: string = kanaList.join('');
-      const chunkList: Array<Chunk> = devideIntoChunk(kanaStr);
+      const chunkList: Chunk[] = devideIntoChunk(kanaStr);
       const romanLength: number = chunkList.reduce((acc, cur) => acc + cur.roman.length, 0);
       romanCount += romanLength;
 
@@ -655,6 +656,7 @@ export default class TypingGame {
     const result = this._chunkList[this._chunkCount].update(inputChar);
     if (result) { // 正しい入力の場合
       ++this._typeCount;
+      this._missFlag = false;
       // 終了判定
       if (this._typeCount >= this.romanLength + this._additionalRomanCountSum) {
         this._isFinished = true;
@@ -662,6 +664,7 @@ export default class TypingGame {
     }
     else { // 入力が正しくない場合
       ++this._missCount;
+      this._missFlag = true;
     }
     this._kanaCount = this._chunkList.reduce((acc, cur) => acc + cur.kanaCount, 0);
     if (this._chunkList[this._chunkCount].isChunkFinished) {
@@ -721,8 +724,8 @@ export default class TypingGame {
         if (c === "　") c = "＿";
         prevTextList[prevTextList.length - 1] += c;
       }
-      else if (isCurText) {
-        if (c === "　") c = "＿";
+      else if (isCurText && i < this._invalidTextIndex) {
+        if (c === "　" && this._missFlag) c = "＿";
         curTextList[curTextList.length - 1] += c;
         isCurText = false;
       }
@@ -746,6 +749,7 @@ export default class TypingGame {
         "cur": curTextList[i],
         "next": nextTextList[i],
         "invalid": invalidTextList[i],
+        "missFlag": this._missFlag,
         "key": `textDataList${i}`
       });
     }
@@ -773,7 +777,7 @@ export default class TypingGame {
         prevRomanList[prevRomanList.length - 1] += c;
       }
       else if (i === prevRoman.length) {
-        if (c === " ") c = "_";
+        if (c === " " && this._missFlag === true) c = "_";
         curRomanList[curRomanList.length - 1] += c;
       }
       else {
@@ -787,6 +791,7 @@ export default class TypingGame {
         "prev": prevRomanList[i],
         "cur": curRomanList[i],
         "next": nextRomanList[i],
+        "missFlag": this._missFlag,
         "key": `romanDataList${i}`
       });
     }
