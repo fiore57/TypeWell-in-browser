@@ -4,6 +4,7 @@ version: 2.1
 # 実行環境
 executors:
   default:
+    working_directory: ~/workspace
     docker:
       - image: circleci/node:erbium # ジョブ実行環境のDockerイメージ(node 12.x)
 
