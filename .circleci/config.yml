@@ -41,7 +41,7 @@ jobs:
       - npm_install
       - run:
           name: deploy to Firebase Hosting
-          command: ./node_modules/.bin/firebase deploy --token=$FIREBASE_TOKEN
+          command: node_modules/.bin/firebase deploy --token=$FIREBASE_TOKEN
 
 
 # Orchestrate or schedule a set of jobs
