@@ -19,7 +19,8 @@
       <ul>
         <li>Windows 10</li>
         <ul>
-          <li>Chrome</li>
+          <li>Google Chrome</li>
+          <li>Microsoft Edge</li>
           <li>Vivaldi</li>
         </ul>
       </ul>
