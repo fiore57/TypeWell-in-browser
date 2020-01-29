@@ -1,13 +1,34 @@
 # Use the latest 2.1 version of CircleCI pipeline process engine. See: https://circleci.com/docs/2.0/configuration-reference
 version: 2.1
-# Use a package of configuration called an orb.
-orbs:
-  # Declare a dependency on the welcome-orb
-  welcome: circleci/welcome-orb@0.4.1
+
+jobs:
+  deploy: # ジョブ名
+    docker:
+      - image: circleci/node:erbium # ジョブ実行環境のDockerイメージ(node 12.x)
+    steps:
+      - checkout # ソースコードのチェックアウト
+      - run: # 順に実行したいコマンド
+        name: npm install
+        command: npm install
+      - run:
+        name: build
+        command: npm run build
+      - run:
+        name: unit test
+        command: npm run test:unit
+      - run:
+        name: lint
+        command: npm run lint
+      - run:
+        name: deploy to Firebase Hosting
+        command: ./node_modules/.bin/firebase deploy --token=$FIREBASE_TOKEN
+
 # Orchestrate or schedule a set of jobs
 workflows:
-  # Name the workflow "welcome"
-  welcome:
+  deploy: # ワークフローの名前
     # Run the welcome/run job in its own container
     jobs:
-      - welcome/run
+      - deploy
+        filters:
+          branches:
+            only: master # masterブランチのみ
