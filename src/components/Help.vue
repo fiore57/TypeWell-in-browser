@@ -30,7 +30,7 @@
     <div class="center-list">
       <ul>
         <li><a href="https://www.pc-gear.com" target="_blank">blog</a></li>
-        <li><a href="https://github.com/fiore57" target = "_blank">Github</a></li>
+        <li><a href="https://github.com/fiore57/TypeWell-in-browser" target = "_blank">Github</a></li>
       </ul>
     </div>
 
