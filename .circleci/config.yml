@@ -40,8 +40,11 @@ jobs:
       - checkout
       - npm_install
       - run:
+          name: install firebase-tools
+          command: npm install --save-dev firebase-tools
+      - run:
           name: deploy to Firebase Hosting
-          command: ~/workspace/node_modules/.bin/firebase deploy --token=$FIREBASE_TOKEN
+          command: ./node_modules/.bin/firebase deploy --token=$FIREBASE_TOKEN
 
 
 # Orchestrate or schedule a set of jobs
