@@ -1,5 +1,9 @@
 # ブラウザ版 タイプウェル国語R
 
+[![CircleCI](https://circleci.com/gh/fiore57/TypeWell-in-browser/tree/master.svg?style=svg)](https://circleci.com/gh/fiore57/TypeWell-in-browser/tree/master)
+
+[ブラウザ版 タイプウェル国語R](https://typewell-in-browser.web.app/)
+
 ## Project setup
 ```
 npm install
