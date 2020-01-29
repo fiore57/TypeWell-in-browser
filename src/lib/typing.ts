@@ -593,8 +593,8 @@ export default class TypingGame {
   /** text1行あたりの文字数 */
   private readonly _textLineLength: number = 43;
   /** roman1行あたりの文字数 */
-  //private readonly _romanLineLength: number = 50;
-  private readonly _romanLineLength: number = 10;
+  private readonly _romanLineLength: number = 50;
+  //private readonly _romanLineLength: number = 10;
   /** romanの行数 */
   private readonly _romanLineNum: number = 8;
 

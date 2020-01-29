@@ -152,7 +152,7 @@ export default class TypeWell extends Vue {
   // ヘッダ
   public get countdown(): string {
     if(this.inCountdown) return "" + this.m_countdown;
-    else if(!this.isReady) return "GO!"
+    else if(this.inGame) return "GO!"
     return "";
   }
   public get modeStr(): string {
