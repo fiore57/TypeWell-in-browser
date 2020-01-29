@@ -28,7 +28,7 @@ workflows:
   deploy: # ワークフローの名前
     # Run the welcome/run job in its own container
     jobs:
-      - deploy
+      - deploy:
         filters:
           branches:
             only: master # masterブランチのみ
