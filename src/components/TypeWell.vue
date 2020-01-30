@@ -3,31 +3,33 @@
     <h2>{{ title }}</h2>
     <p>{{ description }}</p>
 
-    <div class="header">
-      <div :class="{ 'countdown': true, 'go': inGame || inResult }">{{ countdown }}</div>
-      <EnterButton @click="startCountdown" text="READY" :isValid="isReady"/>
-      <h3 class="game-mode">{{ modeStr }}</h3>
-      <Timer :timerStatus="timerStatus" @emit-time="setTime"/>
-    </div>
-
-    <div class="text">
-      <div class="text-line" v-for="text in textDataList" :key="text.key">
-        <div class="prev-text">{{ text.prev }}</div>
-        <div :class="{ 'cur-text': true, 'miss-text': text.missFlag }">{{ text.cur }}</div>
-        <div class="next-text">{{ text.next }}</div>
-        <div class="invalid-text">{{ text.invalid }}</div>
+    <div class="game">
+      <div class="header">
+        <div :class="{ 'countdown': true, 'go': inGame || inResult }">{{ countdown }}</div>
+        <EnterButton @click="startCountdown" text="READY" :isValid="isReady"/>
+        <h3 class="game-mode">{{ modeStr }}</h3>
+        <Timer :timerStatus="timerStatus" @emit-time="setTime"/>
       </div>
-    </div>
 
-    <div class="miss-count">
-      Miss: {{ missCount }}
-    </div>
+      <div class="text">
+        <div class="text-line" v-for="text in textDataList" :key="text.key">
+          <div class="prev-text">{{ text.prev }}</div>
+          <div :class="{ 'cur-text': true, 'miss-text': text.missFlag }">{{ text.cur }}</div>
+          <div class="next-text">{{ text.next }}</div>
+          <div class="invalid-text">{{ text.invalid }}</div>
+        </div>
+      </div>
 
-    <div class="roman">
-      <div class="roman-line" v-for="roman in romanDataList" :key="roman.key">
-        <div class="prev-roman">{{ roman.prev }}</div>
-        <div :class="{ 'cur-roman': true, 'miss-roman': text.missFlag }">{{ roman.cur }}</div>
-        <div class="next-roman">{{ roman.next }}</div>
+      <div class="miss-count">
+        Miss: {{ missCount }}
+      </div>
+
+      <div class="roman">
+        <div class="roman-line" v-for="roman in romanDataList" :key="roman.key">
+          <div class="prev-roman">{{ roman.prev }}</div>
+          <div :class="{ 'cur-roman': true, 'miss-roman': text.missFlag }">{{ roman.cur }}</div>
+          <div class="next-roman">{{ roman.next }}</div>
+        </div>
       </div>
     </div>
 
@@ -45,6 +47,7 @@
       </div>
     </div>
 
+    <Config v-show="isReady" @emit-data="setConfigData"/>
 
   </div>
 </template>
@@ -54,6 +57,7 @@ import { Component, Prop, Vue } from 'vue-property-decorator';
 import TypingGame from '@/lib/typing';
 import EnterButton from './EnterButton.vue';
 import Timer, { eTimerStatus } from './Timer.vue';
+import Config, { ConfigData } from './Config.vue';
 import { eMode, getLevelStr } from '@/lib/typeWell';
 
 const enum eStatus {
@@ -64,6 +68,7 @@ const enum eStatus {
   components: {
     EnterButton,
     Timer,
+    Config,
   },
 })
 export default class TypeWell extends Vue {
@@ -76,6 +81,7 @@ export default class TypeWell extends Vue {
   private m_typingGame: TypingGame = new TypingGame(this.m_mode);
 
   public timeMs: number = 0;
+  private m_configData: ConfigData = new ConfigData();
 
   // カウントダウン関係
   private m_countdown: number = 0;
@@ -91,8 +97,8 @@ export default class TypeWell extends Vue {
   }
   public startCountdown() {
     this.m_status = eStatus.Countdown;
-    this.m_countdown = 3;
-    this.m_countdownId = window.setTimeout(this.countdownFunc, 1000);
+    this.m_countdown = this.m_configData.countdownTime + 1;
+    this.countdownFunc();
   }
   private gameStart() {
     this.m_status = eStatus.Game;
@@ -134,6 +140,9 @@ export default class TypeWell extends Vue {
 
   public setTime(timeMs: number) {
     this.timeMs = timeMs;
+  }
+  public setConfigData(configData: ConfigData){
+    this.m_configData = configData;
   }
 
   // モード判定
@@ -212,11 +221,12 @@ export default class TypeWell extends Vue {
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped lang="scss">
-#type-well{
-
+.game {
+  margin: 1rem;
+  background: whitesmoke;
 }
 h3 {
-  margin: 40px 0 0;
+  margin: 4rem 0 0;
 }
 ul {
   list-style-type: none;
@@ -226,12 +236,10 @@ li {
   display: inline-block;
   margin: 0 10px;
 }
-a {
-  color: #42b983;
-}
 
-$text-font-size: 18px;
-$roman-font-size: 20px;
+
+$text-font-size: 1.8rem;
+$roman-font-size: 2rem;
 
 .header {
   display: flex; /* 子要素をflexboxで揃える */
@@ -240,7 +248,7 @@ $roman-font-size: 20px;
   align-items: center;  /* 子要素をflexboxにより中央に配置する */
 }
 .countdown{
-  font-size: 22px;
+  font-size: 2.2rem;
   border: 1px solid;
   border-color: #000000;
   padding: 2px 10px;
@@ -252,7 +260,7 @@ $roman-font-size: 20px;
   height: 24px;
 }
 .go {
-  color: #FF0000;
+  color: red;
 }
 .game-mode {
   margin-top: 10px;
@@ -275,8 +283,8 @@ $roman-font-size: 20px;
   font-size: $text-font-size;
 }
 .text-line {
-  margin-top: 1px;
-  margin-bottom: 1px;
+  margin-top: 0.1rem;
+  margin-bottom: 0.1rem;
 
   display: flex; /* 子要素をflexboxで揃える */
   flex-direction: row; /* 子要素をflexboxにより横方向に揃える */
@@ -343,12 +351,6 @@ $roman-font-size: 20px;
 }
 .next-roman {
   color: #000000;
-}
-.inline-block-list {
-  li {
-    display: inline-block;
-    margin: 0 10px;
-  }
 }
 .result {
   h3{

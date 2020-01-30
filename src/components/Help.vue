@@ -48,34 +48,9 @@ export default class Help extends Vue {}
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped lang="scss">
-.inline-block-list {
-  li {
-    display: inline-block;
-    margin: 0 10px;
-  }
-}
-.center-list{
-  text-align: left;
-  display: flex;
-  align-items: center;
-  flex-direction: column
-}
-h3 {
-  margin: 40px 0 0;
-}
-ul {
-  padding-left: 15px;
-}
 li {
   //display: inline-block;
   //margin: 0 10px;
-}
-a {
-  color: #42b983;
-}
-h4 {
-  margin-top: 20px;
-  margin-bottom: 0;
 }
 p{
   text-align: left;

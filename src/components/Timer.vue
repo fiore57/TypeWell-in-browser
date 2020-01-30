@@ -72,13 +72,10 @@ export default class Timer extends Vue {
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped lang="scss">
 .timer {
-  font-size: 22px;
-  border: 1px solid;
-  padding: 2px 10px;
-  margin-top: 10px;
-  margin-right: 10px;
-  margin-bottom: 10px;
-  margin-left: 10px;
-  width: 130px;
+  font-size: 2.2rem;
+  border: 0.1rem solid;
+  padding: 0.2rem 1rem;
+  margin: 1rem;
+  width: 14rem;
 }
 </style>
