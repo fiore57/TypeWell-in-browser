@@ -1,0 +1,46 @@
+// 全体に適用するCSS
+*,
+*::before,
+*::after {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+html {
+  font-size: 62.5%;
+}
+// 見出し
+h2 {
+  font-size: 2.8rem;
+}
+h3 {
+  font-size: 2.0rem;
+  margin-top: 4rem;
+}
+h4 {
+  font-size: 1.6rem;
+  margin-top: 2rem;
+}
+// 要素
+p {
+  font-size: 1.55rem;
+}
+a {
+  color: #42b983;
+}
+// リスト
+ul {
+  padding-left: 15px;
+}
+.center-list{   // 中央に表示するリスト
+  text-align: left;
+  display: flex;
+  align-items: center;
+  flex-direction: column
+}
+.inline-block-list {    // 横並びのリスト
+  li {
+    display: inline-block;
+    margin: 0 10px;
+  }
+}
