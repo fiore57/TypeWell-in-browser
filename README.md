@@ -4,7 +4,23 @@
 
 [ブラウザ版 タイプウェル国語R](https://typewell-in-browser.web.app/)
 
-## Project setup
+**このアプリは非公式です。このアプリに関する不具合報告・要望・苦情等は、オリジナル作者にしないようお願いいたします。**
+
+## 概要
+「ブラウザ版 タイプウェル国語R」は、GANGAS様制作「タイプウェル国語R」風のタイピング練習アプリです。
+
+本家と比べるとかなり機能は少ないです（タイムとレベルを計測できる程度で、詳細結果やランキングといった機能はありません）。
+
+### 動作確認済み環境
+* Windows 10
+    * Google Chrome
+    * Vivaldi
+    * Microsoft Edge
+
+### ライセンス
+このソフトウェアは、MITライセンスのもとで公開されています。詳しくはLICENSEを見てください。
+
+## Project setup（以下、開発者向け）
 ```
 npm install
 ```
@@ -31,3 +47,6 @@ npm run lint
 
 ### Customize configuration
 See [Configuration Reference](https://cli.vuejs.org/config/).
+
+### License
+This software is released under the MIT License, see LICENSE.
