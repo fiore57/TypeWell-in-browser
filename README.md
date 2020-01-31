@@ -16,6 +16,8 @@
     * Google Chrome
     * Vivaldi
     * Microsoft Edge
+* Ubuntu 18.04(LTS)
+    * Google Chrome
 
 ### ライセンス
 このソフトウェアは、MITライセンスのもとで公開されています。詳しくはLICENSEを見てください。
