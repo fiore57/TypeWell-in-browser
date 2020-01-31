@@ -1,4 +1,9 @@
 // 全体に適用するCSS
+@font-face {
+  font-family: 'Noto Sans Mono';
+  src: url('~@/assets/fonts/NotoSansMono-Regular.ttf') format('truetype');
+}
+
 *,
 *::before,
 *::after {
@@ -30,7 +35,11 @@ a {
 }
 // リスト
 ul {
-  padding-left: 15px;
+  margin: 0.5rem;
+  padding-left: 1.5rem;
+}
+li {
+  font-size: 1.52rem;
 }
 .center-list{   // 中央に表示するリスト
   text-align: left;
@@ -41,6 +50,6 @@ ul {
 .inline-block-list {    // 横並びのリスト
   li {
     display: inline-block;
-    margin: 0 10px;
+    margin: 0 1rem;
   }
 }

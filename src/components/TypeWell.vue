@@ -1,7 +1,7 @@
 <template>
   <div id="type-well">
     <h2>{{ title }}</h2>
-    <p>{{ description }}</p>
+    <p class="warn">{{ description }}</p>
 
     <div class="game">
       <div class="header">
@@ -34,6 +34,7 @@
     </div>
 
     <div class="result" v-if="inResult">
+    <!--<div class="result">-->
       <h3>結果</h3>
       <p>Time: {{ time }} 秒</p>
       <p>Level: {{ level }}</p>
@@ -222,24 +223,19 @@ export default class TypeWell extends Vue {
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped lang="scss">
 .game {
-  margin: 1rem;
+  width: 85rem;
+  padding: 1rem;
+  margin: 2rem auto 2rem auto;
   background: whitesmoke;
+  border: 0.1rem solid;
+  border-color: gray;
+  box-shadow: 0 3px 5px rgba(0, 0, 0, 0.22);
 }
-h3 {
-  margin: 4rem 0 0;
-}
-ul {
-  list-style-type: none;
-  padding: 0;
-}
-li {
-  display: inline-block;
-  margin: 0 10px;
-}
+.warn {
+  color: red;
+  font-weight: bold;
 
-
-$text-font-size: 1.8rem;
-$roman-font-size: 2rem;
+}
 
 .header {
   display: flex; /* 子要素をflexboxで揃える */
@@ -249,15 +245,13 @@ $roman-font-size: 2rem;
 }
 .countdown{
   font-size: 2.2rem;
-  border: 1px solid;
-  border-color: #000000;
-  padding: 2px 10px;
-  margin-top: 10px;
-  margin-right: 10px;
-  margin-bottom: 10px;
-  margin-left: 10px;
-  width: 40px;
-  height: 24px;
+  border: 0.1rem solid;
+  border-color: gray;
+  padding: 0.2rem 0.5rem;
+  margin: 1rem;
+  width: 5.5rem;
+  height: 3rem;
+  background: white;
 }
 .go {
   color: red;
@@ -269,18 +263,17 @@ $roman-font-size: 2rem;
   margin-bottom: 10px;
 }
 .text {
-  margin-top: 10px;
-  margin-right: auto;
-  margin-bottom: 10px;
-  margin-left: auto;
+  margin: 1rem auto;
   //display: flex; /* 子要素をflexboxで揃える */
   //flex-direction: row; /* 子要素をflexboxにより横方向に揃える */
   //justify-content: center; /* 子要素をflexboxにより中央に配置する */
   //align-items: center;  /* 子要素をflexboxにより中央に配置する */
-  width: 800px; /* 見た目用 */
-  height: 200px; /* 見た目用 */
-  border: 1px solid; /* 見た目用 */;
-  font-size: $text-font-size;
+  width: 80rem; /* 見た目用 */
+  height: 20rem; /* 見た目用 */
+  border: 0.1rem solid;
+  border-color: gray;
+  font-size: 1.8rem;
+  background: white;
 }
 .text-line {
   margin-top: 0.1rem;
@@ -316,22 +309,18 @@ $roman-font-size: 2rem;
   font-size: 18px;
 }
 .roman {
-  margin-top: 10px;
-  margin-right: auto;
-  margin-bottom: 10px;
-  margin-left: auto;
+  margin: 1rem auto;
 
-  width: 600px; /* 見た目用 */
-  height: 200px; /* 見た目用 */
-  border: 1px solid; /* 見た目用 */;
-  font-size: $roman-font-size;
-  font-family: 'Consolas',sans-serif;
+  width: 58rem; /* 見た目用 */
+  height: 21.5rem; /* 見た目用 */
+  border: 0.1rem solid;
+  border-color: gray;
+  font-size: 1.8rem;
+  font-family: 'Noto Sans Mono', sans-serif;
+  background: white;
 }
 .roman-line {
-  margin-top: 2px;
-  margin-right: 10px;
-  margin-bottom: 2px;
-  margin-left: 10px;
+  margin: 0.2rem 1rem;
 
   display: flex; /* 子要素をflexboxで揃える */
   flex-direction: row; /* 子要素をflexboxにより横方向に揃える */
@@ -342,26 +331,36 @@ $roman-font-size: 2rem;
 }
 .prev-roman {
   color: #CCCCCC;
+  margin-left: auto;
 }
 .cur-roman{
-  color: #000000;
+  color: black;
 }
 .miss-roman{
-  color: #FF0000;
+  color: red;
 }
 .next-roman {
-  color: #000000;
+  color: black;
+  margin-right: auto;
 }
 .result {
   h3{
-    font-size: 20px;
-    margin-top: 10px;
+    font-size: 2rem;
+    margin-top: 1rem;
   }
-  font-size: 20px;
 
-  padding: 0.5em 1em;
-  margin: 2em auto;
-  border: double 5px #4689FF;
-  width: 300px;
+  p {
+    font-size: 1.9rem;
+    margin: 1.2rem 0;
+  }
+
+  li {
+    font-size: 1.9rem;
+  }
+
+  padding: 1rem 1rem 2rem 1rem;
+  margin: 4rem auto;
+  border: double 0.5rem #A0D0F0;
+  width: 30rem;
 }
 </style>

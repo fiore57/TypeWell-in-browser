@@ -24,6 +24,7 @@
           <li>Vivaldi</li>
         </ul>
       </ul>
+      <p>Internet Explorerでは動作しません。ご注意ください。</p>
     </div>
 
     <h4>お問い合わせ（不具合報告・要望・苦情等）</h4>
@@ -31,10 +32,12 @@
     <div class="center-list">
       <ul>
         <li><a href="https://www.pc-gear.com" target="_blank">blog</a></li>
-        <li><a href="https://github.com/fiore57/TypeWell-in-browser" target = "_blank">Github</a></li>
+        <li><a href="https://github.com/fiore57/TypeWell-in-browser" target = "_blank">Github</a>（開発者向け）</li>
       </ul>
     </div>
 
+    <h4>ライセンス</h4>
+    <p>「ブラウザ版 タイプウェル国語R」は、MITライセンスのもとで公開されています。詳しくは、<a href="https://github.com/fiore57/TypeWell-in-browser" target = "_blank">Github</a>のLICENSEをご覧ください。</p>
 
   </div>
 </template>
@@ -48,16 +51,9 @@ export default class Help extends Vue {}
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped lang="scss">
-li {
-  //display: inline-block;
-  //margin: 0 10px;
-}
 p{
+  width: min(80vw, 80rem);
   text-align: left;
-  margin-top: 10px;
-  margin-right: 50px;
-  margin-bottom: 10px;
-  margin-left: 50px;
+  margin: 1rem auto;
 }
-
 </style>
