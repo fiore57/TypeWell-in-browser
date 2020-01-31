@@ -10,11 +10,20 @@ executors:
 
 # 再利用するstep
 commands:
+  restore_npm:
+    steps:
+      - restore_cache:
+          name: restore npm dependencies
+          keys:
+            - npm-{{ .Branch }}-{{ checksum "package-lock.json" }}
+            - npm-{{ .Branch }}-
+            - npm-
   npm_install:
     steps:
       - run:
           name: npm install
           command: npm install
+
 
 jobs:
   build: # ジョブ名
@@ -22,6 +31,7 @@ jobs:
       name: default
     steps:
       - checkout # ソースコードのチェックアウト
+      - restore_npm
       - npm_install
       - run: # 順に実行したいコマンド
           name: build
@@ -32,12 +42,19 @@ jobs:
       - run:
           name: lint
           command: npm run lint
+      - save_cache:
+          key: npm-{{ .Branch }}-{{ checksum "package-lock.json" }}
+          paths:
+            - ~/workspace/node_modules
+            - ~/workspace/dist
+          force: yes
 
   deploy:
     executor:
       name: default
     steps:
       - checkout
+      - restore_npm
       - npm_install
       - run:
           name: install firebase-tools

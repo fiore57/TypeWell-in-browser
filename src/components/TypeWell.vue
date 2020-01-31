@@ -1,37 +1,40 @@
 <template>
   <div id="type-well">
     <h2>{{ title }}</h2>
-    <p>{{ description }}</p>
+    <p class="warn">{{ description }}</p>
 
-    <div class="header">
-      <div :class="{ 'countdown': true, 'go': inGame || inResult }">{{ countdown }}</div>
-      <EnterButton @click="startCountdown" text="READY" :isValid="isReady"/>
-      <h3 class="game-mode">{{ modeStr }}</h3>
-      <Timer :timerStatus="timerStatus" @emit-time="setTime"/>
-    </div>
-
-    <div class="text">
-      <div class="text-line" v-for="text in textDataList" :key="text.key">
-        <div class="prev-text">{{ text.prev }}</div>
-        <div :class="{ 'cur-text': true, 'miss-text': text.missFlag }">{{ text.cur }}</div>
-        <div class="next-text">{{ text.next }}</div>
-        <div class="invalid-text">{{ text.invalid }}</div>
+    <div class="game">
+      <div class="header">
+        <div :class="{ 'countdown': true, 'go': inGame || inResult }">{{ countdown }}</div>
+        <EnterButton @click="startCountdown" text="READY" :isValid="isReady"/>
+        <h3 class="game-mode">{{ modeStr }}</h3>
+        <Timer :timerStatus="timerStatus" @emit-time="setTime"/>
       </div>
-    </div>
 
-    <div class="miss-count">
-      Miss: {{ missCount }}
-    </div>
+      <div class="text">
+        <div class="text-line" v-for="text in textDataList" :key="text.key">
+          <div class="prev-text">{{ text.prev }}</div>
+          <div :class="{ 'cur-text': true, 'miss-text': text.missFlag }">{{ text.cur }}</div>
+          <div class="next-text">{{ text.next }}</div>
+          <div class="invalid-text">{{ text.invalid }}</div>
+        </div>
+      </div>
 
-    <div class="roman">
-      <div class="roman-line" v-for="roman in romanDataList" :key="roman.key">
-        <div class="prev-roman">{{ roman.prev }}</div>
-        <div :class="{ 'cur-roman': true, 'miss-roman': text.missFlag }">{{ roman.cur }}</div>
-        <div class="next-roman">{{ roman.next }}</div>
+      <div class="miss-count">
+        Miss: {{ missCount }}
+      </div>
+
+      <div class="roman">
+        <div class="roman-line" v-for="roman in romanDataList" :key="roman.key">
+          <div class="prev-roman">{{ roman.prev }}</div>
+          <div :class="{ 'cur-roman': true, 'miss-roman': text.missFlag }">{{ roman.cur }}</div>
+          <div class="next-roman">{{ roman.next }}</div>
+        </div>
       </div>
     </div>
 
     <div class="result" v-if="inResult">
+    <!--<div class="result">-->
       <h3>結果</h3>
       <p>Time: {{ time }} 秒</p>
       <p>Level: {{ level }}</p>
@@ -45,6 +48,7 @@
       </div>
     </div>
 
+    <Config v-show="isReady" @emit-data="setConfigData"/>
 
   </div>
 </template>
@@ -54,6 +58,7 @@ import { Component, Prop, Vue } from 'vue-property-decorator';
 import TypingGame from '@/lib/typing';
 import EnterButton from './EnterButton.vue';
 import Timer, { eTimerStatus } from './Timer.vue';
+import Config, { ConfigData } from './Config.vue';
 import { eMode, getLevelStr } from '@/lib/typeWell';
 
 const enum eStatus {
@@ -64,6 +69,7 @@ const enum eStatus {
   components: {
     EnterButton,
     Timer,
+    Config,
   },
 })
 export default class TypeWell extends Vue {
@@ -76,6 +82,7 @@ export default class TypeWell extends Vue {
   private m_typingGame: TypingGame = new TypingGame(this.m_mode);
 
   public timeMs: number = 0;
+  private m_configData: ConfigData = new ConfigData();
 
   // カウントダウン関係
   private m_countdown: number = 0;
@@ -91,8 +98,8 @@ export default class TypeWell extends Vue {
   }
   public startCountdown() {
     this.m_status = eStatus.Countdown;
-    this.m_countdown = 3;
-    this.m_countdownId = window.setTimeout(this.countdownFunc, 1000);
+    this.m_countdown = this.m_configData.countdownTime + 1;
+    this.countdownFunc();
   }
   private gameStart() {
     this.m_status = eStatus.Game;
@@ -134,6 +141,9 @@ export default class TypeWell extends Vue {
 
   public setTime(timeMs: number) {
     this.timeMs = timeMs;
+  }
+  public setConfigData(configData: ConfigData){
+    this.m_configData = configData;
   }
 
   // モード判定
@@ -212,26 +222,20 @@ export default class TypeWell extends Vue {
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped lang="scss">
-#type-well{
+.game {
+  width: 85rem;
+  padding: 1rem;
+  margin: 2rem auto 2rem auto;
+  background: whitesmoke;
+  border: 0.1rem solid;
+  border-color: gray;
+  box-shadow: 0 3px 5px rgba(0, 0, 0, 0.22);
+}
+.warn {
+  color: red;
+  font-weight: bold;
 
 }
-h3 {
-  margin: 40px 0 0;
-}
-ul {
-  list-style-type: none;
-  padding: 0;
-}
-li {
-  display: inline-block;
-  margin: 0 10px;
-}
-a {
-  color: #42b983;
-}
-
-$text-font-size: 18px;
-$roman-font-size: 20px;
 
 .header {
   display: flex; /* 子要素をflexboxで揃える */
@@ -240,19 +244,17 @@ $roman-font-size: 20px;
   align-items: center;  /* 子要素をflexboxにより中央に配置する */
 }
 .countdown{
-  font-size: 22px;
-  border: 1px solid;
-  border-color: #000000;
-  padding: 2px 10px;
-  margin-top: 10px;
-  margin-right: 10px;
-  margin-bottom: 10px;
-  margin-left: 10px;
-  width: 40px;
-  height: 24px;
+  font-size: 2.2rem;
+  border: 0.1rem solid;
+  border-color: gray;
+  padding: 0.2rem 0.5rem;
+  margin: 1rem;
+  width: 5.5rem;
+  height: 3rem;
+  background: white;
 }
 .go {
-  color: #FF0000;
+  color: red;
 }
 .game-mode {
   margin-top: 10px;
@@ -261,22 +263,21 @@ $roman-font-size: 20px;
   margin-bottom: 10px;
 }
 .text {
-  margin-top: 10px;
-  margin-right: auto;
-  margin-bottom: 10px;
-  margin-left: auto;
+  margin: 1rem auto;
   //display: flex; /* 子要素をflexboxで揃える */
   //flex-direction: row; /* 子要素をflexboxにより横方向に揃える */
   //justify-content: center; /* 子要素をflexboxにより中央に配置する */
   //align-items: center;  /* 子要素をflexboxにより中央に配置する */
-  width: 800px; /* 見た目用 */
-  height: 200px; /* 見た目用 */
-  border: 1px solid; /* 見た目用 */;
-  font-size: $text-font-size;
+  width: 80rem; /* 見た目用 */
+  height: 20rem; /* 見た目用 */
+  border: 0.1rem solid;
+  border-color: gray;
+  font-size: 1.8rem;
+  background: white;
 }
 .text-line {
-  margin-top: 1px;
-  margin-bottom: 1px;
+  margin-top: 0.1rem;
+  margin-bottom: 0.1rem;
 
   display: flex; /* 子要素をflexboxで揃える */
   flex-direction: row; /* 子要素をflexboxにより横方向に揃える */
@@ -308,22 +309,18 @@ $roman-font-size: 20px;
   font-size: 18px;
 }
 .roman {
-  margin-top: 10px;
-  margin-right: auto;
-  margin-bottom: 10px;
-  margin-left: auto;
+  margin: 1rem auto;
 
-  width: 600px; /* 見た目用 */
-  height: 200px; /* 見た目用 */
-  border: 1px solid; /* 見た目用 */;
-  font-size: $roman-font-size;
-  font-family: 'Consolas',sans-serif;
+  width: 58rem; /* 見た目用 */
+  height: 21.5rem; /* 見た目用 */
+  border: 0.1rem solid;
+  border-color: gray;
+  font-size: 1.8rem;
+  font-family: 'Noto Sans Mono', sans-serif;
+  background: white;
 }
 .roman-line {
-  margin-top: 2px;
-  margin-right: 10px;
-  margin-bottom: 2px;
-  margin-left: 10px;
+  margin: 0.2rem 1rem;
 
   display: flex; /* 子要素をflexboxで揃える */
   flex-direction: row; /* 子要素をflexboxにより横方向に揃える */
@@ -334,32 +331,36 @@ $roman-font-size: 20px;
 }
 .prev-roman {
   color: #CCCCCC;
+  margin-left: auto;
 }
 .cur-roman{
-  color: #000000;
+  color: black;
 }
 .miss-roman{
-  color: #FF0000;
+  color: red;
 }
 .next-roman {
-  color: #000000;
-}
-.inline-block-list {
-  li {
-    display: inline-block;
-    margin: 0 10px;
-  }
+  color: black;
+  margin-right: auto;
 }
 .result {
   h3{
-    font-size: 20px;
-    margin-top: 10px;
+    font-size: 2rem;
+    margin-top: 1rem;
   }
-  font-size: 20px;
 
-  padding: 0.5em 1em;
-  margin: 2em auto;
-  border: double 5px #4689FF;
-  width: 300px;
+  p {
+    font-size: 1.9rem;
+    margin: 1.2rem 0;
+  }
+
+  li {
+    font-size: 1.9rem;
+  }
+
+  padding: 1rem 1rem 2rem 1rem;
+  margin: 4rem auto;
+  border: double 0.5rem #A0D0F0;
+  width: 30rem;
 }
 </style>
