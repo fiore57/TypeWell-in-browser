@@ -577,7 +577,7 @@ export default class TypingGame {
   private _kana: string = "";
   private _kanaCount: number = 0;
 
-  private _chunkList: Chunk[];
+  private _chunkList: Chunk[] = [];
   public _chunkCount: number = 0;
 
   private _typeCount: number = 0;
@@ -600,6 +600,7 @@ export default class TypingGame {
 
 
   public constructor(mode: eMode) {
+    if (!TypingWords.isWordsLoaded) return;
     this._generateWords(mode);
 
     // ローマ字の準備

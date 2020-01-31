@@ -23,16 +23,20 @@
           <li>Microsoft Edge</li>
           <li>Vivaldi</li>
         </ul>
+        <li>Ubuntu 18.04 LTS</li>
+        <ul>
+          <li>Google Chrome</li>
+        </ul>
       </ul>
-      <p>Internet Explorerでは動作しません。ご注意ください。</p>
+      <p>Internet Explorerでは動作しません。また、Firefox(Ubuntu)では、レイアウトが崩れることを確認しています（直すかは未定です）。</p>
     </div>
 
     <h4>お問い合わせ（不具合報告・要望・苦情等）</h4>
     <p>「ブラウザ版 タイプウェル国語R」は私（fiore）が勝手に作ったアプリですので、このアプリに関するお問い合わせはオリジナル作者にしないようお願いいたします。</p>
     <div class="center-list">
       <ul>
-        <li><a href="https://www.pc-gear.com" target="_blank">blog</a></li>
-        <li><a href="https://github.com/fiore57/TypeWell-in-browser" target = "_blank">Github</a>（開発者向け）</li>
+        <li><a href="https://www.pc-gear.com" target="_blank">blog</a>（Contactからお願いします）</li>
+        <li><a href="https://github.com/fiore57/TypeWell-in-browser" target = "_blank">Github</a>（開発者向け。Issueを立ててください。PRも歓迎です）</li>
       </ul>
     </div>
 
