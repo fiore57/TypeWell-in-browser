@@ -1,0 +1,13 @@
+[
+    {
+        "origin": [
+            "https://typewell-in-browser.web.app",
+            "https://typewell-in-browser.firebaseapp.com",
+            "http://localhost:8080"
+        ],
+        "method": [
+            "GET"
+        ],
+        "maxAgeSeconds": 86400
+    }
+]
