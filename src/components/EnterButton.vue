@@ -5,34 +5,58 @@
 </template>
 
 <script lang="ts">
-import { Component, Emit, Prop, Vue } from 'vue-property-decorator';
+import { createComponent, reactive, SetupContext, onBeforeMount, onBeforeUnmount} from "@vue/composition-api";
 
-@Component
-export default class EnterButton extends Vue {
-  @Prop({ default: "button" })
-  private text!: string;
-
-  @Prop({ default: true })
-  private isValid!: boolean;
-
-  @Emit("click")
-  public onClick() {}
-
-  public keyInput(event: KeyboardEvent) {
-    if(this.isValid && event.key === "Enter"){
-      this.onClick();
-    }
-  }
-
-  beforeMount() {
-    window.addEventListener("keydown", this.keyInput, true);
-  }
-
-  beforeDestroy() {
-    window.removeEventListener("keydown", this.keyInput, true);
-  }
-
+type Props = {
+  text: string;
+  isValid: boolean;
 }
+
+export default createComponent({
+  props: {
+    text: {
+      type: String,
+      default: "button"
+    },
+    isValid: {
+      type: Boolean,
+      default: true
+    }
+  },
+  setup(props: Props, context: SetupContext){
+    const onClick = () => {
+      window.console.log("Click Event");
+      context.emit("click");
+    }
+    const state = reactive({
+      isValid: props.isValid
+    });
+
+    const keyInput = (event: KeyboardEvent) => {
+      if(props.isValid){
+        for(const key of ["Enter", " "]){
+          if(event.key === key) {
+            onClick();
+            return;
+          }
+        }
+      }
+    };
+
+    onBeforeMount(() => {
+      window.addEventListener("keydown", keyInput, true);
+    });
+
+    onBeforeUnmount(() => {
+      window.removeEventListener("keydown", keyInput, true);
+    });
+
+    return {
+      state,
+      onClick
+    };
+  }
+})
 </script>
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->

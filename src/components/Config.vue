@@ -2,32 +2,42 @@
   <div class="config">
     <h3>設定</h3>
     カウントダウン（0～3秒）：
-    <input class="number-input" v-model.number="countdownTime" type="number" min="0" max="3" step="1">秒
+    <input class="number-input" v-model.number="state.countdownTime" type="number" min="0" max="3" step="1">秒
   </div>
 </template>
 
 <script lang="ts">
-import { Component, Emit, Watch, Vue } from 'vue-property-decorator';
+import { createComponent, reactive, computed, SetupContext, onBeforeMount, onBeforeUnmount} from "@vue/composition-api";
 
 export class ConfigData {
   public countdownTime: number = 3;
 }
 
-@Component
-export default class Config extends Vue {
-  public configData: ConfigData = new ConfigData();
+export default createComponent({
+  setup(context: SetupContext){
+    const emitData = (data: ConfigData) => {
+      context.emit("emit-data");
+    };
 
-  public get countdownTime(): number {
-    return this.configData.countdownTime;
-  }
-  public set countdownTime(value: number) {
-    this.configData.countdownTime = value;
-    this.emitData(this.configData);
-  }
+    const state = reactive({
+      configData: new ConfigData(),
 
-  @Emit()
-  public emitData(data: ConfigData){}
-}
+      countdownTime: computed({
+        get: (): number => {
+          return state.configData.countdownTime;
+        },
+        set: (val: number) => {
+          state.configData.countdownTime = val;
+          emitData(state.configData);
+        }
+      })
+    });
+
+    return {
+      state,
+    };
+  }
+})
 </script>
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->

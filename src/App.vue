@@ -1,42 +1,57 @@
 <template>
   <div id="app">
+    <h2>{{ title }}</h2>
+    <p class="warn">{{ description }}</p>
+
     <!--<img alt="Vue logo" src="./assets/logo.png">-->
-    <TypeWell msg="test"/>
+    <TypeWellProvider>
+      <TypeWell msg="test"/>
+    </TypeWellProvider>
     <Help/>
   </div>
 </template>
 
 <script lang="ts">
-import { Component, Vue } from 'vue-property-decorator';
-import TypeWell from './components/TypeWell.vue';
-import Help from './components/Help.vue';
+import { createComponent, onBeforeMount, onBeforeUnmount } from "@vue/composition-api";
+import TypeWell from "./components/TypeWell.vue";
+import TypeWellProvider from "./components/TypeWellProvider.vue";
+import Help from "./components/Help.vue";
 
-@Component({
+export default createComponent({
   components: {
     TypeWell,
+    TypeWellProvider,
     Help,
   },
-})
-export default class App extends Vue {
-  public keyInput(event: KeyboardEvent) {
-    const ignoreKeyList: string[] = [
-      " ", "F1", "F2", "F3", "F4"
-    ];
-    for(const ignoreKey of ignoreKeyList){
-      if(event.key === ignoreKey){
-        event.preventDefault(); // デフォルトアクションを止める
+  setup(){
+    // 非リアクティブ
+    const title = "ブラウザ版 タイプウェル国語R";
+    const description = "※このアプリは非公式です";
+
+    function keyInput(event: KeyboardEvent) {
+      const ignoreKeyList: string[] = [
+        " ", "F1", "F2", "F3", "F4"
+      ];
+      for(const ignoreKey of ignoreKeyList){
+        if(event.key === ignoreKey){
+          event.preventDefault(); // デフォルトアクションを止める
+        }
       }
     }
-  }
 
-  beforeMount() {
-    window.addEventListener('keydown', this.keyInput, true);
-  }
+    onBeforeMount(() => {
+      window.addEventListener('keydown', keyInput, true);
+    });
+    onBeforeUnmount(() => {
+      window.removeEventListener('keydown', keyInput, true);
+    });
 
-  beforeDestroy() {
-    window.removeEventListener('keydown', this.keyInput, true);
+    return {
+      title,
+      description,
+    }
   }
-}
+})
 </script>
 
 <style lang="scss">
@@ -48,5 +63,9 @@ export default class App extends Vue {
   text-align: center;
   color: #2c3e50;
   margin-top: 60px;
+}
+.warn {
+  color: red;
+  font-weight: bold;
 }
 </style>

@@ -1,18 +1,17 @@
 <template>
   <div id="type-well">
-    <h2>{{ title }}</h2>
-    <p class="warn">{{ description }}</p>
-
     <div class="game">
       <div class="header">
-        <div :class="{ 'countdown': true, 'go': inGame || inResult }">{{ countdown }}</div>
-        <EnterButton @click="startCountdown" text="READY" :isValid="isReady"/>
-        <h3 class="game-mode">{{ modeStr }}</h3>
-        <Timer :timerStatus="timerStatus" @emit-time="setTime"/>
+        <div :class="{ 'countdown': true, 'go': state.inGame || state.inResult }">{{ state.countdown }}</div>
+        <EnterButton @click="startCountdown" text="READY" :isValid="state.isReady"/>
+        <h3 class="game-mode">{{ state.modeStr }}</h3>
+        <Timer :timerStatus="state.timerStatus" @emit-time="setTime"/>
       </div>
 
+      <p>{{ storeTime }}</p>
+
       <div class="text">
-        <div class="text-line" v-for="text in textDataList" :key="text.key">
+        <div class="text-line" v-for="text in state.textDataList" :key="text.key">
           <div class="prev-text">{{ text.prev }}</div>
           <div :class="{ 'cur-text': true, 'miss-text': text.missFlag }">{{ text.cur }}</div>
           <div class="next-text">{{ text.next }}</div>
@@ -21,19 +20,21 @@
       </div>
 
       <div class="miss-count">
-        Miss: {{ missCount }}
+        Miss: {{ state.missCount }}
       </div>
 
       <div class="roman">
-        <div class="roman-line" v-for="roman in romanDataList" :key="roman.key">
-          <div class="prev-roman">{{ roman.prev }}</div>
-          <div :class="{ 'cur-roman': true, 'miss-roman': text.missFlag }">{{ roman.cur }}</div>
-          <div class="next-roman">{{ roman.next }}</div>
+        <div class="inner-roman" v-if="state.inGame || state.inResult">
+          <div class="roman-line" v-for="roman in state.romanDataList" :key="roman.key">
+            <div class="prev-roman">{{ roman.prev }}</div>
+            <div :class="{ 'cur-roman': true, 'miss-roman': roman.missFlag }">{{ roman.cur }}</div>
+            <div class="next-roman">{{ roman.next }}</div>
+          </div>
         </div>
       </div>
     </div>
 
-    <div class="result" v-if="inResult">
+    <div class="result" v-if="state.inResult">
     <!--<div class="result">-->
       <h3>結果</h3>
       <p>Time: {{ time }} 秒</p>
@@ -48,176 +49,174 @@
       </div>
     </div>
 
-    <Config v-show="isReady" @emit-data="setConfigData"/>
+    <Config v-show="state.isReady" @emit-data="setConfigData"/>
 
   </div>
 </template>
 
 <script lang="ts">
-import { Component, Prop, Vue } from 'vue-property-decorator';
+import { createComponent, reactive, computed, inject, onBeforeMount, onBeforeUnmount } from "@vue/composition-api";
 import TypingGame from '@/lib/typing';
 import EnterButton from './EnterButton.vue';
 import Timer, { eTimerStatus } from './Timer.vue';
 import Config, { ConfigData } from './Config.vue';
 import { eMode, getLevelStr } from '@/lib/typeWell';
+import counterStore from "@/stores/store";
+import TimeStoreKey from "@/stores/time-key";
 
 const enum eStatus {
   Ready, Countdown, Game, Result
 }
 
-@Component({
+export default createComponent({
   components: {
     EnterButton,
     Timer,
     Config,
   },
-})
-export default class TypeWell extends Vue {
-  @Prop() private msg!: string;
-  public readonly title: string = "ブラウザ版 タイプウェル国語R";
-  public readonly description: string = "※このアプリは非公式です"
-
-  private m_mode: eMode = eMode.Khjy;
-  private m_status: eStatus = eStatus.Ready;
-  private m_typingGame: TypingGame = new TypingGame(this.m_mode);
-
-  public timeMs: number = 0;
-  private m_configData: ConfigData = new ConfigData();
-
-  // カウントダウン関係
-  private m_countdown: number = 0;
-  private m_countdownId: number = 0;
-  private countdownFunc(){
-    --this.m_countdown;
-    if(this.m_countdown === 0){
-      this.gameStart();
+  setup(){
+    const timeStore = inject(TimeStoreKey);
+    if(!timeStore){
+      throw new Error(`${TimeStoreKey} is not provided`);
     }
-    else {
-      this.m_countdownId = window.setTimeout(this.countdownFunc, 1000);
-    }
-  }
-  public startCountdown() {
-    this.m_status = eStatus.Countdown;
-    this.m_countdown = this.m_configData.countdownTime + 1;
-    this.countdownFunc();
-  }
-  private gameStart() {
-    this.m_status = eStatus.Game;
-    this.m_typingGame = new TypingGame(this.m_mode);
-  }
 
-  // 入力を処理
-  public keyInput(event: KeyboardEvent) {
-    // Escapeで中断
-    if(event.key === "Escape"){
-      if(this.inCountdown) window.clearTimeout(this.m_countdownId);
-      this.m_status = eStatus.Ready;
-      return;
-    }
-    if(this.isReady){
-      switch(event.key){
-        case "F1":
-          this.m_mode = eMode.Khjy;
-          break;
-        case "F2":
-          this.m_mode = eMode.Ktkn;
-          break;
-        case "F3":
-          this.m_mode = eMode.Knj;
-          break;
-        case "F4":
-          this.m_mode = eMode.Ktwz;
-          break;
+    const storeTime = computed(() => timeStore.timeMs);
+
+    const state = reactive({
+      m_mode: eMode.Khjy,
+      m_status: eStatus.Ready,
+      m_typingGame: new TypingGame(),
+      timeMs: 0,
+      m_configData: new ConfigData(),
+
+      // カウントダウン関係
+      m_countdown: 0,
+      m_countdownId: 0,
+
+      // モード判定
+      isReady: computed((): boolean => state.m_status === eStatus.Ready),
+      inCountdown: computed((): boolean => state.m_status === eStatus.Countdown),
+      inGame: computed((): boolean => state.m_status === eStatus.Game),
+      inResult: computed((): boolean => state.m_status === eStatus.Result),
+
+      // ヘッダ
+      countdown: computed((): string => {
+        if(state.inCountdown) return "" + state.m_countdown;
+        else if(state.inGame) return "GO!"
+        return "";
+      }),
+      modeStr: computed((): string => {
+        const modeStrList = ["基本常用語", "カタカナ語", "漢字", "慣用句・ことわざ"];
+        return modeStrList[state.m_mode];
+      }),
+      timerStatus: computed(() => {
+        switch(state.m_status) {
+          case eStatus.Ready: // fall through
+          case eStatus.Countdown: return eTimerStatus.Reset;
+          case eStatus.Game: return eTimerStatus.Start;
+          case eStatus.Result: return eTimerStatus.Stop;
+          default: throw new Error("Unknown status");
+        }
+      }),
+
+      // テキスト
+      text: computed((): string => state.isReady || state.inCountdown ? "" : state.m_typingGame.text),
+      textDataList: computed((): {}[] => {
+        //if(!state.isReady && !state.inCountdown) window.console.log(state.m_typingGame.textDataList);
+        return state.isReady || state.inCountdown ? [{}] : state.m_typingGame.textDataList;
+        }),
+      missCount: computed((): number => state.isReady || state.inCountdown ? 0 : state.m_typingGame.missCount),
+      romanDataList: computed((): {}[] => state.isReady || state.inCountdown ? [{}] : state.m_typingGame.romanDataList),
+
+      // 結果
+      time: computed((): string => (state.timeMs / 1000).toFixed(3)),
+      level: computed((): string => getLevelStr(state.timeMs)),
+      m_tpm: computed((): number => state.m_tps * 60),
+      m_tps: computed((): number => (state.timeMs === 0 ? 0 : state.m_typingGame.romanLength / state.timeMs * 1000)),
+      tpm: computed((): string => state.m_tpm.toFixed(2)),
+      tps: computed((): string => state.m_tps.toFixed(3)),
+    })
+
+    function countdownFunc() {
+      --state.m_countdown;
+      if(state.m_countdown === 0){
+        gameStart();
+      }
+      else {
+        state.m_countdownId = window.setTimeout(countdownFunc, 1000);
       }
     }
-    if(!this.inGame) return;
-    this.m_typingGame.update(event.key);
 
-    // 終了時の処理
-    if(this.m_typingGame.isFinished()){
-      this.m_status = eStatus.Result;
+    function startCountdown() {
+      state.m_status = eStatus.Countdown;
+      state.m_countdown = state.m_configData.countdownTime + 1;
+      countdownFunc();
+    }
+
+    function gameStart() {
+      state.m_typingGame.init(state.m_mode);
+      state.m_status = eStatus.Game;
+      window.console.log("Game Start!");
+      window.console.log(state.m_typingGame);
+      window.console.log(state.timerStatus);
+    }
+
+    // 入力を処理
+    function keyInput(event: KeyboardEvent) {
+      // Escapeで中断
+      if(event.key === "Escape"){
+        if(state.inCountdown) window.clearTimeout(state.m_countdownId);
+        state.m_status = eStatus.Ready;
+        return;
+      }
+      if(state.isReady){
+        switch(event.key){
+          case "F1":
+            state.m_mode = eMode.Khjy;
+            break;
+          case "F2":
+            state.m_mode = eMode.Ktkn;
+            break;
+          case "F3":
+            state.m_mode = eMode.Knj;
+            break;
+          case "F4":
+            state.m_mode = eMode.Ktwz;
+            break;
+        }
+      }
+      if(!state.inGame) return;
+      state.m_typingGame.update(event.key);
+
+      // 終了時の処理
+      if(state.m_typingGame.isFinished()){
+        state.m_status = eStatus.Result;
+      }
+    }
+
+    function setTime(timeMs: number) {
+      state.timeMs = timeMs;
+    }
+    function setConfigData(configData: ConfigData){
+      state.m_configData = configData;
+    }
+
+    onBeforeMount(() => {
+      window.addEventListener('keydown', keyInput, true);
+    });
+    onBeforeUnmount(() => {
+      window.removeEventListener('keydown', keyInput, true);
+    });
+
+    return {
+      storeTime,
+      state,
+      setConfigData,
+      setTime,
+      startCountdown,
     }
   }
-
-  public setTime(timeMs: number) {
-    this.timeMs = timeMs;
-  }
-  public setConfigData(configData: ConfigData){
-    this.m_configData = configData;
-  }
-
-  // モード判定
-  public get isReady(): boolean{
-    return this.m_status === eStatus.Ready;
-  }
-  public get inCountdown(): boolean {
-    return this.m_status === eStatus.Countdown;
-  }
-  public get inGame(): boolean {
-    return this.m_status === eStatus.Game;
-  }
-  public get inResult(): boolean {
-    return this.m_status === eStatus.Result;
-  }
-  // ヘッダ
-  public get countdown(): string {
-    if(this.inCountdown) return "" + this.m_countdown;
-    else if(this.inGame) return "GO!"
-    return "";
-  }
-  public get modeStr(): string {
-    const modeStrList = ["基本常用語", "カタカナ語", "漢字", "慣用句・ことわざ"];
-    return modeStrList[this.m_mode];
-  }
-  public get timerStatus(): eTimerStatus {
-    switch(this.m_status) {
-      case eStatus.Ready: // fall through
-      case eStatus.Countdown: return eTimerStatus.Reset;
-      case eStatus.Game: return eTimerStatus.Start;
-      case eStatus.Result: return eTimerStatus.Stop;
-      default: throw new Error("Unknown status");
-    }
-  }
-  // テキスト
-  public get text(): string {
-    return this.isReady || this.inCountdown ? "" : this.m_typingGame.text;
-  }
-  public get textDataList(): {} {
-    return this.isReady || this.inCountdown ? {} : this.m_typingGame.textDataList;
-  }
-  public get missCount(): number {
-    return this.isReady || this.inCountdown ? 0 : this.m_typingGame.missCount;
-  }
-  public get romanDataList(): {} {
-    return this.isReady || this.inCountdown ? {} : this.m_typingGame.romanDataList;
-  }
-  // 結果
-  public get time(): string {
-    return (this.timeMs / 1000).toFixed(3);
-  }
-  public get level(): string {
-    return getLevelStr(this.timeMs);
-  }
-  private get m_tpm(): number {
-    return this.m_tps * 60;
-  }
-  private get m_tps(): number {
-    return this.timeMs === 0 ? 0 : this.m_typingGame.romanLength / this.timeMs * 1000;
-  }
-  public get tpm(): string {
-    return this.m_tpm.toFixed(2);
-  }
-  public get tps(): string {
-    return this.m_tps.toFixed(3);
-  }
-
-  beforeMount() {
-    window.addEventListener('keydown', this.keyInput, true);
-  }
-  beforeDestroy() {
-    window.removeEventListener('keydown', this.keyInput, true);
-  }
-}
+})
 </script>
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
@@ -231,12 +230,6 @@ export default class TypeWell extends Vue {
   border-color: gray;
   box-shadow: 0 3px 5px rgba(0, 0, 0, 0.22);
 }
-.warn {
-  color: red;
-  font-weight: bold;
-
-}
-
 .header {
   display: flex; /* 子要素をflexboxで揃える */
   flex-direction: row; /* 子要素をflexboxにより横方向に揃える */

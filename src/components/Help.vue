@@ -47,10 +47,9 @@
 </template>
 
 <script lang="ts">
-import { Component, Prop, Vue } from 'vue-property-decorator';
+import { createComponent } from "@vue/composition-api";
 
-@Component
-export default class Help extends Vue {}
+export default createComponent({});
 </script>
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
