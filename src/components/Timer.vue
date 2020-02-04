@@ -1,72 +1,88 @@
 <template>
   <div class="timer">
-    Time: {{ displayTime }}
+    Time: {{ state.displayTime }}
   </div>
 </template>
 
 <script lang="ts">
-import { Component, Prop, Emit, Watch, Vue } from 'vue-property-decorator';
+import { createComponent, reactive, computed, watch, inject, onBeforeMount, onBeforeUnmount} from "@vue/composition-api";
+import ResultStoreKey from "./result-store-key";
 
 export const enum eTimerStatus{
   Reset, Start, Stop
 }
 
-@Component
-export default class Timer extends Vue {
-  @Prop({ default: eTimerStatus.Reset })
-  private timerStatus!: eTimerStatus;
-
-  private m_timerStatus: eTimerStatus = eTimerStatus.Reset;
-
-  private m_startTime: number = 0;
-  private m_elapsedTimeMs: number = 0;
-
-  @Watch('timerStatus')
-  public onTimerStatusChanged(newValue: eTimerStatus, oldValue: eTimerStatus){
-    this.m_timerStatus = newValue;
-    // Reset -> Start (0秒から起動)
-    if(newValue === eTimerStatus.Start && oldValue === eTimerStatus.Reset){
-      this.m_startTime = Date.now();
-      this.startRAFLoop();
-    }
-    // Stop -> Start (現在の秒数から再開)
-    else if(newValue === eTimerStatus.Start && oldValue === eTimerStatus.Stop){
-      this.m_startTime = Date.now() - this.m_elapsedTimeMs;
-      this.startRAFLoop();
-    }
-    // Start -> Stop (中断・タイムを送信)
-    else if(newValue === eTimerStatus.Stop && oldValue === eTimerStatus.Start){
-      this.emitTime(this.m_elapsedTimeMs);
-    }
-    // * -> Reset (リセット)
-    else if(newValue === eTimerStatus.Reset){
-      this.m_elapsedTimeMs = 0;
-    }
-    // ???
-    else {
-      throw new Error("Unknown status");
-    }
-  }
-
-  @Emit()
-  public emitTime(timeMs: number){}
-
-  private startRAFLoop() {
-    window.requestAnimationFrame(this.calcTime);
-  }
-
-  private calcTime() {
-    if(this.m_timerStatus === eTimerStatus.Start){
-      const nowTime = Date.now();
-      this.m_elapsedTimeMs = nowTime - this.m_startTime;
-      window.requestAnimationFrame(this.calcTime);
-    }
-  }
-
-  public get displayTime(): string{
-    return (Math.floor(this.m_elapsedTimeMs / 100) / 10).toFixed(1)
-  }
+type Props = {
+  timerStatus: eTimerStatus;
 }
+
+export default createComponent({
+  props: {
+    timerStatus: {
+      type: Number,
+      default: eTimerStatus.Reset
+    }
+  },
+  setup(props: Props) {
+    const resultStore = inject(ResultStoreKey);
+    if(!resultStore){
+      throw new Error(`${ResultStoreKey} is not provided`);
+    }
+
+    const state = reactive({
+      m_timerStatus: eTimerStatus.Reset,
+      m_startTime: 0,
+      m_elapsedTimeMs: 0,
+
+      displayTime: computed((): string => (Math.floor(state.m_elapsedTimeMs / 100) / 10).toFixed(1)),
+
+    })
+
+    // props は reactive ではないので、arrow function で包む
+    watch(() => props.timerStatus, (newVal: eTimerStatus, oldVal: eTimerStatus) =>
+    {
+      state.m_timerStatus = newVal;
+      // Reset -> Start (0秒から起動)
+      if(newVal === eTimerStatus.Start && oldVal === eTimerStatus.Reset){
+        state.m_startTime = Date.now();
+        startRAFLoop();
+      }
+      // Stop -> Start (現在の秒数から再開)
+      else if(newVal === eTimerStatus.Start && oldVal === eTimerStatus.Stop){
+        state.m_startTime = Date.now() - state.m_elapsedTimeMs;
+        startRAFLoop();
+      }
+      // Start -> Stop (中断)
+      else if(newVal === eTimerStatus.Stop && oldVal === eTimerStatus.Start){
+        //emitTime(state.m_elapsedTimeMs);
+      }
+      // * -> Reset (リセット)
+      else if(newVal === eTimerStatus.Reset){
+        state.m_elapsedTimeMs = 0;
+      }
+      // ???
+      else {
+        throw new Error("Unknown status");
+      }
+    });
+
+    function startRAFLoop() {
+      window.requestAnimationFrame(calcTime);
+    }
+    function calcTime() {
+      if(resultStore) resultStore.updateTime(Date.now() - state.m_startTime);
+      if(state.m_timerStatus === eTimerStatus.Start){
+        const nowTime = Date.now();
+        state.m_elapsedTimeMs = nowTime - state.m_startTime;
+        window.requestAnimationFrame(calcTime);
+      }
+    }
+
+    return {
+      state,
+    }
+  }
+});
 </script>
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->

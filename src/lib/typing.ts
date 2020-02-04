@@ -401,7 +401,7 @@ class TypePatternList {
   /** 正しい入力であればtrue、そうでなければfalseを返す */
   public update(inputChar: string, kanaFinished: (newKanaCount: number) => void): boolean {
     // 正しい入力でない場合、即return
-    window.console.log(inputChar);
+    // window.console.log(inputChar);
     if (!this.isCorrectInput(inputChar)) {
       return false;
     }
@@ -598,8 +598,32 @@ export default class TypingGame {
   /** romanの行数 */
   private readonly _romanLineNum: number = 8;
 
+  // Constructorは何もしない
+  public constructor() { }
 
-  public constructor(mode: eMode) {
+  /** 変数を初期化する */
+  private initVariables() {
+    this._text = "";
+    this._kanaList = [];
+    this._kana = "";
+    this._kanaCount = 0;
+
+    this._chunkList = [];
+    this._chunkCount = 0;
+
+    this._typeCount = 0;
+    this._missCount = 0;
+    this._isFinished = false;
+    this._missFlag = false;
+
+    this._additionalRomanCountSum = 0;
+    this._invalidTextIndex = 0;
+  }
+
+  /** 初期化処理を行う */
+  public init(mode: eMode) {
+    this.initVariables();
+
     if (!TypingWords.isWordsLoaded) return;
     this._generateWords(mode);
 

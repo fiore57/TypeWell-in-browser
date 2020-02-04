@@ -31,7 +31,7 @@
       <p>Internet Explorerでは動作しません。また、Firefox(Ubuntu)では、レイアウトが崩れることを確認しています（直すかは未定です）。</p>
     </div>
 
-    <h4>お問い合わせ（不具合報告・要望・苦情等）</h4>
+    <h4>お問い合わせ（ワード間違い・不具合報告・要望・苦情等）</h4>
     <p>「ブラウザ版 タイプウェル国語R」は私（fiore）が勝手に作ったアプリですので、このアプリに関するお問い合わせはオリジナル作者にしないようお願いいたします。</p>
     <div class="center-list">
       <ul>
@@ -47,10 +47,9 @@
 </template>
 
 <script lang="ts">
-import { Component, Prop, Vue } from 'vue-property-decorator';
+import { createComponent } from "@vue/composition-api";
 
-@Component
-export default class Help extends Vue {}
+export default createComponent({});
 </script>
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
