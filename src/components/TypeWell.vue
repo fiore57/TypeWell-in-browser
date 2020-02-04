@@ -8,8 +8,6 @@
         <Timer :timerStatus="state.timerStatus"/>
       </div>
 
-      <p>{{ storeTimeMs }}, {{ storeMissCount }}</p>
-
       <TypeWellText :textDataList="state.textDataList"/>
 
       <div class="miss-count">
@@ -17,13 +15,12 @@
       </div>
 
       <TypeWellRoman :romanDataList="state.romanDataList"/>
-
     </div>
 
-    <!--<Result v-if="state.inResult"/>-->
-    <Result />
+    <Result v-if="state.inResult"/>
+    <!--<Result />-->
 
-    <Config v-show="state.isReady" @emit-data="setConfigData"/>
+    <Config v-show="state.isReady" @updated="setConfigData"/>
 
   </div>
 </template>
@@ -126,9 +123,6 @@ export default createComponent({
     function gameStart() {
       state.m_typingGame.init(state.m_mode);
       state.m_status = eStatus.Game;
-      window.console.log("Game Start!");
-      window.console.log(state.m_typingGame);
-      window.console.log(state.timerStatus);
     }
 
     // 入力を処理
@@ -156,6 +150,7 @@ export default createComponent({
         }
       }
       if(!state.inGame) return;
+      // 入力処理
       state.m_typingGame.update(event.key);
 
       // 終了時の処理
@@ -198,7 +193,7 @@ export default createComponent({
   background: whitesmoke;
   border: 0.1rem solid;
   border-color: gray;
-  box-shadow: 0 3px 5px rgba(0, 0, 0, 0.22);
+  box-shadow: 0 0.3rem 0.5rem rgba(0, 0, 0, 0.22);
 }
 .header {
   display: flex; /* 子要素をflexboxで揃える */
@@ -220,14 +215,11 @@ export default createComponent({
   color: red;
 }
 .game-mode {
-  margin-top: 10px;
-  margin-left: 50px;
-  margin-right: 100px;
-  margin-bottom: 10px;
+  width: 20rem;
+  margin: 1rem 10rem 1rem 5rem;
 }
 .miss-count {
-  margin-top: 4px;
-  margin-bottom: 4px;
-  font-size: 18px;
+  margin: 0.4rem 0;
+  font-size: 1.8rem;
 }
 </style>

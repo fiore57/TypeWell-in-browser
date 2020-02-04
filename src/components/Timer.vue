@@ -70,7 +70,6 @@ export default createComponent({
       window.requestAnimationFrame(calcTime);
     }
     function calcTime() {
-      window.console.log();
       if(resultStore) resultStore.updateTime(Date.now() - state.m_startTime);
       if(state.m_timerStatus === eTimerStatus.Start){
         const nowTime = Date.now();

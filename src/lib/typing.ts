@@ -401,7 +401,7 @@ class TypePatternList {
   /** 正しい入力であればtrue、そうでなければfalseを返す */
   public update(inputChar: string, kanaFinished: (newKanaCount: number) => void): boolean {
     // 正しい入力でない場合、即return
-    window.console.log(inputChar);
+    // window.console.log(inputChar);
     if (!this.isCorrectInput(inputChar)) {
       return false;
     }

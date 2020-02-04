@@ -7,31 +7,32 @@
 </template>
 
 <script lang="ts">
-import { createComponent, reactive, computed, SetupContext, onBeforeMount, onBeforeUnmount} from "@vue/composition-api";
+import { createComponent, reactive, computed, SetupContext, onBeforeMount, onBeforeUnmount } from "@vue/composition-api";
 
 export class ConfigData {
   public countdownTime: number = 3;
 }
 
 export default createComponent({
-  setup(context: SetupContext){
-    const emitData = (data: ConfigData) => {
-      context.emit("emit-data");
-    };
+  // context は第2引数にすること！！！
+  setup(_props, context: SetupContext){
+    let configData = new ConfigData();
 
     const state = reactive({
-      configData: new ConfigData(),
-
       countdownTime: computed({
         get: (): number => {
-          return state.configData.countdownTime;
+          return configData.countdownTime;
         },
         set: (val: number) => {
-          state.configData.countdownTime = val;
-          emitData(state.configData);
+          configData.countdownTime = val;
+          emitData(configData);
         }
       })
     });
+
+    function emitData(data: ConfigData) {
+      context.emit("updated", data);
+    }
 
     return {
       state,

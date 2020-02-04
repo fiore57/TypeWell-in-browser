@@ -64,16 +64,13 @@ export default createComponent({
     font-size: 2rem;
     margin-top: 1rem;
   }
-
   p {
     font-size: 1.9rem;
     margin: 1.2rem 0;
   }
-
   li {
     font-size: 1.9rem;
   }
-
   padding: 1rem 1rem 2rem 1rem;
   margin: 4rem auto;
   border: double 0.5rem #A0D0F0;
