@@ -1,5 +1,4 @@
 <template>
-  <!--<div class="result" v-if="state.inResult">-->
   <div class="result">
     <h3>結果</h3>
     <p>Time: {{ state.time }} 秒</p>
@@ -19,6 +18,7 @@
 import { createComponent, reactive, computed, inject, onBeforeMount, onBeforeUnmount} from "@vue/composition-api";
 import ResultStoreKey from "./result-store-key";
 import { getLevelStr } from '@/lib/typeWell';
+import { calcUps, calcUpm } from "@/lib/typing-utils";
 
 type Props = {
   timeMs: number;
@@ -43,9 +43,11 @@ export default createComponent({
       time: computed((): string => (state.timeMs / 1000).toFixed(3)),
       level: computed((): string => getLevelStr(state.timeMs)),
       missCount: computed((): number => resultStore.missCount),
-      m_tpm: computed((): number => state.m_tps * 60),
+      m_tpm: computed((): number => calcUpm(400, state.timeMs)),
+      //m_tpm: computed((): number => state.m_tps * 60),
       // TODO: romanLengthがマジックナンバーになっている
-      m_tps: computed((): number => (state.timeMs === 0 ? 0 : 400 / state.timeMs * 1000)),
+      m_tps: computed((): number => calcUps(400, state.timeMs)),
+      //m_tps: computed((): number => (state.timeMs === 0 ? 0 : 400 / state.timeMs * 1000)),
       tpm: computed((): string => state.m_tpm.toFixed(2)),
       tps: computed((): string => state.m_tps.toFixed(3)),
     })
