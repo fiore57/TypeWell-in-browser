@@ -1,10 +1,10 @@
 <template>
   <div class="roman">
-      <div class="roman-line" v-for="roman in state.romanDataList" :key="roman.key">
-        <div class="prev-roman">{{ roman.prev }}</div>
-        <div :class="{ 'cur-roman': true, 'miss-roman': roman.missFlag }">{{ roman.cur }}</div>
-        <div class="next-roman">{{ roman.next }}</div>
-      </div>
+    <div class="roman-line" v-for="roman in state.romanDataList" :key="roman.key">
+      <div class="prev-roman">{{ roman.prev }}</div>
+      <div :class="{ 'cur-roman': true, 'miss-roman': roman.missFlag }">{{ roman.cur }}</div>
+      <div class="next-roman">{{ roman.next }}</div>
+    </div>
   </div>
 </template>
 
@@ -31,7 +31,7 @@ export default createComponent({
 
     const state = reactive({
       romanDataList: computed(() => props.romanDataList)
-    })
+    });
 
     return {
       state,
@@ -44,8 +44,8 @@ export default createComponent({
 <style scoped lang="scss">
 .roman {
   margin: 1rem auto;
-  width: 58rem; /* 見た目用 */
-  height: 21.5rem; /* 見た目用 */
+  width: 58rem;
+  height: 21.5rem;
   border: 0.1rem solid;
   border-color: gray;
   font-size: 1.8rem;
