@@ -5,8 +5,8 @@
 </template>
 
 <script lang="ts">
-import { createComponent, reactive, computed, watch, inject, SetupContext, onBeforeMount, onBeforeUnmount} from "@vue/composition-api";
-import TimeStoreKey from "@/stores/time-key";
+import { createComponent, reactive, computed, watch, inject, onBeforeMount, onBeforeUnmount} from "@vue/composition-api";
+import ResultStoreKey from "./result-store-key";
 
 export const enum eTimerStatus{
   Reset, Start, Stop
@@ -23,15 +23,11 @@ export default createComponent({
       default: eTimerStatus.Reset
     }
   },
-  setup(props: Props, context: SetupContext) {
-    const timeStore = inject(TimeStoreKey);
-    if(!timeStore){
-      throw new Error(`${TimeStoreKey} is not provided`);
+  setup(props: Props) {
+    const resultStore = inject(ResultStoreKey);
+    if(!resultStore){
+      throw new Error(`${ResultStoreKey} is not provided`);
     }
-
-    const emitTime = (timeMs: number) => {
-      context.emit("emit-time", timeMs);
-    };
 
     const state = reactive({
       m_timerStatus: eTimerStatus.Reset,
@@ -42,40 +38,40 @@ export default createComponent({
 
     })
 
-      // props は reactive ではないので、arrow function で包む
-      watch(() => props.timerStatus, (newVal: eTimerStatus, oldVal: eTimerStatus) =>
-      {
-        state.m_timerStatus = newVal;
-        // Reset -> Start (0秒から起動)
-        if(newVal === eTimerStatus.Start && oldVal === eTimerStatus.Reset){
-          state.m_startTime = Date.now();
-          startRAFLoop();
-        }
-        // Stop -> Start (現在の秒数から再開)
-        else if(newVal === eTimerStatus.Start && oldVal === eTimerStatus.Stop){
-          state.m_startTime = Date.now() - state.m_elapsedTimeMs;
-          startRAFLoop();
-        }
-        // Start -> Stop (中断・タイムを送信)
-        else if(newVal === eTimerStatus.Stop && oldVal === eTimerStatus.Start){
-          emitTime(state.m_elapsedTimeMs);
-        }
-        // * -> Reset (リセット)
-        else if(newVal === eTimerStatus.Reset){
-          state.m_elapsedTimeMs = 0;
-        }
-        // ???
-        else {
-          throw new Error("Unknown status");
-        }
-      });
+    // props は reactive ではないので、arrow function で包む
+    watch(() => props.timerStatus, (newVal: eTimerStatus, oldVal: eTimerStatus) =>
+    {
+      state.m_timerStatus = newVal;
+      // Reset -> Start (0秒から起動)
+      if(newVal === eTimerStatus.Start && oldVal === eTimerStatus.Reset){
+        state.m_startTime = Date.now();
+        startRAFLoop();
+      }
+      // Stop -> Start (現在の秒数から再開)
+      else if(newVal === eTimerStatus.Start && oldVal === eTimerStatus.Stop){
+        state.m_startTime = Date.now() - state.m_elapsedTimeMs;
+        startRAFLoop();
+      }
+      // Start -> Stop (中断)
+      else if(newVal === eTimerStatus.Stop && oldVal === eTimerStatus.Start){
+        //emitTime(state.m_elapsedTimeMs);
+      }
+      // * -> Reset (リセット)
+      else if(newVal === eTimerStatus.Reset){
+        state.m_elapsedTimeMs = 0;
+      }
+      // ???
+      else {
+        throw new Error("Unknown status");
+      }
+    });
 
     function startRAFLoop() {
       window.requestAnimationFrame(calcTime);
     }
     function calcTime() {
       window.console.log();
-      if(timeStore) timeStore.updateTime(Date.now() - state.m_startTime);
+      if(resultStore) resultStore.updateTime(Date.now() - state.m_startTime);
       if(state.m_timerStatus === eTimerStatus.Start){
         const nowTime = Date.now();
         state.m_elapsedTimeMs = nowTime - state.m_startTime;

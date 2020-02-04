@@ -1,11 +1,11 @@
 <template>
-  <div class="enter-button">
-    <button @click="onClick" :disabled="!isValid" :class="{ disabledButton: isValid }">{{ text }}</button>
+  <div class="type-well-button">
+    <button @click="onClick" :disabled="!state.isValid" :class="{ disabledButton: state.isValid }">{{ state.text }}</button>
   </div>
 </template>
 
 <script lang="ts">
-import { createComponent, reactive, SetupContext, onBeforeMount, onBeforeUnmount} from "@vue/composition-api";
+import { createComponent, reactive, computed, SetupContext, onBeforeMount, onBeforeUnmount } from "@vue/composition-api";
 
 type Props = {
   text: string;
@@ -24,16 +24,14 @@ export default createComponent({
     }
   },
   setup(props: Props, context: SetupContext){
-    const onClick = () => {
-      window.console.log("Click Event");
-      context.emit("click");
-    }
     const state = reactive({
-      isValid: props.isValid
+      isValid: computed(() => props.isValid),
+      text: computed(() => props.text),
     });
 
-    const keyInput = (event: KeyboardEvent) => {
-      if(props.isValid){
+    function keyInput(event: KeyboardEvent) {
+      if(state.isValid){
+        // Enter or Space で発火
         for(const key of ["Enter", " "]){
           if(event.key === key) {
             onClick();
@@ -41,19 +39,22 @@ export default createComponent({
           }
         }
       }
-    };
+    }
+
+    function onClick() {
+      context.emit("click");
+    }
 
     onBeforeMount(() => {
       window.addEventListener("keydown", keyInput, true);
     });
-
     onBeforeUnmount(() => {
       window.removeEventListener("keydown", keyInput, true);
     });
 
     return {
       state,
-      onClick
+      onClick,
     };
   }
 })
@@ -61,15 +62,10 @@ export default createComponent({
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped lang="scss">
-
 button {
-  width: 100px;
-  height: 30px;
-  font-size: 18px;
-  margin-top: 10px;
-  margin-right: 20px;
-  margin-bottom: 10px;
-  margin-left: 20px;
+  width: 10rem;
+  height: 3rem;
+  font-size: 1.8rem;
+  margin: 1rem 2rem;
 }
-
 </style>
