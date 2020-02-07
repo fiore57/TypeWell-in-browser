@@ -10,6 +10,8 @@
 
       <TypeWellText :textDataList="state.textDataList"/>
 
+      <TypeWellTarget/>
+
       <div class="miss-count">
         Miss: {{ state.missCount }}
       </div>
@@ -17,8 +19,11 @@
       <TypeWellRoman :romanDataList="state.romanDataList"/>
     </div>
 
+    <!--
     <Result v-if="state.inResult"/>
-    <!--<Result />-->
+    <Result />
+    -->
+    <Result />
 
     <Config v-show="state.isReady" @updated="setConfigData"/>
 
@@ -31,6 +36,7 @@ import TypingGame from "@/lib/typing";
 import TypeWellButton from "./TypeWellButton.vue";
 import Timer, { eTimerStatus } from "./Timer.vue";
 import TypeWellText from "./TypeWellText.vue";
+import TypeWellTarget from "./TypeWellTarget.vue";
 import TypeWellRoman from "./TypeWellRoman.vue";
 import Config, { ConfigData } from "./Config.vue";
 import Result from "./Result.vue";
@@ -46,6 +52,7 @@ export default createComponent({
     TypeWellButton,
     Timer,
     TypeWellText,
+    TypeWellTarget,
     TypeWellRoman,
     Config,
     Result,
@@ -152,13 +159,14 @@ export default createComponent({
       if(!state.inGame) return;
       // 入力処理
       state.m_typingGame.update(event.key);
+      if(resultStore){
+        resultStore.updateTypeCount(state.m_typingGame.typeCount);
+        resultStore.updateMissCount(state.m_typingGame.missCount);
+      }
 
       // 終了時の処理
       if(state.m_typingGame.isFinished()){
         state.m_status = eStatus.Result;
-        if(resultStore){
-          resultStore.setMissCount(state.missCount);
-        }
       }
     }
 

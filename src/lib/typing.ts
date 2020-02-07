@@ -723,6 +723,16 @@ export default class TypingGame {
     }
     return ret;
   }
+  /**
+   * romanLengthに対する打鍵数
+   *
+   * 0 <= typeCount <= romanLength
+   *
+   * 純粋な打鍵数ではないので注意！！！
+   */
+  public get typeCount(): number {
+    return this._typeCount - this._additionalRomanCountSum;
+  }
   public get missCount(): number {
     return this._missCount;
   }
