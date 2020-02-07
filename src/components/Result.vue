@@ -44,10 +44,8 @@ export default createComponent({
       level: computed((): string => getLevelStr(state.timeMs)),
       missCount: computed((): number => resultStore.missCount),
       m_tpm: computed((): number => calcUpm(400, state.timeMs)),
-      //m_tpm: computed((): number => state.m_tps * 60),
       // TODO: romanLengthがマジックナンバーになっている
       m_tps: computed((): number => calcUps(400, state.timeMs)),
-      //m_tps: computed((): number => (state.timeMs === 0 ? 0 : 400 / state.timeMs * 1000)),
       tpm: computed((): string => state.m_tpm.toFixed(2)),
       tps: computed((): string => state.m_tps.toFixed(3)),
     })
