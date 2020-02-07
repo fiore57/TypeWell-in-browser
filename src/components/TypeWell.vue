@@ -138,6 +138,7 @@ export default createComponent({
       if(event.key === "Escape"){
         if(state.inCountdown) window.clearTimeout(state.m_countdownId);
         state.m_status = eStatus.Ready;
+        if(resultStore) resultStore.reset();
         return;
       }
       if(state.isReady){

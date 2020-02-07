@@ -7,6 +7,11 @@ export default function resultStore() {
     missCount: 0,
   });
   return {
+    reset() {
+      state.timeMs = 0;
+      state.typeCount = 0;
+      state.missCount = 0;
+    },
     get timeMs(): number {
       return state.timeMs;
     },
