@@ -6,12 +6,15 @@
     </div>
 
     <p>{{ state.timeDiff }}</p>
+
+    <p>{{ state.targetLevelStr }}</p>
   </div>
 </template>
 
 <script lang="ts">
-import { createComponent, reactive, computed, inject} from "@vue/composition-api";
+import { createComponent, reactive, computed, inject } from "@vue/composition-api";
 import ResultStoreKey from "./result-store-key";
+import ConfigStoreKey from "./config-store-key";
 
 export default createComponent({
   setup() {
@@ -19,17 +22,27 @@ export default createComponent({
     if(!resultStore){
       throw new Error(`${ResultStoreKey} is not provided`);
     }
+    const configStore = inject(ConfigStoreKey);
+    if(!configStore){
+      throw new Error(`${ConfigStoreKey} is not provided`);
+    }
 
-    const targetGaugeWidth = 20;
-    const targetTimeMs = 50 * 1000;
-    const targetGaugeTimeMs = 200;
+    const targetGaugeWidth = 20;    // 目標ゲージのマスの数
+    const targetGaugeTimeMs = 200;  // 目標ゲージ1マスあたりのタイム
 
     const state = reactive({
+      // 目標タイム
+      targetTimeMs: computed((): number => configStore.targetTimeMs),
+      // 現在のタイム
       curTimeMs: computed((): number => resultStore.timeMs),
+      // 現在の打鍵数
       curTypeCount: computed((): number => resultStore.typeCount),
 
-      estimatedTimeMs: computed((): number => state.curTimeMs + ((400) - state.curTypeCount) / (400 / targetTimeMs)),
-      timeDiff: computed((): number => 50 * 1000- state.estimatedTimeMs),
+      // 推定タイム
+      estimatedTimeMs: computed((): number => state.curTimeMs + ((400) - state.curTypeCount) / (400 / state.targetTimeMs)),
+      // 推定タイムと現在のタイムの差
+      // 正なら速く、負なら遅い
+      timeDiff: computed((): number => state.targetTimeMs - state.estimatedTimeMs),
 
       gaugeStateList: computed((): {}[] => {
         let ret: {}[] = [];

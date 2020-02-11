@@ -2,7 +2,7 @@ export const enum eMode {
   Khjy, Ktkn, Knj, Ktwz
 }
 
-enum eLevel {
+export enum eLevel {
   None,
   J, I, H, G, F, E, D, C, B, A,
   SJ, SI, SH, SG, SF, SE, SD, SC, SB, SA, SS,
@@ -11,6 +11,19 @@ enum eLevel {
   M1, M2, M3, M4,
 }
 
+export function getEnumLevel(levelStr: string): eLevel {
+  return (<any>eLevel)[levelStr];
+}
+
+export const levelDataList = Object.keys(eLevel).reduce((acc: {}[], cur) => {
+  if (isNaN(Number(cur))) {
+    if (cur === "None") cur = "-";
+    acc.push({ string: cur, key: `eLevel${cur}` });
+  }
+  return acc;
+}, []);
+
+/** タイムからレベルを取得 */
 export function getLevel(timeMs: number): eLevel {
   const time = timeMs / 1000;
   if (time <= 0) return eLevel.None;
@@ -30,8 +43,32 @@ export function getLevel(timeMs: number): eLevel {
   return level;
 }
 
+/** レベルからレベルの文字列を取得 */
 export function getLevelStr(timeMs: number): string {
   const level: eLevel = getLevel(timeMs);
   const levelStr: string = eLevel[level];
   return levelStr === eLevel[eLevel.None] ? "-" : levelStr;
+}
+
+/** そのレベルに達するためのタイムを取得 */
+export function getTimeMs(level: eLevel): number {
+  let time: number = 0;
+  switch (level) {
+    case eLevel.None: time = 0; break;
+    case eLevel.J: time = 206; break;
+    case eLevel.I: time = 184; break;
+    case eLevel.H: time = 164; break;
+    case eLevel.G: time = 146; break;
+    case eLevel.F: time = 130; break;
+    case eLevel.E: time = 116; break;
+    case eLevel.D: time = 104; break;
+    case eLevel.C: time = 94; break;
+    case eLevel.B: time = 86; break;
+    case eLevel.A: time = 80; break;
+    case eLevel.SJ: time = 76; break;
+    default: {
+      time = 76 - (level - eLevel.SJ) * 2;
+    }
+  }
+  return Math.max(time * 1000, 0);
 }
