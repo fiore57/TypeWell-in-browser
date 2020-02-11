@@ -3,7 +3,7 @@
     <h3>操作方法</h3>
     <div class="inline-block-list">
       <ul>
-        <li>Enter: スタート</li>
+        <li>Space/Enter: スタート</li>
         <li>Esc: リセット</li>
         <li>F1-F4: モード変更</li>
       </ul>
