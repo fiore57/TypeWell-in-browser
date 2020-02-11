@@ -59,6 +59,7 @@ export enum eLevel {
 
 /** レベル（文字列）を列挙型に変換する */
 export function convertLevelToEnum(levelStr: string): eLevel {
+  if (levelStr === "なし") levelStr = "None";
   return (<any>eLevel)[levelStr];
 }
 /** レベル（列挙型）を文字列に変換する */
@@ -68,7 +69,7 @@ export function convertLevelToString(level: eLevel): string {
 
 export const levelDataList = Object.keys(eLevel).reduce((acc: {}[], cur) => {
   if (isNaN(Number(cur))) {
-    if (cur === "None") cur = "-";
+    if (cur === "None") cur = "なし";
     acc.push({ string: cur, key: `eLevel${cur}` });
   }
   return acc;

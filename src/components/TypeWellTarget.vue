@@ -22,7 +22,7 @@ import {
 } from "@vue/composition-api";
 import ResultStoreKey from "./result-store-key";
 import ConfigStoreKey from "./config-store-key";
-import { convertLevelToString } from "@/lib/typeWell";
+import { eLevel, convertLevelToString } from "@/lib/typeWell";
 
 export default createComponent({
   setup() {
@@ -42,9 +42,15 @@ export default createComponent({
       // 目標タイム
       targetTimeMs: computed((): number => configStore.targetTimeMs),
       // 目標レベル（文字列）
-      targetLevelStr: computed((): string =>
-        convertLevelToString(configStore.targetLevel)
-      ),
+      targetLevelStr: computed((): string => {
+        const targetLevel = configStore.targetLevel;
+        if (targetLevel === eLevel.None) {
+          return convertLevelToString(targetLevel);
+        } else {
+          return `${convertLevelToString(targetLevel)}（${state.targetTimeMs /
+            1000} 秒）`;
+        }
+      }),
       // 現在のタイム
       curTimeMs: computed((): number => resultStore.timeMs),
       // 現在の打鍵数
@@ -65,8 +71,7 @@ export default createComponent({
       gaugeStateList: computed((): {}[] => {
         let ret: {}[] = [];
         for (let i = 0; i < targetGaugeWidth; ++i) {
-          window.console.log("gaugeStateList");
-          if (state.curTimeMs === 0) {
+          if (state.targetTimeMs === 0) {
             ret.push({
               color: "transparent",
               key: `gaugeData${i}"`

@@ -28,7 +28,7 @@
     <Result v-if="state.inResult"/>
     <Result />
     -->
-    <Result />
+    <Result v-if="state.inResult" />
 
     <Config v-if="state.isReady" />
   </div>
@@ -183,7 +183,6 @@ export default createComponent({
       if (event.key === "Escape") {
         if (state.inCountdown) window.clearTimeout(state.m_countdownId);
         state.m_status = eStatus.Ready;
-        window.console.log("Escape");
         if (resultStore) resultStore.reset();
         return;
       }
