@@ -24,7 +24,6 @@ commands:
           name: npm install
           command: npm install
 
-
 jobs:
   build: # ジョブ名
     executor: # nameで使いたい実行環境を指定
@@ -62,7 +61,6 @@ jobs:
       - run:
           name: deploy to Firebase Hosting
           command: ./node_modules/.bin/firebase deploy --token=$FIREBASE_TOKEN
-
 
 # Orchestrate or schedule a set of jobs
 workflows:
