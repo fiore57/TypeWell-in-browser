@@ -1,16 +1,29 @@
 <template>
   <div class="type-well-button">
-    <button @click="onClick" :disabled="!state.isValid" :class="{ disabledButton: state.isValid }">{{ state.text }}</button>
+    <button
+      @click="onClick"
+      :disabled="!state.isValid"
+      :class="{ disabledButton: state.isValid }"
+    >
+      {{ state.text }}
+    </button>
   </div>
 </template>
 
 <script lang="ts">
-import { createComponent, reactive, computed, SetupContext, onBeforeMount, onBeforeUnmount } from "@vue/composition-api";
+import {
+  createComponent,
+  reactive,
+  computed,
+  SetupContext,
+  onBeforeMount,
+  onBeforeUnmount
+} from "@vue/composition-api";
 
 type Props = {
   text: string;
   isValid: boolean;
-}
+};
 
 export default createComponent({
   props: {
@@ -23,17 +36,17 @@ export default createComponent({
       default: true
     }
   },
-  setup(props: Props, context: SetupContext){
+  setup(props: Props, context: SetupContext) {
     const state = reactive({
       isValid: computed(() => props.isValid),
-      text: computed(() => props.text),
+      text: computed(() => props.text)
     });
 
     function keyInput(event: KeyboardEvent) {
-      if(state.isValid){
+      if (state.isValid) {
         // Enter or Space で発火
-        for(const key of ["Enter", " "]){
-          if(event.key === key) {
+        for (const key of ["Enter", " "]) {
+          if (event.key === key) {
             onClick();
             return;
           }
@@ -54,10 +67,10 @@ export default createComponent({
 
     return {
       state,
-      onClick,
+      onClick
     };
   }
-})
+});
 </script>
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->

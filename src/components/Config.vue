@@ -1,44 +1,76 @@
 <template>
   <div class="config">
     <h3>設定</h3>
-    カウントダウン（0～3秒）：
-    <input class="number-input" v-model.number="state.countdownTime" type="number" min="0" max="3" step="1">秒
+    <ul>
+      <li>
+        カウントダウン（0～3秒）：
+        <input
+          class="number-input"
+          v-model.number="state.countdownTime"
+          type="number"
+          min="0"
+          max="3"
+          step="1"
+        />秒
+      </li>
+      <li>
+        目標設定：
+        <select v-model="state.targetLevel">
+          <option disabled value="">目標レベル</option>
+          <option v-for="levelData in levelDataList" :key="levelData.key">{{
+            levelData.string
+          }}</option>
+        </select>
+      </li>
+    </ul>
   </div>
 </template>
 
 <script lang="ts">
-import { createComponent, reactive, computed, SetupContext, onBeforeMount, onBeforeUnmount } from "@vue/composition-api";
-
-export class ConfigData {
-  public countdownTime: number = 3;
-}
+import {
+  createComponent,
+  reactive,
+  computed,
+  inject,
+  onBeforeMount,
+  onBeforeUnmount
+} from "@vue/composition-api";
+import { eLevel, convertLevelToEnum, levelDataList } from "@/lib/typeWell";
+import ConfigStoreKey from "./config-store-key";
 
 export default createComponent({
-  // context は第2引数にすること！！！
-  setup(_props, context: SetupContext){
-    let configData = new ConfigData();
+  setup() {
+    const configStore = inject(ConfigStoreKey);
+    if (!configStore) {
+      throw new Error(`${ConfigStoreKey} is not provided`);
+    }
 
     const state = reactive({
       countdownTime: computed({
         get: (): number => {
-          return configData.countdownTime;
+          return configStore.countdownTime;
         },
-        set: (val: number) => {
-          configData.countdownTime = val;
-          emitData(configData);
+        set: (newVal: number) => {
+          configStore.setCountdownTime(newVal);
+        }
+      }),
+      targetLevel: computed({
+        get: (): string => {
+          return eLevel[configStore.targetLevel];
+        },
+        set: (newLevelStr: string) => {
+          const enumTargetLevel: eLevel = convertLevelToEnum(newLevelStr);
+          configStore.setTargetLevel(enumTargetLevel);
         }
       })
     });
 
-    function emitData(data: ConfigData) {
-      context.emit("updated", data);
-    }
-
     return {
       state,
+      levelDataList
     };
   }
-})
+});
 </script>
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
@@ -48,7 +80,7 @@ export default createComponent({
   margin: 3em auto 1em auto;
   width: 400px;
 }
-.number-input{
+.number-input {
   font-size: 1em;
 }
 </style>
