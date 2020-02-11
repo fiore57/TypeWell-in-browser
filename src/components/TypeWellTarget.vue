@@ -1,81 +1,114 @@
 <template>
   <div class="target">
     <div class="target-meter">
-      <div class="meter-inner-box" v-for="gaugeData in state.gaugeStateList" :style="{ 'background-color': gaugeData.color }" :key="gaugeData.key">
-      </div>
+      <div
+        class="meter-inner-box"
+        v-for="gaugeData in state.gaugeStateList"
+        :style="{ 'background-color': gaugeData.color }"
+        :key="gaugeData.key"
+      ></div>
     </div>
 
-    <p>{{ state.timeDiff }}</p>
-
-    <p>{{ state.targetLevelStr }}</p>
+    <div class="target-string">目標 -- {{ state.targetLevelStr }}</div>
   </div>
 </template>
 
 <script lang="ts">
-import { createComponent, reactive, computed, inject } from "@vue/composition-api";
+import {
+  createComponent,
+  reactive,
+  computed,
+  inject
+} from "@vue/composition-api";
 import ResultStoreKey from "./result-store-key";
 import ConfigStoreKey from "./config-store-key";
+import { convertLevelToString } from "@/lib/typeWell";
 
 export default createComponent({
   setup() {
     const resultStore = inject(ResultStoreKey);
-    if(!resultStore){
+    if (!resultStore) {
       throw new Error(`${ResultStoreKey} is not provided`);
     }
     const configStore = inject(ConfigStoreKey);
-    if(!configStore){
+    if (!configStore) {
       throw new Error(`${ConfigStoreKey} is not provided`);
     }
 
-    const targetGaugeWidth = 20;    // 目標ゲージのマスの数
-    const targetGaugeTimeMs = 200;  // 目標ゲージ1マスあたりのタイム
+    const targetGaugeWidth = 20; // 目標ゲージのマスの数
+    const targetGaugeTimeMs = 200; // 目標ゲージ1マスあたりのタイム
 
     const state = reactive({
       // 目標タイム
       targetTimeMs: computed((): number => configStore.targetTimeMs),
+      // 目標レベル（文字列）
+      targetLevelStr: computed((): string =>
+        convertLevelToString(configStore.targetLevel)
+      ),
       // 現在のタイム
       curTimeMs: computed((): number => resultStore.timeMs),
       // 現在の打鍵数
       curTypeCount: computed((): number => resultStore.typeCount),
 
       // 推定タイム
-      estimatedTimeMs: computed((): number => state.curTimeMs + ((400) - state.curTypeCount) / (400 / state.targetTimeMs)),
+      estimatedTimeMs: computed(
+        (): number =>
+          state.curTimeMs +
+          (400 - state.curTypeCount) / (400 / state.targetTimeMs)
+      ),
       // 推定タイムと現在のタイムの差
       // 正なら速く、負なら遅い
-      timeDiff: computed((): number => state.targetTimeMs - state.estimatedTimeMs),
+      timeDiff: computed(
+        (): number => state.targetTimeMs - state.estimatedTimeMs
+      ),
 
       gaugeStateList: computed((): {}[] => {
         let ret: {}[] = [];
-        for(let i = 0; i < targetGaugeWidth; ++i){
-          if(state.timeDiff)
-          if(Math.abs(state.timeDiff) / targetGaugeTimeMs > (i + 1)){
+        for (let i = 0; i < targetGaugeWidth; ++i) {
+          window.console.log("gaugeStateList");
+          if (state.curTimeMs === 0) {
             ret.push({
-              "color": (state.timeDiff > 0 ? "blue" : (i >= (targetGaugeWidth / 2) ? "red" : "yellow")),
-              "key": `gaugeData${i}"`
+              color: "transparent",
+              key: `gaugeData${i}"`
             });
-          }
-          else {
+          } else if (Math.abs(state.timeDiff) / targetGaugeTimeMs > i + 1) {
             ret.push({
-              "color": "transparent",
-              "key": `gaugeData${i}"`
+              color:
+                state.timeDiff > 0
+                  ? "blue"
+                  : i >= targetGaugeWidth / 2
+                  ? "red"
+                  : "yellow",
+              key: `gaugeData${i}"`
+            });
+          } else {
+            ret.push({
+              color: "transparent",
+              key: `gaugeData${i}"`
             });
           }
         }
         return ret;
-      }),
+      })
     });
 
     return {
-      state,
-    }
+      state
+    };
   }
 });
 </script>
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped lang="scss">
+.target {
+  display: flex; /* 子要素をflexboxで揃える */
+  flex-direction: row; /* 子要素をflexboxにより横方向に揃える */
+  justify-content: flex-start; /* 子要素をflexboxにより左に配置する */
+  align-items: center; /* 子要素をflexboxにより中央に配置する */
+}
 .target-meter {
-
+  margin: 0.1rem 5rem 0.1rem 3rem;
 }
 .meter-inner-box {
   display: inline-block;
@@ -84,37 +117,9 @@ export default createComponent({
   margin: 0.1rem;
   border: 0.1rem solid;
 }
-.roman {
-  margin: 1rem auto;
-  width: 58rem; /* 見た目用 */
-  height: 21.5rem; /* 見た目用 */
-  border: 0.1rem solid;
-  border-color: gray;
+.target-string {
+  margin: 0.1rem 5rem;
   font-size: 1.8rem;
-  font-family: 'Noto Sans Mono', sans-serif;
-  background: white;
-}
-.roman-line {
-  margin: 0.2rem 1rem;
-  display: flex; /* 子要素をflexboxで揃える */
-  flex-direction: row; /* 子要素をflexboxにより横方向に揃える */
-  justify-content: flex-start; /* 子要素をflexboxにより左に配置する */
-  align-items: center;  /* 子要素をflexboxにより中央に配置する */
-  white-space: pre;
-  word-break: break-all;
-}
-.prev-roman {
-  color: #CCCCCC;
-  margin-left: auto;
-}
-.cur-roman{
-  color: black;
-}
-.miss-roman{
   color: red;
-}
-.next-roman {
-  color: black;
-  margin-right: auto;
 }
 </style>

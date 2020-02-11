@@ -15,14 +15,21 @@
 </template>
 
 <script lang="ts">
-import { createComponent, reactive, computed, inject, onBeforeMount, onBeforeUnmount} from "@vue/composition-api";
+import {
+  createComponent,
+  reactive,
+  computed,
+  inject,
+  onBeforeMount,
+  onBeforeUnmount
+} from "@vue/composition-api";
 import ResultStoreKey from "./result-store-key";
-import { getLevelStr } from '@/lib/typeWell';
+import { getLevelStr } from "@/lib/typeWell";
 import { calcUps, calcUpm } from "@/lib/typing-utils";
 
 type Props = {
   timeMs: number;
-}
+};
 
 export default createComponent({
   props: {
@@ -33,7 +40,7 @@ export default createComponent({
   },
   setup(props: Props) {
     const resultStore = inject(ResultStoreKey);
-    if(!resultStore){
+    if (!resultStore) {
       throw new Error(`${ResultStoreKey} is not provided`);
     }
 
@@ -47,12 +54,12 @@ export default createComponent({
       // TODO: romanLengthがマジックナンバーになっている
       m_tps: computed((): number => calcUps(400, state.timeMs)),
       tpm: computed((): string => state.m_tpm.toFixed(2)),
-      tps: computed((): string => state.m_tps.toFixed(3)),
-    })
+      tps: computed((): string => state.m_tps.toFixed(3))
+    });
 
     return {
-      state,
-    }
+      state
+    };
   }
 });
 </script>
@@ -60,7 +67,7 @@ export default createComponent({
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped lang="scss">
 .result {
-  h3{
+  h3 {
     font-size: 2rem;
     margin-top: 1rem;
   }
@@ -73,7 +80,7 @@ export default createComponent({
   }
   padding: 1rem 1rem 2rem 1rem;
   margin: 4rem auto;
-  border: double 0.5rem #A0D0F0;
+  border: double 0.5rem #a0d0f0;
   width: 30rem;
 }
 </style>

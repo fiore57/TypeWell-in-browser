@@ -2,21 +2,26 @@
   <div id="type-well">
     <div class="game">
       <div class="header">
-        <div :class="{ 'countdown': true, 'go': state.inGame || state.inResult }">{{ state.countdown }}</div>
-        <TypeWellButton @click="startCountdown" text="READY" :isValid="state.isReady"/>
+        <div :class="{ countdown: true, go: state.inGame || state.inResult }">
+          {{ state.countdown }}
+        </div>
+        <TypeWellButton
+          @click="startCountdown"
+          text="READY"
+          :isValid="state.isReady"
+        />
         <h3 class="game-mode">{{ state.modeStr }}</h3>
-        <Timer :timerStatus="state.timerStatus"/>
+        <Timer :timerStatus="state.timerStatus" />
       </div>
 
-      <TypeWellText :textDataList="state.textDataList"/>
+      <TypeWellText :textDataList="state.textDataList" />
 
-      <TypeWellTarget/>
-
-      <div class="miss-count">
-        Miss: {{ state.missCount }}
+      <div class="target-and-miss">
+        <TypeWellTarget />
+        <div class="miss-count">Miss: {{ state.missCount }}</div>
       </div>
 
-      <TypeWellRoman :romanDataList="state.romanDataList"/>
+      <TypeWellRoman :romanDataList="state.romanDataList" />
     </div>
 
     <!--
@@ -25,13 +30,19 @@
     -->
     <Result />
 
-    <Config v-if="state.isReady"/>
-
+    <Config v-if="state.isReady" />
   </div>
 </template>
 
 <script lang="ts">
-import { createComponent, reactive, computed, inject, onBeforeMount, onBeforeUnmount } from "@vue/composition-api";
+import {
+  createComponent,
+  reactive,
+  computed,
+  inject,
+  onBeforeMount,
+  onBeforeUnmount
+} from "@vue/composition-api";
 import TypingGame from "@/lib/typing";
 import TypeWellButton from "./TypeWellButton.vue";
 import Timer, { eTimerStatus } from "./Timer.vue";
@@ -40,12 +51,15 @@ import TypeWellTarget from "./TypeWellTarget.vue";
 import TypeWellRoman from "./TypeWellRoman.vue";
 import Config from "./Config.vue";
 import Result from "./Result.vue";
-import { eMode } from '@/lib/typeWell';
+import { eMode } from "@/lib/typeWell";
 import ResultStoreKey from "./result-store-key";
 import ConfigStoreKey from "./config-store-key";
 
 const enum eStatus {
-  Ready, Countdown, Game, Result
+  Ready,
+  Countdown,
+  Game,
+  Result
 }
 
 export default createComponent({
@@ -56,15 +70,15 @@ export default createComponent({
     TypeWellTarget,
     TypeWellRoman,
     Config,
-    Result,
+    Result
   },
-  setup(){
+  setup() {
     const resultStore = inject(ResultStoreKey);
-    if(!resultStore){
+    if (!resultStore) {
       throw new Error(`${ResultStoreKey} is not provided`);
     }
     const configStore = inject(ConfigStoreKey);
-    if(!configStore){
+    if (!configStore) {
       throw new Error(`${ConfigStoreKey} is not provided`);
     }
 
@@ -82,52 +96,72 @@ export default createComponent({
 
       // モード判定
       isReady: computed((): boolean => state.m_status === eStatus.Ready),
-      inCountdown: computed((): boolean => state.m_status === eStatus.Countdown),
+      inCountdown: computed(
+        (): boolean => state.m_status === eStatus.Countdown
+      ),
       inGame: computed((): boolean => state.m_status === eStatus.Game),
       inResult: computed((): boolean => state.m_status === eStatus.Result),
 
       // ヘッダ
       countdown: computed((): string => {
-        if(state.inCountdown) return "" + state.m_countdown;
-        else if(state.inGame) return "GO!"
+        if (state.inCountdown) return "" + state.m_countdown;
+        else if (state.inGame) return "GO!";
         return "";
       }),
       modeStr: computed((): string => {
-        const modeStrList = ["基本常用語", "カタカナ語", "漢字", "慣用句・ことわざ"];
+        const modeStrList = [
+          "基本常用語",
+          "カタカナ語",
+          "漢字",
+          "慣用句・ことわざ"
+        ];
         return modeStrList[state.m_mode];
       }),
       timerStatus: computed(() => {
-        switch(state.m_status) {
+        switch (state.m_status) {
           case eStatus.Ready: // fall through
-          case eStatus.Countdown: return eTimerStatus.Reset;
-          case eStatus.Game: return eTimerStatus.Start;
-          case eStatus.Result: return eTimerStatus.Stop;
-          default: throw new Error("Unknown status");
+          case eStatus.Countdown:
+            return eTimerStatus.Reset;
+          case eStatus.Game:
+            return eTimerStatus.Start;
+          case eStatus.Result:
+            return eTimerStatus.Stop;
+          default:
+            throw new Error("Unknown status");
         }
       }),
 
       // テキスト
-      text: computed((): string => state.isReady || state.inCountdown ? "" : state.m_typingGame.text),
+      text: computed((): string =>
+        state.isReady || state.inCountdown ? "" : state.m_typingGame.text
+      ),
       textDataList: computed((): {}[] => {
-        return state.isReady || state.inCountdown ? [{}] : state.m_typingGame.textDataList;
-        }),
-      missCount: computed((): number => state.isReady || state.inCountdown ? 0 : state.m_typingGame.missCount),
-      romanDataList: computed((): {}[] => state.isReady || state.inCountdown ? [{}] : state.m_typingGame.romanDataList),
-    })
+        return state.isReady || state.inCountdown
+          ? [{}]
+          : state.m_typingGame.textDataList;
+      }),
+      missCount: computed((): number =>
+        state.isReady || state.inCountdown ? 0 : state.m_typingGame.missCount
+      ),
+      romanDataList: computed((): {}[] =>
+        state.isReady || state.inCountdown
+          ? [{}]
+          : state.m_typingGame.romanDataList
+      )
+    });
 
     function countdownFunc() {
       --state.m_countdown;
-      if(state.m_countdown === 0){
+      if (state.m_countdown === 0) {
         gameStart();
-      }
-      else {
+      } else {
         state.m_countdownId = window.setTimeout(countdownFunc, 1000);
       }
     }
 
     function startCountdown() {
       state.m_status = eStatus.Countdown;
-      if(!configStore){
+      if (!configStore) {
         throw new Error(`${ConfigStoreKey} is not provided`);
       }
       state.m_countdown = configStore.countdownTime + 1;
@@ -137,19 +171,24 @@ export default createComponent({
     function gameStart() {
       state.m_typingGame.init(state.m_mode);
       state.m_status = eStatus.Game;
+      if (!resultStore) {
+        throw new Error(`${ResultStoreKey} is not provided`);
+      }
+      resultStore.unlock();
     }
 
     // 入力を処理
     function keyInput(event: KeyboardEvent) {
       // Escapeで中断
-      if(event.key === "Escape"){
-        if(state.inCountdown) window.clearTimeout(state.m_countdownId);
+      if (event.key === "Escape") {
+        if (state.inCountdown) window.clearTimeout(state.m_countdownId);
         state.m_status = eStatus.Ready;
-        if(resultStore) resultStore.reset();
+        window.console.log("Escape");
+        if (resultStore) resultStore.reset();
         return;
       }
-      if(state.isReady){
-        switch(event.key){
+      if (state.isReady) {
+        switch (event.key) {
           case "F1":
             state.m_mode = eMode.Khjy;
             break;
@@ -164,35 +203,35 @@ export default createComponent({
             break;
         }
       }
-      if(!state.inGame) return;
+      if (!state.inGame) return;
       // 入力処理
       state.m_typingGame.update(event.key);
-      if(resultStore){
+      if (resultStore) {
         resultStore.updateTypeCount(state.m_typingGame.typeCount);
         resultStore.updateMissCount(state.m_typingGame.missCount);
       }
 
       // 終了時の処理
-      if(state.m_typingGame.isFinished()){
+      if (state.m_typingGame.isFinished()) {
         state.m_status = eStatus.Result;
       }
     }
 
     onBeforeMount(() => {
-      window.addEventListener('keydown', keyInput, true);
+      window.addEventListener("keydown", keyInput, true);
     });
     onBeforeUnmount(() => {
-      window.removeEventListener('keydown', keyInput, true);
+      window.removeEventListener("keydown", keyInput, true);
     });
 
     return {
       storeTimeMs,
       storeMissCount,
       state,
-      startCountdown,
-    }
+      startCountdown
+    };
   }
-})
+});
 </script>
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
@@ -210,9 +249,9 @@ export default createComponent({
   display: flex; /* 子要素をflexboxで揃える */
   flex-direction: row; /* 子要素をflexboxにより横方向に揃える */
   justify-content: center; /* 子要素をflexboxにより中央に配置する */
-  align-items: center;  /* 子要素をflexboxにより中央に配置する */
+  align-items: center; /* 子要素をflexboxにより中央に配置する */
 }
-.countdown{
+.countdown {
   font-size: 2.2rem;
   border: 0.1rem solid;
   border-color: gray;
@@ -229,8 +268,14 @@ export default createComponent({
   width: 20rem;
   margin: 1rem 10rem 1rem 5rem;
 }
+.target-and-miss {
+  display: flex; /* 子要素をflexboxで揃える */
+  flex-direction: row; /* 子要素をflexboxにより横方向に揃える */
+  justify-content: flex-start; /* 子要素をflexboxにより左に配置する */
+  align-items: center; /* 子要素をflexboxにより中央に配置する */
+}
 .miss-count {
-  margin: 0.4rem 0;
+  margin: 0.2rem 3rem 0.2rem auto;
   font-size: 1.8rem;
 }
 </style>

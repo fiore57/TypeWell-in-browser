@@ -19,7 +19,7 @@
 
 <script lang="ts">
 import { createComponent, reactive, computed, inject, onBeforeMount, onBeforeUnmount } from "@vue/composition-api";
-import { eLevel, getEnumLevel, levelDataList } from "@/lib/typeWell";
+import { eLevel, convertLevelToEnum, levelDataList } from "@/lib/typeWell";
 import ConfigStoreKey from "./config-store-key";
 
 export default createComponent({
@@ -42,8 +42,8 @@ export default createComponent({
         get: (): string => {
           return eLevel[configStore.targetLevel];
         },
-        set: (newTargetLevel: string) => {
-          const enumTargetLevel: eLevel = getEnumLevel(newTargetLevel);
+        set: (newLevelStr: string) => {
+          const enumTargetLevel: eLevel = convertLevelToEnum(newLevelStr);
           configStore.setTargetLevel(enumTargetLevel);
         }
       })

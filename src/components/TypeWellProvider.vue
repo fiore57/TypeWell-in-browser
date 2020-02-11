@@ -16,6 +16,6 @@ export default {
     provide(ResultStoreKey, resultStore());
     provide(ConfigStoreKey, configStore());
     return {};
-  },
+  }
 };
 </script>
