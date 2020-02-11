@@ -2,54 +2,45 @@
   <div class="config">
     <h3>設定</h3>
     <ul>
-    <li>
-    カウントダウン（0～3秒）：
-    <input class="number-input" v-model.number="state.countdownTime" type="number" min="0" max="3" step="1">秒
-    </li>
-    <li>
-    目標設定：
-    <select v-model="state.targetLevel">
-      <option disabled value="">目標レベルを設定してください</option>
-      <option v-for="levelData in levelDataList" :key="levelData.key">{{ levelData.string }}</option>
-    </select>
-    </li>
-
+      <li>
+        カウントダウン（0～3秒）：
+        <input class="number-input" v-model.number="state.countdownTime" type="number" min="0" max="3" step="1">秒
+      </li>
+      <li>
+        目標設定：
+        <select v-model="state.targetLevel">
+          <option disabled value="">目標レベルを設定してください</option>
+          <option v-for="levelData in levelDataList" :key="levelData.key">{{ levelData.string }}</option>
+        </select>
+      </li>
     </ul>
   </div>
 </template>
 
 <script lang="ts">
-import { createComponent, reactive, computed, inject, SetupContext, onBeforeMount, onBeforeUnmount } from "@vue/composition-api";
-import { eLevel, getEnumLevel, levelDataList, getTimeMs } from "@/lib/typeWell";
+import { createComponent, reactive, computed, inject, onBeforeMount, onBeforeUnmount } from "@vue/composition-api";
+import { eLevel, getEnumLevel, levelDataList } from "@/lib/typeWell";
 import ConfigStoreKey from "./config-store-key";
 
-export class ConfigData {
-  public countdownTime: number = 3;
-}
-
 export default createComponent({
-  // context は第2引数にすること！！！
-  setup(_props, context: SetupContext){
+  setup(){
     const configStore = inject(ConfigStoreKey);
     if(!configStore){
       throw new Error(`${ConfigStoreKey} is not provided`);
     }
 
-    let configData = new ConfigData();
-
     const state = reactive({
       countdownTime: computed({
         get: (): number => {
-          return configData.countdownTime;
+          return configStore.countdownTime;
         },
-        set: (val: number) => {
-          configData.countdownTime = val;
-          emitData(configData);
+        set: (newVal: number) => {
+          configStore.setCountdownTime(newVal);
         }
       }),
       targetLevel: computed({
         get: (): string => {
-          return "";
+          return eLevel[configStore.targetLevel];
         },
         set: (newTargetLevel: string) => {
           const enumTargetLevel: eLevel = getEnumLevel(newTargetLevel);
@@ -57,10 +48,6 @@ export default createComponent({
         }
       })
     });
-
-    function emitData(data: ConfigData) {
-      context.emit("updated", data);
-    }
 
     return {
       state,

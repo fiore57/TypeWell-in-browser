@@ -25,7 +25,7 @@
     -->
     <Result />
 
-    <Config v-show="state.isReady" @updated="setConfigData"/>
+    <Config v-if="state.isReady"/>
 
   </div>
 </template>
@@ -38,10 +38,11 @@ import Timer, { eTimerStatus } from "./Timer.vue";
 import TypeWellText from "./TypeWellText.vue";
 import TypeWellTarget from "./TypeWellTarget.vue";
 import TypeWellRoman from "./TypeWellRoman.vue";
-import Config, { ConfigData } from "./Config.vue";
+import Config from "./Config.vue";
 import Result from "./Result.vue";
 import { eMode } from '@/lib/typeWell';
 import ResultStoreKey from "./result-store-key";
+import ConfigStoreKey from "./config-store-key";
 
 const enum eStatus {
   Ready, Countdown, Game, Result
@@ -62,6 +63,10 @@ export default createComponent({
     if(!resultStore){
       throw new Error(`${ResultStoreKey} is not provided`);
     }
+    const configStore = inject(ConfigStoreKey);
+    if(!configStore){
+      throw new Error(`${ConfigStoreKey} is not provided`);
+    }
 
     const storeTimeMs = computed(() => resultStore.timeMs);
     const storeMissCount = computed(() => resultStore.missCount);
@@ -70,7 +75,6 @@ export default createComponent({
       m_mode: eMode.Khjy,
       m_status: eStatus.Ready,
       m_typingGame: new TypingGame(),
-      m_configData: new ConfigData(),
 
       // カウントダウン関係
       m_countdown: 0,
@@ -123,7 +127,10 @@ export default createComponent({
 
     function startCountdown() {
       state.m_status = eStatus.Countdown;
-      state.m_countdown = state.m_configData.countdownTime + 1;
+      if(!configStore){
+        throw new Error(`${ConfigStoreKey} is not provided`);
+      }
+      state.m_countdown = configStore.countdownTime + 1;
       countdownFunc();
     }
 
@@ -171,10 +178,6 @@ export default createComponent({
       }
     }
 
-    function setConfigData(configData: ConfigData){
-      state.m_configData = configData;
-    }
-
     onBeforeMount(() => {
       window.addEventListener('keydown', keyInput, true);
     });
@@ -186,7 +189,6 @@ export default createComponent({
       storeTimeMs,
       storeMissCount,
       state,
-      setConfigData,
       startCountdown,
     }
   }
