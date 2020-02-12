@@ -1,5 +1,5 @@
 import { reactive } from "@vue/composition-api";
-import { eLevel, getTimeMs } from '@/lib/typeWell';
+import { eLevel, getTimeMs } from "@/lib/typeWell";
 
 export default function configStore() {
   const state = reactive({
@@ -8,21 +8,16 @@ export default function configStore() {
     targetTimeMs: 0,
     fastTargetBoxTimeMs: 500,
     slowTargetBoxTimeMs: 200,
+    missMax: 255
   });
   return {
-    reset() {
-      state.countdownTime = 3;
-      state.targetLevel = eLevel.None;
-      state.targetTimeMs = 0;
-      state.fastTargetBoxTimeMs = 500;
-      state.slowTargetBoxTimeMs = 200;
-    },
     get countdownTime(): number {
       return state.countdownTime;
     },
     setCountdownTime(time: number) {
       state.countdownTime = time;
     },
+
     get targetLevel(): eLevel {
       return state.targetLevel;
     },
@@ -30,6 +25,7 @@ export default function configStore() {
       state.targetLevel = level;
       state.targetTimeMs = getTimeMs(level);
     },
+
     get targetTimeMs(): number {
       return state.targetTimeMs;
     },
@@ -38,17 +34,26 @@ export default function configStore() {
       state.targetTimeMs = timeMs;
     },
     */
+
     get fastTargetBoxTimeMs(): number {
       return state.fastTargetBoxTimeMs;
     },
     setFastTargetBoxTimeMs(timeMs: number) {
       state.fastTargetBoxTimeMs = timeMs;
     },
+
     get slowTargetBoxTimeMs(): number {
       return state.slowTargetBoxTimeMs;
     },
     setSlowTargetBoxTimeMs(timeMs: number) {
       state.slowTargetBoxTimeMs = timeMs;
+    },
+
+    get missMax(): number {
+      return state.missMax;
+    },
+    setMissMax(miss: number) {
+      state.missMax = miss;
     }
   };
 }
