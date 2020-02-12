@@ -177,13 +177,19 @@ export default createComponent({
       resultStore.unlock();
     }
 
+    // 中断処理
+    function resetGame() {
+      if (state.inCountdown) window.clearTimeout(state.m_countdownId);
+      state.m_status = eStatus.Ready;
+      if (resultStore) resultStore.reset();
+    }
+
     // 入力を処理
     function keyInput(event: KeyboardEvent) {
+      window.console.log(event.key);
       // Escapeで中断
       if (event.key === "Escape") {
-        if (state.inCountdown) window.clearTimeout(state.m_countdownId);
-        state.m_status = eStatus.Ready;
-        if (resultStore) resultStore.reset();
+        resetGame();
         return;
       }
       if (state.isReady) {
@@ -205,9 +211,19 @@ export default createComponent({
       if (!state.inGame) return;
       // 入力処理
       state.m_typingGame.update(event.key);
-      if (resultStore) {
-        resultStore.updateTypeCount(state.m_typingGame.typeCount);
-        resultStore.updateMissCount(state.m_typingGame.missCount);
+      if (!resultStore) {
+        throw new Error(`${ResultStoreKey} is not provided`);
+      }
+      resultStore.updateTypeCount(state.m_typingGame.typeCount);
+      resultStore.updateMissCount(state.m_typingGame.missCount);
+      if (!configStore) {
+        throw new Error(`${ConfigStoreKey} is not provided`);
+      }
+      if (state.m_typingGame.missCount > configStore.missMax) {
+        alert("ミスが多すぎます。はじめからやり直してください");
+        resetGame();
+        event.stopPropagation(); // イベントの伝播を止める
+        return;
       }
 
       // 終了時の処理

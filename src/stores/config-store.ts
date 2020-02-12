@@ -8,7 +8,7 @@ export default function configStore() {
     targetTimeMs: 0,
     fastTargetBoxTimeMs: 500,
     slowTargetBoxTimeMs: 200,
-    missMax: 255
+    missMax: 99
   });
   return {
     get countdownTime(): number {

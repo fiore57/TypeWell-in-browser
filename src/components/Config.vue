@@ -3,12 +3,12 @@
     <h3>設定</h3>
     <ul>
       <li>
-        カウントダウン（0～3秒）：
+        カウントダウン（1～3秒）：
         <input
           class="number-input"
           v-model.number="state.countdownTime"
           type="number"
-          min="0"
+          min="1"
           max="3"
           step="1"
         />秒
@@ -21,6 +21,17 @@
             levelData.string
           }}</option>
         </select>
+      </li>
+      <li>
+        ミス上限（0～255回）：
+        <input
+          class="number-input"
+          v-model.number="state.missMax"
+          type="number"
+          min="0"
+          max="255"
+          step="1"
+        />回
       </li>
     </ul>
   </div>
@@ -61,6 +72,14 @@ export default createComponent({
         set: (newLevelStr: string) => {
           const enumTargetLevel: eLevel = convertLevelToEnum(newLevelStr);
           configStore.setTargetLevel(enumTargetLevel);
+        }
+      }),
+      missMax: computed({
+        get: (): number => {
+          return configStore.missMax;
+        },
+        set: (newVal: number) => {
+          configStore.setMissMax(newVal);
         }
       })
     });
