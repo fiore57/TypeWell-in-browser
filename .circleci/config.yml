@@ -18,6 +18,10 @@ commands:
             - npm-{{ .Branch }}-{{ checksum "package-lock.json" }}
             - npm-{{ .Branch }}-
             - npm-
+      - restore_cache:
+          name: restore dist
+          keys:
+            - dist-{{ .Branch }}-{{ .BuildNum }}
   npm_install:
     steps:
       - run:
@@ -45,6 +49,10 @@ jobs:
           key: npm-{{ .Branch }}-{{ checksum "package-lock.json" }}
           paths:
             - ~/workspace/node_modules
+          force: yes
+      - save_cache:
+          key: dist-{{ .Branch }}-{{ .BuildNum }}
+          paths:
             - ~/workspace/dist
           force: yes
 
