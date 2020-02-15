@@ -68,27 +68,42 @@ export default createComponent({
         (): number => state.targetTimeMs - state.estimatedTimeMs
       ),
 
+      // ゲージ1マスあたりの秒数
+      fastTargetBoxTimeMs: computed(
+        (): number => configStore.fastTargetBoxTimeMs
+      ),
+      slowTargetBoxTimeMs: computed(
+        (): number => configStore.slowTargetBoxTimeMs
+      ),
+
+      // ゲージの各マスの色
       gaugeStateList: computed((): {}[] => {
         let ret: {}[] = [];
         for (let i = 0; i < targetGaugeWidth; ++i) {
           if (state.targetTimeMs === 0) {
+            // 目標なしの場合
             ret.push({
               color: "transparent",
               key: `gaugeData${i}"`
             });
-          } else if (Math.abs(state.timeDiff) / targetGaugeTimeMs > i + 1) {
+          } else if (state.timeDiff > 0) {
+            // 目標より速いペースの場合
             ret.push({
               color:
-                state.timeDiff > 0
+                Math.abs(state.timeDiff) / state.fastTargetBoxTimeMs > i + 1
                   ? "blue"
-                  : i >= targetGaugeWidth / 2
-                  ? "red"
-                  : "yellow",
-              key: `gaugeData${i}"`
+                  : "transparent",
+              key: `gaugeData${i}`
             });
           } else {
+            // 目標より遅いペースの場合
             ret.push({
-              color: "transparent",
+              color:
+                Math.abs(state.timeDiff) / state.slowTargetBoxTimeMs > i + 1
+                  ? i >= targetGaugeWidth / 2
+                    ? "red"
+                    : "yellow"
+                  : "transparent",
               key: `gaugeData${i}"`
             });
           }
