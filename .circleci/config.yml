@@ -21,7 +21,7 @@ commands:
       - restore_cache:
           name: restore dist
           keys:
-            - dist-{{ .Branch }}-{{ .BuildNum }}
+            - dist-{{ .Branch }}-{{ .Revision }}
   npm_install:
     steps:
       - run:
@@ -51,7 +51,7 @@ jobs:
             - ~/workspace/node_modules
           force: yes
       - save_cache:
-          key: dist-{{ .Branch }}-{{ .BuildNum }}
+          key: dist-{{ .Branch }}-{{ .Revision }}
           paths:
             - ~/workspace/dist
           force: yes
