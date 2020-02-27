@@ -52,10 +52,10 @@ export default createComponent({
   margin-top: 0.1rem;
   margin-bottom: 0.1rem;
 
-  display: flex; /* 子要素をflexboxで揃える */
-  flex-direction: row; /* 子要素をflexboxにより横方向に揃える */
-  justify-content: flex-start; /* 子要素をflexboxにより左に配置する */
-  align-items: center; /* 子要素をflexboxにより中央に配置する */
+  display: flex; // 子要素をflexboxで揃える
+  flex-direction: row; // 横方向
+  justify-content: flex-start; // 水平方向左揃え
+  align-items: center; // 垂直方向中央揃え
   white-space: pre;
   word-break: break-all;
 }
@@ -64,13 +64,13 @@ export default createComponent({
   margin-left: auto;
 }
 .cur-text {
-  color: #000000;
+  color: black;
 }
 .miss-text {
-  color: #ff0000;
+  color: red;
 }
 .next-text {
-  color: #000000;
+  color: black;
 }
 .invalid-text {
   color: #cccccc;

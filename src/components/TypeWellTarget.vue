@@ -122,10 +122,10 @@ export default createComponent({
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped lang="scss">
 .target {
-  display: flex; /* 子要素をflexboxで揃える */
-  flex-direction: row; /* 子要素をflexboxにより横方向に揃える */
-  justify-content: flex-start; /* 子要素をflexboxにより左に配置する */
-  align-items: center; /* 子要素をflexboxにより中央に配置する */
+  display: flex; // 子要素をflexboxで揃える
+  flex-direction: row; // 横方向
+  justify-content: flex-start; // 水平方向左揃え
+  align-items: center; // 垂直方向中央揃え
 }
 .target-meter {
   margin: 0.1rem 5rem 0.1rem 3rem;
