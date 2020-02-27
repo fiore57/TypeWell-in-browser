@@ -87,7 +87,7 @@ export default createComponent({
       window.requestAnimationFrame(calcTime);
     }
     function calcTime() {
-      if (resultStore) resultStore.updateTime(Date.now() - state.m_startTime);
+      if (resultStore) resultStore.updateTimeMs(Date.now() - state.m_startTime);
       if (state.m_timerStatus === eTimerStatus.Start) {
         const nowTime = Date.now();
         state.m_elapsedTimeMs = nowTime - state.m_startTime;
@@ -104,11 +104,10 @@ export default createComponent({
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped lang="scss">
+@import "@/assets/variable.scss";
 .timer {
-  background: white;
+  @include white-block;
   font-size: 2.2rem;
-  border: 0.1rem solid;
-  border-color: gray;
   padding: 0.2rem 1rem;
   margin: 1rem;
   width: 14rem;

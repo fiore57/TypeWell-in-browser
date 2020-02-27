@@ -40,14 +40,13 @@ export default createComponent({
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped lang="scss">
+@import "@/assets/variable.scss";
 .text {
+  @include white-block;
   margin: 1rem auto;
-  width: 80rem; /* 見た目用 */
-  height: 20rem; /* 見た目用 */
-  border: 0.1rem solid;
-  border-color: gray;
+  width: 80rem;
+  height: 20rem;
   font-size: 1.8rem;
-  background: white;
 }
 .text-line {
   margin-top: 0.1rem;
