@@ -285,10 +285,10 @@ export default createComponent({
   box-shadow: 0 0.3rem 0.5rem rgba(0, 0, 0, 0.22);
 }
 .header {
-  display: flex; /* 子要素をflexboxで揃える */
-  flex-direction: row; /* 子要素をflexboxにより横方向に揃える */
-  justify-content: center; /* 子要素をflexboxにより中央に配置する */
-  align-items: center; /* 子要素をflexboxにより中央に配置する */
+  display: flex; // 子要素をflexboxで揃える
+  flex-direction: row; // 横方向
+  justify-content: center; // 水平方向中央揃え
+  align-items: center; // 垂直方向中央揃え
 }
 .countdown {
   @include white-block;
@@ -306,10 +306,10 @@ export default createComponent({
   margin: 1rem 10rem 1rem 5rem;
 }
 .target-and-miss {
-  display: flex; /* 子要素をflexboxで揃える */
-  flex-direction: row; /* 子要素をflexboxにより横方向に揃える */
-  justify-content: flex-start; /* 子要素をflexboxにより左に配置する */
-  align-items: center; /* 子要素をflexboxにより中央に配置する */
+  display: flex; // 子要素をflexboxで揃える
+  flex-direction: row; // 横方向
+  justify-content: flex-start; // 水平方向左揃え
+  align-items: center; // 垂直方向中央揃え
 }
 .miss-count {
   margin: 0.2rem 3rem 0.2rem auto;
@@ -318,7 +318,7 @@ export default createComponent({
 .roman-and-lap {
   display: flex; // 子要素をflexboxで揃える
   flex-direction: row; // 横方向
-  justify-content: center; // 水平方向中央
-  align-items: center; // 垂直方向中央
+  justify-content: center; // 水平方向中央揃え
+  align-items: center; // 垂直方向中央揃え
 }
 </style>
