@@ -231,11 +231,11 @@ export default createComponent({
           state.m_typingGame.romanLineLength * (resultStore.curLineNum + 1)
         ) {
           resultStore.addLapTimeMs(resultStore.timeMs);
-          window.console.log(resultStore.lapTimeMsList);
         }
 
         // 終了時の処理
         if (state.m_typingGame.isFinished()) {
+          resultStore.lock(); // resultStore をロック
           state.m_status = eStatus.Result;
         }
       } else {

@@ -1,8 +1,8 @@
-import { eMode } from './typeWell';
-import { getRandomInt } from './utils';
+import { eMode } from "./typeWell";
+import { getRandomInt } from "./utils";
 
-import * as firebase from 'firebase/app';
-import 'firebase/storage'
+import * as firebase from "firebase/app";
+import "firebase/storage";
 
 // ストレージを準備
 const firebaseConfig = {
@@ -18,45 +18,51 @@ const firebaseConfig = {
 firebase.initializeApp(firebaseConfig);
 const storage = firebase.storage();
 const fileNameList: string[] = [
-  "khjy.json", "ktkn.json", "knj.json", "ktwz.json"
+  "khjy.json",
+  "ktkn.json",
+  "knj.json",
+  "ktwz.json"
 ];
 
 for (let i = 0; i < 4; ++i) {
   const ref = storage.ref(fileNameList[i]);
-  ref.getDownloadURL().then((url) => {
-    const xhr = new XMLHttpRequest();
-    xhr.responseType = "json";
-    xhr.onload = (event) => {
-      // 読み込まれたあとの処理
-      TypingWords.m_words[i] = xhr.response.list;
-    };
-    xhr.open("GET", url);
-    xhr.send();
-  }).catch((error) => {
-    switch (error.code) {
-      case 'storage/object-not-found':
-        // File doesn't exist
-        window.console.error("Word file not found");
-        break;
-      case 'storage/unauthorized':
-        // User doesn't have permission to access the object
-        window.console.error("Permission denied");
-        break;
-      case 'storage/canceled':
-        // User canceled the upload
-        window.console.error("User canceled the upload");
-        break;
-      case 'storage/unknown':
-        // Unknown error occurred, inspect the server response
-        window.console.error("Unknown error has occurred");
-        break;
-    }
-  });
+  ref
+    .getDownloadURL()
+    .then(url => {
+      const xhr = new XMLHttpRequest();
+      xhr.responseType = "json";
+      xhr.onload = event => {
+        // 読み込まれたあとの処理
+        TypingWords.m_words[i] = xhr.response.list;
+      };
+      xhr.open("GET", url);
+      xhr.send();
+    })
+    .catch(error => {
+      switch (error.code) {
+        case "storage/object-not-found":
+          // File doesn't exist
+          window.console.error("Word file not found");
+          break;
+        case "storage/unauthorized":
+          // User doesn't have permission to access the object
+          window.console.error("Permission denied");
+          break;
+        case "storage/canceled":
+          // User canceled the upload
+          window.console.error("User canceled the upload");
+          break;
+        case "storage/unknown":
+          // Unknown error occurred, inspect the server response
+          window.console.error("Unknown error has occurred");
+          break;
+      }
+    });
 }
 
 interface WordsObj {
-  text: string,
-  kana: string[]
+  text: string;
+  kana: string[];
 }
 
 export default class TypingWords {

@@ -41,6 +41,10 @@ export default function resultStore() {
       state.lapTimeMsList = [];
       state.lock = true;
     },
+    /** resultStore をロックする */
+    lock() {
+      state.lock = true;
+    },
     /** resultStore のロックを解除する */
     unlock() {
       state.lock = false;
