@@ -757,31 +757,37 @@ export default class TypingGame {
   }
   /** 入力済み・入力中・未入力・範囲外のテキストに関するデータ */
   public get textDataList() {
+    const text = this._text;
+    const textLineLength = this._textLineLength;
+    const kanaList = this._kanaList;
+    const missFlag = this._missFlag;
+    const invalidTextIndex = this._invalidTextIndex;
+
     let prevTextList: string[] = [];
     let curTextList: string[] = [];
     let nextTextList: string[] = [];
     let invalidTextList: string[] = [];
     let isCurText: boolean = true;
 
-    for (let i = 0, kanaCount = 0; i < this._text.length; ++i) {
-      kanaCount += this._kanaList[i].length;
-      // this._textLineLength文字ごとに改行
-      if (i % this._textLineLength === 0) {
+    for (let i = 0, kanaCount = 0; i < text.length; ++i) {
+      kanaCount += kanaList[i].length;
+      // textLineLength 文字ごとに改行
+      if (i % textLineLength === 0) {
         prevTextList.push("");
         curTextList.push("");
         nextTextList.push("");
         invalidTextList.push("");
       }
 
-      let c: string = this._text[i];
+      let c: string = text[i];
       if (kanaCount <= this._kanaCount) {
         if (c === "　") c = "＿";
         prevTextList[prevTextList.length - 1] += c;
-      } else if (isCurText && i < this._invalidTextIndex) {
-        if (c === "　" && this._missFlag) c = "＿";
+      } else if (isCurText && i < invalidTextIndex) {
+        if (c === "　" && missFlag) c = "＿";
         curTextList[curTextList.length - 1] += c;
         isCurText = false;
-      } else if (i <= this._invalidTextIndex) {
+      } else if (i <= invalidTextIndex) {
         nextTextList[nextTextList.length - 1] += c;
       } else {
         invalidTextList[invalidTextList.length - 1] += c;
@@ -794,7 +800,7 @@ export default class TypingGame {
         curTextList.back().length +
         nextTextList.back().length +
         invalidTextList.back().length) %
-        this._textLineLength !==
+        textLineLength !==
       0
     ) {
       invalidTextList[invalidTextList.length - 1] += "　";
@@ -807,7 +813,7 @@ export default class TypingGame {
         cur: curTextList[i],
         next: nextTextList[i],
         invalid: invalidTextList[i],
-        missFlag: this._missFlag,
+        missFlag: missFlag,
         key: `textDataList${i}`
       });
     }
@@ -818,6 +824,7 @@ export default class TypingGame {
     const prevRoman = this.prevRoman;
     const nextRoman = this.nextRoman;
     const roman = prevRoman + nextRoman;
+    const missFlag = this._missFlag;
 
     let prevRomanList: string[] = [];
     let curRomanList: string[] = [];
@@ -838,7 +845,7 @@ export default class TypingGame {
         if (c === " ") c = "_";
         prevRomanList[prevRomanList.length - 1] += c;
       } else if (i === prevRoman.length) {
-        if (c === " " && this._missFlag === true) c = "_";
+        if (c === " " && missFlag === true) c = "_";
         curRomanList[curRomanList.length - 1] += c;
       } else {
         nextRomanList[nextRomanList.length - 1] += c;
@@ -851,7 +858,7 @@ export default class TypingGame {
         prev: prevRomanList[i],
         cur: curRomanList[i],
         next: nextRomanList[i],
-        missFlag: this._missFlag,
+        missFlag: missFlag,
         key: `romanDataList${i}`
       });
     }
