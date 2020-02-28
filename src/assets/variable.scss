@@ -1,0 +1,12 @@
+// 複数のコンポーネントで共有する変数
+
+$roman-block-height: 21.5rem;
+
+// 再利用するコード
+
+// 白背景・グレー枠線
+@mixin white-block {
+  border: 0.1rem solid;
+  border-color: gray;
+  background: white;
+}

@@ -16,224 +16,224 @@
 // ライセンス
 // MIT
 
-import TypingWords from '@/lib/word';
-import { eMode } from './typeWell';
+import TypingWords from "@/lib/word";
+import { eMode } from "./typeWell";
 
 // 全入力パターンのmapを保持するクラス
 class ChunkPattern {
   static list = new Map([
-    ['あ', [['a']]],
-    ['い', [['i'], ['yi']]],
-    ['う', [['u'], ['wu'], ['whu']]],
-    ['え', [['e']]],
-    ['お', [['o']]],
-    ['うぁ', [['wha']]],
-    ['うぃ', [['wi'], ['whi']]],
-    ['うぇ', [['we'], ['whe']]],
-    ['うぉ', [['who']]],
-    ['ゐ', [['wi']]],
-    ['ゑ', [['we']]],
-    ['ぁ', [['la'], ['xa']]],
-    ['ぃ', [['li'], ['xi'], ['lyi'], ['xyi']]],
-    ['ぅ', [['lu'], ['xu']]],
-    ['ぇ', [['le'], ['xe'], ['lye'], ['xye']]],
-    ['ぉ', [['lo'], ['xo']]],
-    ['ぃぇ', [['ye']]],
-    ['か', [['ka'], ['ca']]],
-    ['き', [['ki']]],
-    ['く', [['ku'], ['cu'], ['qu']]],
-    ['け', [['ke']]],
-    ['こ', [['ko'], ['co']]],
-    ['きゃ', [['kya']]],
-    ['きぃ', [['kyi']]],
-    ['きゅ', [['kyu']]],
-    ['きぇ', [['kye']]],
-    ['きょ', [['kyo']]],
-    ['くゃ', [['qya']]],
-    ['くゅ', [['qyu']]],
-    ['くょ', [['qyo']]],
-    ['くぁ', [['qa'], ['qwa'], ['kwa']]],
-    ['くぃ', [['qi'], ['qwi'], ['qyi']]],
-    ['くぅ', [['qwu']]],
-    ['くぇ', [['qe'], ['qwe'], ['qye']]],
-    ['くぉ', [['qo'], ['qwo']]],
-    ['が', [['ga']]],
-    ['ぎ', [['gi']]],
-    ['ぐ', [['gu']]],
-    ['げ', [['ge']]],
-    ['ご', [['go']]],
-    ['ぎゃ', [['gya']]],
-    ['ぎぃ', [['gyi']]],
-    ['ぎゅ', [['gyu']]],
-    ['ぎぇ', [['gye']]],
-    ['ぎょ', [['gyo']]],
-    ['ぐぁ', [['gwa']]],
-    ['ぐぃ', [['gwi']]],
-    ['ぐぅ', [['gwu']]],
-    ['ぐぇ', [['gwe']]],
-    ['ぐぉ', [['gwo']]],
-    ['ヵ', [['lka'], ['xka']]],
-    ['ヶ', [['lke'], ['xke']]],
-    ['さ', [['sa']]],
-    ['し', [['si'], ['ci'], ['shi']]],
-    ['す', [['su']]],
-    ['せ', [['se'], ['ce']]],
-    ['そ', [['so']]],
-    ['しゃ', [['sya'], ['sha']]],
-    ['しぃ', [['syi']]],
-    ['しゅ', [['syu'], ['shu']]],
-    ['しぇ', [['sye'], ['she']]],
-    ['しょ', [['syo'], ['sho']]],
-    ['すぁ', [['swa']]],
-    ['すぃ', [['swi']]],
-    ['すぅ', [['swu']]],
-    ['すぇ', [['swe']]],
-    ['すぉ', [['swo']]],
-    ['ざ', [['za']]],
-    ['じ', [['zi'], ['ji']]],
-    ['ず', [['zu']]],
-    ['ぜ', [['ze']]],
-    ['ぞ', [['zo']]],
-    ['じゃ', [['ja'], ['zya'], ['jya']]],
-    ['じぃ', [['zyi'], ['jyi']]],
-    ['じゅ', [['ju'], ['zyu'], ['jyu']]],
-    ['じぇ', [['je'], ['zye'], ['jye']]],
-    ['じょ', [['jo'], ['zyo'], ['jyo']]],
-    ['た', [['ta']]],
-    ['ち', [['ti'], ['chi']]],
-    ['つ', [['tu'], ['tsu']]],
-    ['て', [['te']]],
-    ['と', [['to']]],
-    ['ちゃ', [['tya'], ['cha'], ['cya']]],
-    ['ちぃ', [['tyi'], ['cyi']]],
-    ['ちゅ', [['tyu'], ['chu'], ['cyu']]],
-    ['ちぇ', [['tye'], ['che'], ['cye']]],
-    ['ちょ', [['tyo'], ['cho'], ['cyo']]],
-    ['つぁ', [['tsa']]],
-    ['つぃ', [['tsi']]],
-    ['つぇ', [['tse']]],
-    ['つぉ', [['tso']]],
-    ['てゃ', [['tha']]],
-    ['てぃ', [['thi']]],
-    ['てゅ', [['thu']]],
-    ['てぇ', [['the']]],
-    ['てょ', [['tho']]],
-    ['とぁ', [['twa']]],
-    ['とぃ', [['twi']]],
-    ['とぅ', [['twu']]],
-    ['とぇ', [['twe']]],
-    ['とぉ', [['two']]],
-    ['だ', [['da']]],
-    ['ぢ', [['di']]],
-    ['づ', [['du']]],
-    ['で', [['de']]],
-    ['ど', [['do']]],
-    ['ぢゃ', [['dya']]],
-    ['ぢぃ', [['dyi']]],
-    ['ぢゅ', [['dyu']]],
-    ['ぢぇ', [['dye']]],
-    ['ぢょ', [['dyo']]],
-    ['でゃ', [['dha']]],
-    ['でぃ', [['dhi']]],
-    ['でゅ', [['dhu']]],
-    ['でぇ', [['dhe']]],
-    ['でょ', [['dho']]],
-    ['どぁ', [['dwa']]],
-    ['どぃ', [['dwi']]],
-    ['どぅ', [['dwu']]],
-    ['どぇ', [['dwe']]],
-    ['どぉ', [['dwo']]],
-    ['っ', [['ltu'], ['xtu'], ['ltsu'], ['xtsu']]],
-    ['な', [['na']]],
-    ['に', [['ni']]],
-    ['ぬ', [['nu']]],
-    ['ね', [['ne']]],
-    ['の', [['no']]],
-    ['にゃ', [['nya']]],
-    ['にぃ', [['nyi']]],
-    ['にゅ', [['nyu']]],
-    ['にぇ', [['nye']]],
-    ['にょ', [['nyo']]],
-    ['は', [['ha']]],
-    ['ひ', [['hi']]],
-    ['ふ', [['hu'], ['fu']]],
-    ['へ', [['he']]],
-    ['ほ', [['ho']]],
-    ['ひゃ', [['hya']]],
-    ['ひぃ', [['hyi']]],
-    ['ひゅ', [['hyu']]],
-    ['ひぇ', [['hye']]],
-    ['ひょ', [['hyo']]],
-    ['ふぁ', [['fa'], ['fwa']]],
-    ['ふぃ', [['fi'], ['fwi'], ['fyi']]],
-    ['ふぅ', [['fwu']]],
-    ['ふぇ', [['fe'], ['fwe'], ['fye']]],
-    ['ふぉ', [['fo'], ['fwo']]],
-    ['ふゃ', [['fya']]],
-    ['ふゅ', [['fyu']]],
-    ['ふょ', [['fyo']]],
-    ['ば', [['ba']]],
-    ['び', [['bi']]],
-    ['ぶ', [['bu']]],
-    ['べ', [['be']]],
-    ['ぼ', [['bo']]],
-    ['びゃ', [['bya']]],
-    ['びぃ', [['byi']]],
-    ['びゅ', [['byu']]],
-    ['びぇ', [['bye']]],
-    ['びょ', [['byo']]],
-    ['ヴぁ', [['va']]],
-    ['ヴぃ', [['vi']]],
-    ['ヴ', [['vu']]],
-    ['ヴぇ', [['ve']]],
-    ['ヴぉ', [['vo']]],
-    ['ヴゃ', [['vya']]],
-    ['ヴぃ', [['vyi']]],
-    ['ヴゅ', [['vyu']]],
-    ['ヴぇ', [['vye']]],
-    ['ヴょ', [['vyo']]],
-    ['ぱ', [['pa']]],
-    ['ぴ', [['pi']]],
-    ['ぷ', [['pu']]],
-    ['ぺ', [['pe']]],
-    ['ぽ', [['po']]],
-    ['ぴゃ', [['pya']]],
-    ['ぴぃ', [['pyi']]],
-    ['ぴゅ', [['pyu']]],
-    ['ぴぇ', [['pye']]],
-    ['ぴょ', [['pyo']]],
-    ['ま', [['ma']]],
-    ['み', [['mi']]],
-    ['む', [['mu']]],
-    ['め', [['me']]],
-    ['も', [['mo']]],
-    ['みゃ', [['mya']]],
-    ['みぃ', [['myi']]],
-    ['みゅ', [['myu']]],
-    ['みぇ', [['mye']]],
-    ['みょ', [['myo']]],
-    ['や', [['ya']]],
-    ['ゆ', [['yu']]],
-    ['よ', [['yo']]],
-    ['ゃ', [['lya'], ['xya']]],
-    ['ゅ', [['lyu'], ['xyu']]],
-    ['ょ', [['lyo'], ['xyo']]],
-    ['ら', [['ra']]],
-    ['り', [['ri']]],
-    ['る', [['ru']]],
-    ['れ', [['re']]],
-    ['ろ', [['ro']]],
-    ['りゃ', [['rya']]],
-    ['りぃ', [['ryi']]],
-    ['りゅ', [['ryu']]],
-    ['りぇ', [['rye']]],
-    ['りょ', [['ryo']]],
-    ['わ', [['wa']]],
-    ['を', [['wo']]],
-    ['ん', [['n'], ['nn'], ["n'"], ['xn']]],
-    ['ゎ', [['lwa'], ['xwa']]],
-    ['　', [[' ']]],
-    ['ー', [['-']]]
+    ["あ", [["a"]]],
+    ["い", [["i"], ["yi"]]],
+    ["う", [["u"], ["wu"], ["whu"]]],
+    ["え", [["e"]]],
+    ["お", [["o"]]],
+    ["うぁ", [["wha"]]],
+    ["うぃ", [["wi"], ["whi"]]],
+    ["うぇ", [["we"], ["whe"]]],
+    ["うぉ", [["who"]]],
+    ["ゐ", [["wi"]]],
+    ["ゑ", [["we"]]],
+    ["ぁ", [["la"], ["xa"]]],
+    ["ぃ", [["li"], ["xi"], ["lyi"], ["xyi"]]],
+    ["ぅ", [["lu"], ["xu"]]],
+    ["ぇ", [["le"], ["xe"], ["lye"], ["xye"]]],
+    ["ぉ", [["lo"], ["xo"]]],
+    ["ぃぇ", [["ye"]]],
+    ["か", [["ka"], ["ca"]]],
+    ["き", [["ki"]]],
+    ["く", [["ku"], ["cu"], ["qu"]]],
+    ["け", [["ke"]]],
+    ["こ", [["ko"], ["co"]]],
+    ["きゃ", [["kya"]]],
+    ["きぃ", [["kyi"]]],
+    ["きゅ", [["kyu"]]],
+    ["きぇ", [["kye"]]],
+    ["きょ", [["kyo"]]],
+    ["くゃ", [["qya"]]],
+    ["くゅ", [["qyu"]]],
+    ["くょ", [["qyo"]]],
+    ["くぁ", [["qa"], ["qwa"], ["kwa"]]],
+    ["くぃ", [["qi"], ["qwi"], ["qyi"]]],
+    ["くぅ", [["qwu"]]],
+    ["くぇ", [["qe"], ["qwe"], ["qye"]]],
+    ["くぉ", [["qo"], ["qwo"]]],
+    ["が", [["ga"]]],
+    ["ぎ", [["gi"]]],
+    ["ぐ", [["gu"]]],
+    ["げ", [["ge"]]],
+    ["ご", [["go"]]],
+    ["ぎゃ", [["gya"]]],
+    ["ぎぃ", [["gyi"]]],
+    ["ぎゅ", [["gyu"]]],
+    ["ぎぇ", [["gye"]]],
+    ["ぎょ", [["gyo"]]],
+    ["ぐぁ", [["gwa"]]],
+    ["ぐぃ", [["gwi"]]],
+    ["ぐぅ", [["gwu"]]],
+    ["ぐぇ", [["gwe"]]],
+    ["ぐぉ", [["gwo"]]],
+    ["ヵ", [["lka"], ["xka"]]],
+    ["ヶ", [["lke"], ["xke"]]],
+    ["さ", [["sa"]]],
+    ["し", [["si"], ["ci"], ["shi"]]],
+    ["す", [["su"]]],
+    ["せ", [["se"], ["ce"]]],
+    ["そ", [["so"]]],
+    ["しゃ", [["sya"], ["sha"]]],
+    ["しぃ", [["syi"]]],
+    ["しゅ", [["syu"], ["shu"]]],
+    ["しぇ", [["sye"], ["she"]]],
+    ["しょ", [["syo"], ["sho"]]],
+    ["すぁ", [["swa"]]],
+    ["すぃ", [["swi"]]],
+    ["すぅ", [["swu"]]],
+    ["すぇ", [["swe"]]],
+    ["すぉ", [["swo"]]],
+    ["ざ", [["za"]]],
+    ["じ", [["zi"], ["ji"]]],
+    ["ず", [["zu"]]],
+    ["ぜ", [["ze"]]],
+    ["ぞ", [["zo"]]],
+    ["じゃ", [["ja"], ["zya"], ["jya"]]],
+    ["じぃ", [["zyi"], ["jyi"]]],
+    ["じゅ", [["ju"], ["zyu"], ["jyu"]]],
+    ["じぇ", [["je"], ["zye"], ["jye"]]],
+    ["じょ", [["jo"], ["zyo"], ["jyo"]]],
+    ["た", [["ta"]]],
+    ["ち", [["ti"], ["chi"]]],
+    ["つ", [["tu"], ["tsu"]]],
+    ["て", [["te"]]],
+    ["と", [["to"]]],
+    ["ちゃ", [["tya"], ["cha"], ["cya"]]],
+    ["ちぃ", [["tyi"], ["cyi"]]],
+    ["ちゅ", [["tyu"], ["chu"], ["cyu"]]],
+    ["ちぇ", [["tye"], ["che"], ["cye"]]],
+    ["ちょ", [["tyo"], ["cho"], ["cyo"]]],
+    ["つぁ", [["tsa"]]],
+    ["つぃ", [["tsi"]]],
+    ["つぇ", [["tse"]]],
+    ["つぉ", [["tso"]]],
+    ["てゃ", [["tha"]]],
+    ["てぃ", [["thi"]]],
+    ["てゅ", [["thu"]]],
+    ["てぇ", [["the"]]],
+    ["てょ", [["tho"]]],
+    ["とぁ", [["twa"]]],
+    ["とぃ", [["twi"]]],
+    ["とぅ", [["twu"]]],
+    ["とぇ", [["twe"]]],
+    ["とぉ", [["two"]]],
+    ["だ", [["da"]]],
+    ["ぢ", [["di"]]],
+    ["づ", [["du"]]],
+    ["で", [["de"]]],
+    ["ど", [["do"]]],
+    ["ぢゃ", [["dya"]]],
+    ["ぢぃ", [["dyi"]]],
+    ["ぢゅ", [["dyu"]]],
+    ["ぢぇ", [["dye"]]],
+    ["ぢょ", [["dyo"]]],
+    ["でゃ", [["dha"]]],
+    ["でぃ", [["dhi"]]],
+    ["でゅ", [["dhu"]]],
+    ["でぇ", [["dhe"]]],
+    ["でょ", [["dho"]]],
+    ["どぁ", [["dwa"]]],
+    ["どぃ", [["dwi"]]],
+    ["どぅ", [["dwu"]]],
+    ["どぇ", [["dwe"]]],
+    ["どぉ", [["dwo"]]],
+    ["っ", [["ltu"], ["xtu"], ["ltsu"], ["xtsu"]]],
+    ["な", [["na"]]],
+    ["に", [["ni"]]],
+    ["ぬ", [["nu"]]],
+    ["ね", [["ne"]]],
+    ["の", [["no"]]],
+    ["にゃ", [["nya"]]],
+    ["にぃ", [["nyi"]]],
+    ["にゅ", [["nyu"]]],
+    ["にぇ", [["nye"]]],
+    ["にょ", [["nyo"]]],
+    ["は", [["ha"]]],
+    ["ひ", [["hi"]]],
+    ["ふ", [["hu"], ["fu"]]],
+    ["へ", [["he"]]],
+    ["ほ", [["ho"]]],
+    ["ひゃ", [["hya"]]],
+    ["ひぃ", [["hyi"]]],
+    ["ひゅ", [["hyu"]]],
+    ["ひぇ", [["hye"]]],
+    ["ひょ", [["hyo"]]],
+    ["ふぁ", [["fa"], ["fwa"]]],
+    ["ふぃ", [["fi"], ["fwi"], ["fyi"]]],
+    ["ふぅ", [["fwu"]]],
+    ["ふぇ", [["fe"], ["fwe"], ["fye"]]],
+    ["ふぉ", [["fo"], ["fwo"]]],
+    ["ふゃ", [["fya"]]],
+    ["ふゅ", [["fyu"]]],
+    ["ふょ", [["fyo"]]],
+    ["ば", [["ba"]]],
+    ["び", [["bi"]]],
+    ["ぶ", [["bu"]]],
+    ["べ", [["be"]]],
+    ["ぼ", [["bo"]]],
+    ["びゃ", [["bya"]]],
+    ["びぃ", [["byi"]]],
+    ["びゅ", [["byu"]]],
+    ["びぇ", [["bye"]]],
+    ["びょ", [["byo"]]],
+    ["ヴぁ", [["va"]]],
+    ["ヴぃ", [["vi"]]],
+    ["ヴ", [["vu"]]],
+    ["ヴぇ", [["ve"]]],
+    ["ヴぉ", [["vo"]]],
+    ["ヴゃ", [["vya"]]],
+    ["ヴぃ", [["vyi"]]],
+    ["ヴゅ", [["vyu"]]],
+    ["ヴぇ", [["vye"]]],
+    ["ヴょ", [["vyo"]]],
+    ["ぱ", [["pa"]]],
+    ["ぴ", [["pi"]]],
+    ["ぷ", [["pu"]]],
+    ["ぺ", [["pe"]]],
+    ["ぽ", [["po"]]],
+    ["ぴゃ", [["pya"]]],
+    ["ぴぃ", [["pyi"]]],
+    ["ぴゅ", [["pyu"]]],
+    ["ぴぇ", [["pye"]]],
+    ["ぴょ", [["pyo"]]],
+    ["ま", [["ma"]]],
+    ["み", [["mi"]]],
+    ["む", [["mu"]]],
+    ["め", [["me"]]],
+    ["も", [["mo"]]],
+    ["みゃ", [["mya"]]],
+    ["みぃ", [["myi"]]],
+    ["みゅ", [["myu"]]],
+    ["みぇ", [["mye"]]],
+    ["みょ", [["myo"]]],
+    ["や", [["ya"]]],
+    ["ゆ", [["yu"]]],
+    ["よ", [["yo"]]],
+    ["ゃ", [["lya"], ["xya"]]],
+    ["ゅ", [["lyu"], ["xyu"]]],
+    ["ょ", [["lyo"], ["xyo"]]],
+    ["ら", [["ra"]]],
+    ["り", [["ri"]]],
+    ["る", [["ru"]]],
+    ["れ", [["re"]]],
+    ["ろ", [["ro"]]],
+    ["りゃ", [["rya"]]],
+    ["りぃ", [["ryi"]]],
+    ["りゅ", [["ryu"]]],
+    ["りぇ", [["rye"]]],
+    ["りょ", [["ryo"]]],
+    ["わ", [["wa"]]],
+    ["を", [["wo"]]],
+    ["ん", [["n"], ["nn"], ["n'"], ["xn"]]],
+    ["ゎ", [["lwa"], ["xwa"]]],
+    ["　", [[" "]]],
+    ["ー", [["-"]]]
   ]);
   private static _initialize = (() => {
     for (const chunkPattern of ChunkPattern.list) {
@@ -243,8 +243,7 @@ class ChunkPattern {
         for (const c of kana) {
           if (multiPattern.length === 0) {
             multiPattern = ChunkPattern.list.get(c)!;
-          }
-          else {
+          } else {
             let tmp: string[][] = [];
             for (const p1 of multiPattern) {
               for (const p2 of ChunkPattern.list.get(c)!) {
@@ -287,7 +286,7 @@ function devideIntoChunk(kana: string): Chunk[] {
       // 最後から2番目の文字の場合
       if (i >= kana.length - 2) {
         // かつ、次の文字がスペースでない場合、2文字で1チャンク
-        if (kana[i + 1] !== '　') {
+        if (kana[i + 1] !== "　") {
           ret.push(new Chunk(kana[i] + kana[i + 1]));
           break;
         }
@@ -387,7 +386,9 @@ class TypePatternList {
   private _additionalRomanCount: number = 0;
 
   public constructor(romanLists: string[][]) {
-    this._typePatternList = romanLists.map(romanList => new TypePattern(romanList));
+    this._typePatternList = romanLists.map(
+      romanList => new TypePattern(romanList)
+    );
   }
 
   private isCorrectInput(inputChar: string): boolean {
@@ -399,9 +400,11 @@ class TypePatternList {
   }
 
   /** 正しい入力であればtrue、そうでなければfalseを返す */
-  public update(inputChar: string, kanaFinished: (newKanaCount: number) => void): boolean {
+  public update(
+    inputChar: string,
+    kanaFinished: (newKanaCount: number) => void
+  ): boolean {
     // 正しい入力でない場合、即return
-    // window.console.log(inputChar);
     if (!this.isCorrectInput(inputChar)) {
       return false;
     }
@@ -415,8 +418,7 @@ class TypePatternList {
           this._isChunkFinished = true;
           continue;
         }
-      }
-      else {
+      } else {
         if (typePattern === this._typePatternList[this._displayPatternNum]) {
           this._displayPatternNum = -1;
         }
@@ -434,7 +436,8 @@ class TypePatternList {
       }
     }
     const curDisplayRoman = this.displayRoman;
-    this._additionalRomanCount += curDisplayRoman.length - prevDisplayRoman.length;
+    this._additionalRomanCount +=
+      curDisplayRoman.length - prevDisplayRoman.length;
     return true;
   }
   public get displayRoman(): string {
@@ -472,9 +475,10 @@ class Chunk {
 
     if (kana.length == 1) {
       this._typePatternList = new TypePatternList(ChunkPattern.list.get(kana)!);
-    }
-    else { // かなが2文字以上の場合
-      if (kana[0] === 'っ') { // チャンクの1文字目が「っ」
+    } else {
+      // かなが2文字以上の場合
+      if (kana[0] === "っ") {
+        // チャンクの1文字目が「っ」
         // 「っ」を除いた場合のパターン
         const curPatterns: string[][] = ChunkPattern.list.get(kana.substr(1))!;
 
@@ -497,8 +501,8 @@ class Chunk {
         }
 
         this._typePatternList = new TypePatternList(newPatterns);
-      }
-      else if (kana[0] === "ん") { // チャンクの1文字目が「ん」
+      } else if (kana[0] === "ん") {
+        // チャンクの1文字目が「ん」
         // 「ん」を除いた場合のパターン
         const curPatterns: string[][] = ChunkPattern.list.get(kana.substr(1))!;
 
@@ -510,8 +514,7 @@ class Chunk {
           for (const xn of xnPatterns) {
             if (xn[0] !== "n") {
               newPatterns.push(xn.concat(roman));
-            }
-            else {
+            } else {
               // 次の文字がa/i/u/e/o/n/yでないなら「n」が使える
               if (!this._xnVowels.includes(roman[0][0])) {
                 newPatterns.push(xn.concat(roman));
@@ -520,9 +523,11 @@ class Chunk {
           }
         }
         this._typePatternList = new TypePatternList(newPatterns);
-      }
-      else { // チャンクの1文字目が「っ」でも「ん」でもない
-        this._typePatternList = new TypePatternList(ChunkPattern.list.get(kana)!);
+      } else {
+        // チャンクの1文字目が「っ」でも「ん」でもない
+        this._typePatternList = new TypePatternList(
+          ChunkPattern.list.get(kana)!
+        );
       }
     }
     this._roman = this._typePatternList.displayRoman;
@@ -593,13 +598,12 @@ export default class TypingGame {
   /** text1行あたりの文字数 */
   private readonly _textLineLength: number = 43;
   /** roman1行あたりの文字数 */
-  private readonly _romanLineLength: number = 50;
-  //private readonly _romanLineLength: number = 10;
+  public readonly romanLineLength: number = 50;
   /** romanの行数 */
   private readonly _romanLineNum: number = 8;
 
   // Constructorは何もしない
-  public constructor() { }
+  public constructor() {}
 
   /** 変数を初期化する */
   private initVariables() {
@@ -661,15 +665,18 @@ export default class TypingGame {
 
   private _generateWords(mode: eMode) {
     // ローマ字が400字ジャストのときは、もう1単語追加する
-    for (let romanCount: number = 0; romanCount <= this.romanLength;) {
+    for (let romanCount: number = 0; romanCount <= this.romanLength; ) {
       const word = TypingWords.getWord(mode);
       const text: string = word.text + "　";
       const kanaList: string[] = word.kana.concat(["　"]);
       this._kanaList = this._kanaList.concat(kanaList);
 
-      const kanaStr: string = kanaList.join('');
+      const kanaStr: string = kanaList.join("");
       const chunkList: Chunk[] = devideIntoChunk(kanaStr);
-      const romanLength: number = chunkList.reduce((acc, cur) => acc + cur.roman.length, 0);
+      const romanLength: number = chunkList.reduce(
+        (acc, cur) => acc + cur.roman.length,
+        0
+      );
       romanCount += romanLength;
 
       this._text += text;
@@ -677,26 +684,38 @@ export default class TypingGame {
     }
   }
 
-  public update(inputChar: string) {
+  /**
+   * @param inputChar 入力した文字
+   * @return {boolean} 入力が正しいならtrue、誤りならfalseを返す
+   */
+  public update(inputChar: string): boolean {
     const result = this._chunkList[this._chunkCount].update(inputChar);
-    if (result) { // 正しい入力の場合
+    if (result) {
+      // 正しい入力の場合
       ++this._typeCount;
       this._missFlag = false;
       // 終了判定
       if (this._typeCount >= this.romanLength + this._additionalRomanCountSum) {
         this._isFinished = true;
       }
-    }
-    else { // 入力が正しくない場合
+    } else {
+      // 入力が正しくない場合
       ++this._missCount;
       this._missFlag = true;
     }
-    this._kanaCount = this._chunkList.reduce((acc, cur) => acc + cur.kanaCount, 0);
+    this._kanaCount = this._chunkList.reduce(
+      (acc, cur) => acc + cur.kanaCount,
+      0
+    );
     if (this._chunkList[this._chunkCount].isChunkFinished) {
       ++this._chunkCount;
     }
 
-    this._additionalRomanCountSum = this._chunkList.reduce((acc, cur) => acc += cur.additionalRomanCount, 0);
+    this._additionalRomanCountSum = this._chunkList.reduce(
+      (acc, cur) => (acc += cur.additionalRomanCount),
+      0
+    );
+    return !this._missFlag;
   }
 
   public isFinished(): boolean {
@@ -704,7 +723,7 @@ export default class TypingGame {
   }
 
   public get romanLength(): number {
-    return this._romanLineLength * this._romanLineNum;
+    return this.romanLineLength * this._romanLineNum;
   }
   public get text(): string {
     return this._text;
@@ -758,34 +777,38 @@ export default class TypingGame {
       if (kanaCount <= this._kanaCount) {
         if (c === "　") c = "＿";
         prevTextList[prevTextList.length - 1] += c;
-      }
-      else if (isCurText && i < this._invalidTextIndex) {
+      } else if (isCurText && i < this._invalidTextIndex) {
         if (c === "　" && this._missFlag) c = "＿";
         curTextList[curTextList.length - 1] += c;
         isCurText = false;
-      }
-      else if (i <= this._invalidTextIndex) {
+      } else if (i <= this._invalidTextIndex) {
         nextTextList[nextTextList.length - 1] += c;
-      }
-      else {
+      } else {
         invalidTextList[invalidTextList.length - 1] += c;
       }
     }
 
     // 最後を空白で埋める
-    while ((prevTextList.back().length + curTextList.back().length + nextTextList.back().length + invalidTextList.back().length) % this._textLineLength !== 0) {
+    while (
+      (prevTextList.back().length +
+        curTextList.back().length +
+        nextTextList.back().length +
+        invalidTextList.back().length) %
+        this._textLineLength !==
+      0
+    ) {
       invalidTextList[invalidTextList.length - 1] += "　";
     }
 
     let ret: {}[] = [];
     for (let i = 0; i < prevTextList.length; ++i) {
       ret.push({
-        "prev": prevTextList[i],
-        "cur": curTextList[i],
-        "next": nextTextList[i],
-        "invalid": invalidTextList[i],
-        "missFlag": this._missFlag,
-        "key": `textDataList${i}`
+        prev: prevTextList[i],
+        cur: curTextList[i],
+        next: nextTextList[i],
+        invalid: invalidTextList[i],
+        missFlag: this._missFlag,
+        key: `textDataList${i}`
       });
     }
     return ret;
@@ -799,8 +822,12 @@ export default class TypingGame {
     let prevRomanList: string[] = [];
     let curRomanList: string[] = [];
     let nextRomanList: string[] = [];
-    for (let i = this._additionalRomanCountSum; i < this.romanLength + this._additionalRomanCountSum; ++i) {
-      if ((i - this._additionalRomanCountSum) % this._romanLineLength === 0) {
+    for (
+      let i = this._additionalRomanCountSum;
+      i < this.romanLength + this._additionalRomanCountSum;
+      ++i
+    ) {
+      if ((i - this._additionalRomanCountSum) % this.romanLineLength === 0) {
         prevRomanList.push("");
         curRomanList.push("");
         nextRomanList.push("");
@@ -810,12 +837,10 @@ export default class TypingGame {
       if (i < prevRoman.length) {
         if (c === " ") c = "_";
         prevRomanList[prevRomanList.length - 1] += c;
-      }
-      else if (i === prevRoman.length) {
+      } else if (i === prevRoman.length) {
         if (c === " " && this._missFlag === true) c = "_";
         curRomanList[curRomanList.length - 1] += c;
-      }
-      else {
+      } else {
         nextRomanList[nextRomanList.length - 1] += c;
       }
     }
@@ -823,11 +848,11 @@ export default class TypingGame {
     let ret: {}[] = [];
     for (let i = 0; i < this._romanLineNum; ++i) {
       ret.push({
-        "prev": prevRomanList[i],
-        "cur": curRomanList[i],
-        "next": nextRomanList[i],
-        "missFlag": this._missFlag,
-        "key": `romanDataList${i}`
+        prev: prevRomanList[i],
+        cur: curRomanList[i],
+        next: nextRomanList[i],
+        missFlag: this._missFlag,
+        key: `romanDataList${i}`
       });
     }
     return ret;

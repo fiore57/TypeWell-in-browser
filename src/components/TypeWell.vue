@@ -21,7 +21,10 @@
         <div class="miss-count">Miss: {{ state.missCount }}</div>
       </div>
 
-      <TypeWellRoman :romanDataList="state.romanDataList" />
+      <div class="roman-and-lap">
+        <TypeWellRoman :romanDataList="state.romanDataList" />
+        <TypeWellLapTime :lapTimeMsList="state.lapTimeMsList" />
+      </div>
     </div>
 
     <!--
@@ -49,6 +52,7 @@ import Timer, { eTimerStatus } from "./Timer.vue";
 import TypeWellText from "./TypeWellText.vue";
 import TypeWellTarget from "./TypeWellTarget.vue";
 import TypeWellRoman from "./TypeWellRoman.vue";
+import TypeWellLapTime from "./TypeWellLapTime.vue";
 import Config from "./Config.vue";
 import Result from "./Result.vue";
 import { eMode } from "@/lib/typeWell";
@@ -69,6 +73,7 @@ export default createComponent({
     TypeWellText,
     TypeWellTarget,
     TypeWellRoman,
+    TypeWellLapTime,
     Config,
     Result
   },
@@ -147,7 +152,8 @@ export default createComponent({
         state.isReady || state.inCountdown
           ? [{}]
           : state.m_typingGame.romanDataList
-      )
+      ),
+      lapTimeMsList: computed(() => resultStore.lapTimeMsList)
     });
 
     function countdownFunc() {
@@ -186,7 +192,7 @@ export default createComponent({
 
     // 入力を処理
     function keyInput(event: KeyboardEvent) {
-      window.console.log(event.key);
+      // window.console.log(event.key);
       // Escapeで中断
       if (event.key === "Escape") {
         resetGame();
@@ -210,25 +216,42 @@ export default createComponent({
       }
       if (!state.inGame) return;
       // 入力処理
-      state.m_typingGame.update(event.key);
+      const isCorrectInput: boolean = state.m_typingGame.update(event.key);
       if (!resultStore) {
         throw new Error(`${ResultStoreKey} is not provided`);
       }
-      resultStore.updateTypeCount(state.m_typingGame.typeCount);
-      resultStore.updateMissCount(state.m_typingGame.missCount);
-      if (!configStore) {
-        throw new Error(`${ConfigStoreKey} is not provided`);
-      }
-      if (state.m_typingGame.missCount > configStore.missMax) {
-        alert("ミスが多すぎます。はじめからやり直してください");
-        resetGame();
-        event.stopPropagation(); // イベントの伝播を止める
-        return;
-      }
 
-      // 終了時の処理
-      if (state.m_typingGame.isFinished()) {
-        state.m_status = eStatus.Result;
+      if (isCorrectInput) {
+        // 正しい入力の場合
+        resultStore.updateTypeCount(state.m_typingGame.typeCount);
+
+        // ラップタイムの処理
+        if (
+          state.m_typingGame.typeCount >=
+          state.m_typingGame.romanLineLength * (resultStore.curLineNum + 1)
+        ) {
+          resultStore.addLapTimeMs(resultStore.timeMs);
+        }
+
+        // 終了時の処理
+        if (state.m_typingGame.isFinished()) {
+          resultStore.lock(); // resultStore をロック
+          state.m_status = eStatus.Result;
+        }
+      } else {
+        // 誤った入力の場合
+        resultStore.updateMissCount(state.m_typingGame.missCount);
+
+        // ミス回数の判定
+        if (!configStore) {
+          throw new Error(`${ConfigStoreKey} is not provided`);
+        }
+        if (state.m_typingGame.missCount > configStore.missMax) {
+          alert("ミスが多すぎます。はじめからやり直してください");
+          resetGame();
+          event.stopPropagation(); // イベントの伝播を止める
+          return;
+        }
       }
     }
 
@@ -251,6 +274,7 @@ export default createComponent({
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped lang="scss">
+@import "@/assets/variable.scss";
 .game {
   width: 85rem;
   padding: 1rem;
@@ -261,20 +285,18 @@ export default createComponent({
   box-shadow: 0 0.3rem 0.5rem rgba(0, 0, 0, 0.22);
 }
 .header {
-  display: flex; /* 子要素をflexboxで揃える */
-  flex-direction: row; /* 子要素をflexboxにより横方向に揃える */
-  justify-content: center; /* 子要素をflexboxにより中央に配置する */
-  align-items: center; /* 子要素をflexboxにより中央に配置する */
+  display: flex; // 子要素をflexboxで揃える
+  flex-direction: row; // 横方向
+  justify-content: center; // 水平方向中央揃え
+  align-items: center; // 垂直方向中央揃え
 }
 .countdown {
+  @include white-block;
   font-size: 2.2rem;
-  border: 0.1rem solid;
-  border-color: gray;
   padding: 0.2rem 0.5rem;
   margin: 1rem;
   width: 5.5rem;
   height: 3rem;
-  background: white;
 }
 .go {
   color: red;
@@ -284,13 +306,19 @@ export default createComponent({
   margin: 1rem 10rem 1rem 5rem;
 }
 .target-and-miss {
-  display: flex; /* 子要素をflexboxで揃える */
-  flex-direction: row; /* 子要素をflexboxにより横方向に揃える */
-  justify-content: flex-start; /* 子要素をflexboxにより左に配置する */
-  align-items: center; /* 子要素をflexboxにより中央に配置する */
+  display: flex; // 子要素をflexboxで揃える
+  flex-direction: row; // 横方向
+  justify-content: flex-start; // 水平方向左揃え
+  align-items: center; // 垂直方向中央揃え
 }
 .miss-count {
   margin: 0.2rem 3rem 0.2rem auto;
   font-size: 1.8rem;
+}
+.roman-and-lap {
+  display: flex; // 子要素をflexboxで揃える
+  flex-direction: row; // 横方向
+  justify-content: center; // 水平方向中央揃え
+  align-items: center; // 垂直方向中央揃え
 }
 </style>
