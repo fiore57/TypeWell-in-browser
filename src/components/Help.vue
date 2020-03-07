@@ -31,6 +31,10 @@
         <ul>
           <li>Google Chrome</li>
         </ul>
+        <li>Android 9（Bluetooth キーボード接続時）</li>
+        <ul>
+          <li>Google Chrome</li>
+        </ul>
       </ul>
       <p>
         Internet
