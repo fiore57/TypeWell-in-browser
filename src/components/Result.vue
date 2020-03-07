@@ -7,10 +7,13 @@
 
     <div class="inline-block-list">
       <ul>
-        <li>{{ state.tpm }} 打/分</li>
-        <li>{{ state.tps }} 打/秒</li>
+        <li>{{ state.tpmStr }} 打/分</li>
+        <li>{{ state.tpsStr }} 打/秒</li>
       </ul>
     </div>
+
+    <p>正打率: {{ state.rateStr }} %</p>
+    <p>e-typing換算スコア: {{ state.etypingScore }}</p>
   </div>
 </template>
 
@@ -44,17 +47,26 @@ export default createComponent({
       throw new Error(`${ResultStoreKey} is not provided`);
     }
 
+    // TODO: romanLengthがマジックナンバーになっている
+    const romanLength = 400;
+
     const state = reactive({
       // 結果
       timeMs: computed(() => resultStore.timeMs),
       time: computed((): string => (state.timeMs / 1000).toFixed(3)),
       level: computed((): string => getLevelStr(state.timeMs)),
       missCount: computed((): number => resultStore.missCount),
-      m_tpm: computed((): number => calcUpm(400, state.timeMs)),
-      // TODO: romanLengthがマジックナンバーになっている
-      m_tps: computed((): number => calcUps(400, state.timeMs)),
-      tpm: computed((): string => state.m_tpm.toFixed(2)),
-      tps: computed((): string => state.m_tps.toFixed(3))
+      tpm: computed((): number => calcUpm(romanLength, state.timeMs)),
+      tps: computed((): number => calcUps(romanLength, state.timeMs)),
+      tpmStr: computed((): string => state.tpm.toFixed(2)),
+      tpsStr: computed((): string => state.tps.toFixed(3)),
+      rate: computed(
+        (): number => romanLength / (romanLength + state.missCount)
+      ),
+      rateStr: computed((): string => (state.rate * 100).toFixed(2)),
+      etypingScore: computed((): number =>
+        Math.round(state.tpm * Math.pow(state.rate, 3))
+      )
     });
 
     return {
