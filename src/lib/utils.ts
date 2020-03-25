@@ -16,7 +16,7 @@ declare global {
   interface Array<T> {
     front(): T;
     back(): T;
-    empty(): T;
+    empty(): boolean;
   }
 }
 /** 配列の最初の要素を返す（右辺値） */
