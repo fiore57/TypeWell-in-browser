@@ -10,3 +10,11 @@ $roman-block-height: 21.5rem;
   border-color: gray;
   background: white;
 }
+
+// 薄灰色背景・グレー枠線・影付き
+@mixin gray-block-shadow {
+  background: whitesmoke;
+  border: 0.1rem solid;
+  border-color: gray;
+  box-shadow: 0 0.3rem 0.5rem rgba(0, 0, 0, 0.22);
+}

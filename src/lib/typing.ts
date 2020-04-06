@@ -742,6 +742,12 @@ export default class TypingGame {
     }
     return ret;
   }
+  public get roman(): string {
+    return this.prevRoman + this.nextRoman;
+  }
+  public get additionalRomanCountSum(): number {
+    return this._additionalRomanCountSum;
+  }
   /**
    * romanLengthに対する打鍵数
    *
@@ -823,7 +829,7 @@ export default class TypingGame {
   public get romanDataList() {
     const prevRoman = this.prevRoman;
     const nextRoman = this.nextRoman;
-    const roman = prevRoman + nextRoman;
+    const roman = this.roman;
     const missFlag = this._missFlag;
 
     let prevRomanList: string[] = [];

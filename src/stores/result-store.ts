@@ -1,5 +1,19 @@
 import { reactive } from "@vue/composition-api";
 
+export const enum eLogType {
+  Correct,
+  Miss
+}
+
+export interface typingLogObj {
+  /** ログの種類 */
+  logType: eLogType;
+  /** タイム（ミリ秒） */
+  timeMs: number;
+  /** その時点でのローマ字 */
+  roman: string;
+}
+
 interface resultStoreObj {
   /** タイム（ミリ秒） */
   timeMs: number;
@@ -7,9 +21,12 @@ interface resultStoreObj {
   typeCount: number;
   /** ミス数 */
   missCount: number;
-  typingLog: {}[];
+  /** ログ */
+  typingLog: typingLogObj[];
   /** ラップタイム（累積和配列） */
   lapTimeMsList: number[];
+  /** ローマ字 */
+  roman: string;
   /** リセットされた後、RAFLoop で store が書き換えられないようにする */
   lock: boolean;
 }
@@ -19,18 +36,12 @@ export default function resultStore() {
     timeMs: 0,
     typeCount: 0,
     missCount: 0,
-    typingLog: [{}],
+    typingLog: [],
     lapTimeMsList: [],
+    roman: "",
+    additionalRomanCount: 0,
     lock: false
   });
-
-  const updateLog = () => {
-    state.typingLog.push({
-      timeMs: state.timeMs,
-      typeCount: state.typeCount,
-      missCount: state.missCount
-    });
-  };
 
   return {
     reset() {
@@ -39,6 +50,7 @@ export default function resultStore() {
       state.missCount = 0;
       state.typingLog = [];
       state.lapTimeMsList = [];
+      state.roman = "";
       state.lock = true;
     },
     /** resultStore をロックする */
@@ -59,18 +71,26 @@ export default function resultStore() {
     get typeCount(): number {
       return state.typeCount;
     },
-    updateTypeCount(count: number) {
+    incTypeCount() {
       if (state.lock) return;
-      state.typeCount = count;
-      updateLog();
+      ++state.typeCount;
+      state.typingLog.push({
+        logType: eLogType.Correct,
+        timeMs: state.timeMs,
+        roman: state.roman
+      });
     },
     get missCount(): number {
       return state.missCount;
     },
-    updateMissCount(miss: number) {
+    incMissCount() {
       if (state.lock) return;
-      state.missCount = miss;
-      updateLog();
+      ++state.missCount;
+      state.typingLog.push({
+        logType: eLogType.Miss,
+        timeMs: state.timeMs,
+        roman: state.roman
+      });
     },
     /** 累積和配列を返す */
     get lapTimeMsList(): number[] {
@@ -82,6 +102,16 @@ export default function resultStore() {
     },
     get curLineNum(): number {
       return state.lapTimeMsList.length;
+    },
+    get typingLog(): typingLogObj[] {
+      return state.typingLog;
+    },
+    get roman(): string {
+      return state.roman;
+    },
+    setRoman(newRoman: string) {
+      if (state.lock) return;
+      state.roman = newRoman;
     }
   };
 }

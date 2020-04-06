@@ -19,11 +19,11 @@ declare global {
     empty(): boolean;
   }
 }
-/** 配列の最初の要素を返す（右辺値） */
+/** 配列の最初の要素を返す */
 (Array.prototype as any).front = function() {
   return this[0];
 };
-/** 配列の最後の要素を返す（右辺値） */
+/** 配列の最後の要素を返す */
 (Array.prototype as any).back = function() {
   return this[this.length - 1];
 };

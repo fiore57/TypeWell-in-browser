@@ -33,6 +33,8 @@
     -->
     <Result v-if="state.inResult" />
 
+    <TypeWellReplay />
+
     <Config v-if="state.isReady" />
   </div>
 </template>
@@ -44,7 +46,7 @@ import {
   computed,
   inject,
   onBeforeMount,
-  onBeforeUnmount
+  onBeforeUnmount,
 } from "@vue/composition-api";
 import TypingGame from "@/lib/typing";
 import TypeWellButton from "./TypeWellButton.vue";
@@ -55,6 +57,7 @@ import TypeWellRoman from "./TypeWellRoman.vue";
 import TypeWellLapTime from "./TypeWellLapTime.vue";
 import Config from "./Config.vue";
 import Result from "./Result.vue";
+import TypeWellReplay from "./TypeWellReplay.vue";
 import { eMode } from "@/lib/typeWell";
 import ResultStoreKey from "./result-store-key";
 import ConfigStoreKey from "./config-store-key";
@@ -63,7 +66,7 @@ const enum eStatus {
   Ready,
   Countdown,
   Game,
-  Result
+  Result,
 }
 
 export default createComponent({
@@ -75,7 +78,8 @@ export default createComponent({
     TypeWellRoman,
     TypeWellLapTime,
     Config,
-    Result
+    Result,
+    TypeWellReplay,
   },
   setup() {
     const resultStore = inject(ResultStoreKey);
@@ -118,7 +122,7 @@ export default createComponent({
           "基本常用語",
           "カタカナ語",
           "漢字",
-          "慣用句・ことわざ"
+          "慣用句・ことわざ",
         ];
         return modeStrList[state.m_mode];
       }),
@@ -153,7 +157,7 @@ export default createComponent({
           ? [{}]
           : state.m_typingGame.romanDataList
       ),
-      lapTimeMsList: computed(() => resultStore.lapTimeMsList)
+      lapTimeMsList: computed(() => resultStore.lapTimeMsList),
     });
 
     function countdownFunc() {
@@ -221,9 +225,17 @@ export default createComponent({
         throw new Error(`${ResultStoreKey} is not provided`);
       }
 
+      // 正誤に関わらず呼び出す
+      resultStore.setRoman(
+        state.m_typingGame.roman.substr(
+          0,
+          400 + state.m_typingGame.additionalRomanCountSum
+        )
+      );
+
       if (isCorrectInput) {
         // 正しい入力の場合
-        resultStore.updateTypeCount(state.m_typingGame.typeCount);
+        resultStore.incTypeCount();
 
         // ラップタイムの処理
         if (
@@ -235,12 +247,13 @@ export default createComponent({
 
         // 終了時の処理
         if (state.m_typingGame.isFinished()) {
+          resultStore.setRoman(state.m_typingGame.roman);
           resultStore.lock(); // resultStore をロック
           state.m_status = eStatus.Result;
         }
       } else {
         // 誤った入力の場合
-        resultStore.updateMissCount(state.m_typingGame.missCount);
+        resultStore.incMissCount();
 
         // ミス回数の判定
         if (!configStore) {
@@ -266,9 +279,9 @@ export default createComponent({
       storeTimeMs,
       storeMissCount,
       state,
-      startCountdown
+      startCountdown,
     };
-  }
+  },
 });
 </script>
 
@@ -276,13 +289,10 @@ export default createComponent({
 <style scoped lang="scss">
 @import "@/assets/variable.scss";
 .game {
+  @include gray-block-shadow;
   width: 85rem;
   padding: 1rem;
   margin: 2rem auto 2rem auto;
-  background: whitesmoke;
-  border: 0.1rem solid;
-  border-color: gray;
-  box-shadow: 0 0.3rem 0.5rem rgba(0, 0, 0, 0.22);
 }
 .header {
   display: flex; // 子要素をflexboxで揃える
