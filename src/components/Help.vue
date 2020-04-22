@@ -1,11 +1,19 @@
 <template>
   <div id="help">
     <h3>操作方法</h3>
+    <h4>プレイ画面</h4>
     <div class="inline-block-list">
       <ul>
         <li>Space/Enter: スタート</li>
         <li>Esc: リセット</li>
         <li>F1-F4: モード変更</li>
+      </ul>
+    </div>
+    <h4>結果画面</h4>
+    <div class="inline-block-list">
+      <ul>
+        <li>R (Shift + r): リプレイを再生</li>
+        <li>Esc: リセット</li>
       </ul>
     </div>
 

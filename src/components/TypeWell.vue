@@ -9,6 +9,7 @@
           @click="startCountdown"
           text="READY"
           :isValid="state.isReady"
+          :keyList="['Enter', ' ']"
         />
         <h3 class="game-mode">{{ state.modeStr }}</h3>
         <Timer :timerStatus="state.timerStatus" />
@@ -18,7 +19,7 @@
 
       <div class="target-and-miss">
         <TypeWellTarget />
-        <div class="miss-count">Miss: {{ state.missCount }}</div>
+        <TypeWellMissCount :missCount="state.missCount" />
       </div>
 
       <div class="roman-and-lap">
@@ -27,11 +28,9 @@
       </div>
     </div>
 
-    <!--
-    <Result v-if="state.inResult"/>
-    <Result />
-    -->
     <Result v-if="state.inResult" />
+
+    <TypeWellReplay v-if="state.inResult" />
 
     <Config v-if="state.isReady" />
   </div>
@@ -44,27 +43,23 @@ import {
   computed,
   inject,
   onBeforeMount,
-  onBeforeUnmount
+  onBeforeUnmount,
 } from "@vue/composition-api";
 import TypingGame from "@/lib/typing";
 import TypeWellButton from "./TypeWellButton.vue";
-import Timer, { eTimerStatus } from "./Timer.vue";
+import Timer from "./Timer.vue";
 import TypeWellText from "./TypeWellText.vue";
 import TypeWellTarget from "./TypeWellTarget.vue";
+import TypeWellMissCount from "./TypeWellMissCount.vue";
 import TypeWellRoman from "./TypeWellRoman.vue";
 import TypeWellLapTime from "./TypeWellLapTime.vue";
 import Config from "./Config.vue";
 import Result from "./Result.vue";
+import TypeWellReplay from "./TypeWellReplay.vue";
 import { eMode } from "@/lib/typeWell";
 import ResultStoreKey from "./result-store-key";
 import ConfigStoreKey from "./config-store-key";
-
-const enum eStatus {
-  Ready,
-  Countdown,
-  Game,
-  Result
-}
+import { eStatus, eTimerStatus } from "@/lib/typeWell";
 
 export default createComponent({
   components: {
@@ -72,10 +67,12 @@ export default createComponent({
     Timer,
     TypeWellText,
     TypeWellTarget,
+    TypeWellMissCount,
     TypeWellRoman,
     TypeWellLapTime,
     Config,
-    Result
+    Result,
+    TypeWellReplay,
   },
   setup() {
     const resultStore = inject(ResultStoreKey);
@@ -118,7 +115,7 @@ export default createComponent({
           "基本常用語",
           "カタカナ語",
           "漢字",
-          "慣用句・ことわざ"
+          "慣用句・ことわざ",
         ];
         return modeStrList[state.m_mode];
       }),
@@ -153,7 +150,7 @@ export default createComponent({
           ? [{}]
           : state.m_typingGame.romanDataList
       ),
-      lapTimeMsList: computed(() => resultStore.lapTimeMsList)
+      lapTimeMsList: computed(() => resultStore.lapTimeMsList),
     });
 
     function countdownFunc() {
@@ -221,9 +218,17 @@ export default createComponent({
         throw new Error(`${ResultStoreKey} is not provided`);
       }
 
+      // 正誤に関わらず呼び出す
+      resultStore.setRoman(
+        state.m_typingGame.roman.substr(
+          0,
+          400 + state.m_typingGame.additionalRomanCountSum
+        )
+      );
+
       if (isCorrectInput) {
         // 正しい入力の場合
-        resultStore.updateTypeCount(state.m_typingGame.typeCount);
+        resultStore.incTypeCount();
 
         // ラップタイムの処理
         if (
@@ -235,12 +240,13 @@ export default createComponent({
 
         // 終了時の処理
         if (state.m_typingGame.isFinished()) {
+          resultStore.setRoman(state.m_typingGame.roman);
           resultStore.lock(); // resultStore をロック
           state.m_status = eStatus.Result;
         }
       } else {
         // 誤った入力の場合
-        resultStore.updateMissCount(state.m_typingGame.missCount);
+        resultStore.incMissCount();
 
         // ミス回数の判定
         if (!configStore) {
@@ -266,9 +272,9 @@ export default createComponent({
       storeTimeMs,
       storeMissCount,
       state,
-      startCountdown
+      startCountdown,
     };
-  }
+  },
 });
 </script>
 
@@ -276,19 +282,13 @@ export default createComponent({
 <style scoped lang="scss">
 @import "@/assets/variable.scss";
 .game {
+  @include gray-block-shadow;
   width: 85rem;
   padding: 1rem;
   margin: 2rem auto 2rem auto;
-  background: whitesmoke;
-  border: 0.1rem solid;
-  border-color: gray;
-  box-shadow: 0 0.3rem 0.5rem rgba(0, 0, 0, 0.22);
 }
 .header {
-  display: flex; // 子要素をflexboxで揃える
-  flex-direction: row; // 横方向
-  justify-content: center; // 水平方向中央揃え
-  align-items: center; // 垂直方向中央揃え
+  @include flex-row-center;
 }
 .countdown {
   @include white-block;
@@ -311,14 +311,7 @@ export default createComponent({
   justify-content: flex-start; // 水平方向左揃え
   align-items: center; // 垂直方向中央揃え
 }
-.miss-count {
-  margin: 0.2rem 3rem 0.2rem auto;
-  font-size: 1.8rem;
-}
 .roman-and-lap {
-  display: flex; // 子要素をflexboxで揃える
-  flex-direction: row; // 横方向
-  justify-content: center; // 水平方向中央揃え
-  align-items: center; // 垂直方向中央揃え
+  @include flex-row-center;
 }
 </style>

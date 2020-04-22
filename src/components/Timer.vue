@@ -9,16 +9,9 @@ import {
   computed,
   watch,
   inject,
-  onBeforeMount,
-  onBeforeUnmount
 } from "@vue/composition-api";
 import ResultStoreKey from "./result-store-key";
-
-export const enum eTimerStatus {
-  Reset,
-  Start,
-  Stop
-}
+import { eTimerStatus } from "@/lib/typeWell";
 
 type Props = {
   timerStatus: eTimerStatus;
@@ -28,8 +21,8 @@ export default createComponent({
   props: {
     timerStatus: {
       type: Number,
-      default: eTimerStatus.Reset
-    }
+      default: eTimerStatus.Reset,
+    },
   },
   setup(props: Props) {
     const resultStore = inject(ResultStoreKey);
@@ -44,7 +37,7 @@ export default createComponent({
 
       displayTime: computed((): string =>
         (Math.floor(state.m_elapsedTimeMs / 100) / 10).toFixed(1)
-      )
+      ),
     });
 
     // props は reactive ではないので、arrow function で包む
@@ -96,9 +89,9 @@ export default createComponent({
     }
 
     return {
-      state
+      state,
     };
-  }
+  },
 });
 </script>
 

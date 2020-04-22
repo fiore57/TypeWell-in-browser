@@ -23,8 +23,6 @@ import {
   reactive,
   computed,
   inject,
-  onBeforeMount,
-  onBeforeUnmount
 } from "@vue/composition-api";
 import ResultStoreKey from "./result-store-key";
 import { getLevelStr } from "@/lib/typeWell";
@@ -38,10 +36,10 @@ export default createComponent({
   props: {
     timeMs: {
       type: Boolean,
-      default: false
-    }
+      default: false,
+    },
   },
-  setup(props: Props) {
+  setup() {
     const resultStore = inject(ResultStoreKey);
     if (!resultStore) {
       throw new Error(`${ResultStoreKey} is not provided`);
@@ -66,13 +64,13 @@ export default createComponent({
       rateStr: computed((): string => (state.rate * 100).toFixed(2)),
       etypingScore: computed((): number =>
         Math.round(state.tpm * Math.pow(state.rate, 3))
-      )
+      ),
     });
 
     return {
-      state
+      state,
     };
-  }
+  },
 });
 </script>
 

@@ -16,15 +16,25 @@ declare global {
   interface Array<T> {
     front(): T;
     back(): T;
+    empty(): boolean;
+  }
+  interface ReadonlyArray<T> {
+    front(): T;
+    back(): T;
+    empty(): boolean;
   }
 }
-/** 配列の最初の要素を返す（右辺値） */
+/** 配列の最初の要素を返す */
 (Array.prototype as any).front = function() {
   return this[0];
 };
-/** 配列の最後の要素を返す（右辺値） */
+/** 配列の最後の要素を返す */
 (Array.prototype as any).back = function() {
   return this[this.length - 1];
+};
+/** 配列が空であるかどうかを返す */
+(Array.prototype as any).empty = function() {
+  return this.length === 0;
 };
 
 /** val を [low, high] に収める */

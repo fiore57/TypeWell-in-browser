@@ -36,6 +36,16 @@ describe("front() and back()", () => {
     expect(arr.back()).toEqual(25);
   });
 });
+describe("empty()", () => {
+  const arr1: number[] = [1];
+  const arr2: number[] = [];
+  it("[1]は空ではない", () => {
+    expect(arr1.empty()).toEqual(false);
+  });
+  it("[]は空である", () => {
+    expect(arr2.empty()).toEqual(true);
+  });
+});
 
 describe("clamp(val, low, high)", () => {
   const low = 35;

@@ -13,7 +13,6 @@
 
 <script lang="ts">
 import { createComponent, reactive, computed } from "@vue/composition-api";
-import ResultStoreKey from "./result-store-key";
 
 type Props = {
   textDataList: {}[];
@@ -23,18 +22,18 @@ export default createComponent({
   props: {
     textDataList: {
       type: Array,
-      default: []
-    }
+      default: [],
+    },
   },
   setup(props: Props) {
     const state = reactive({
-      textDataList: computed(() => props.textDataList)
+      textDataList: computed(() => props.textDataList),
     });
 
     return {
-      state
+      state,
     };
-  }
+  },
 });
 </script>
 
