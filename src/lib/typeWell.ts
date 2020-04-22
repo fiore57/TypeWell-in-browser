@@ -2,7 +2,7 @@ export const enum eMode {
   Khjy,
   Ktkn,
   Knj,
-  Ktwz
+  Ktwz,
 }
 
 export enum eLevel {
@@ -54,7 +54,27 @@ export enum eLevel {
   ZX,
   ZZ,
   M1,
-  M2
+  M2,
+}
+
+export const enum eStatus {
+  Ready,
+  Countdown,
+  Game,
+  Result,
+}
+
+export const enum eReplayRomanState {
+  Prev,
+  Next,
+  PrevMiss,
+  NextMiss,
+}
+
+export const enum eTimerStatus {
+  Reset,
+  Start,
+  Stop,
 }
 
 /** レベル（文字列）を列挙型に変換する */

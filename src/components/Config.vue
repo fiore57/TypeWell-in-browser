@@ -65,8 +65,6 @@ import {
   reactive,
   computed,
   inject,
-  onBeforeMount,
-  onBeforeUnmount
 } from "@vue/composition-api";
 import { eLevel, convertLevelToEnum, levelDataList } from "@/lib/typeWell";
 import ConfigStoreKey from "./config-store-key";
@@ -88,7 +86,7 @@ export default createComponent({
         set: (newVal: number) => {
           newVal = step(clamp(newVal, 1, 3), 1);
           configStore.setCountdownTime(newVal);
-        }
+        },
       }),
       // 目標レベル
       targetLevel: computed({
@@ -98,7 +96,7 @@ export default createComponent({
         set: (newLevelStr: string) => {
           const enumTargetLevel: eLevel = convertLevelToEnum(newLevelStr);
           configStore.setTargetLevel(enumTargetLevel);
-        }
+        },
       }),
       // ミスの上限回数（0以上255以下）
       missMax: computed({
@@ -108,7 +106,7 @@ export default createComponent({
         set: (newVal: number) => {
           newVal = step(clamp(newVal, 0, 255), 1);
           configStore.setMissMax(newVal);
-        }
+        },
       }),
       // 目標ゲージ（青）の秒数
       // ミリ秒ではない！！！
@@ -120,7 +118,7 @@ export default createComponent({
           let timeMs = time * 1000;
           timeMs = step(clamp(timeMs, 10, 10 * 1000), 10);
           configStore.setFastTargetBoxTimeMs(timeMs);
-        }
+        },
       }),
       // 目標ゲージ（黄・赤）の秒数
       // ミリ秒ではない！！！
@@ -132,15 +130,15 @@ export default createComponent({
           let timeMs = time * 1000;
           timeMs = step(clamp(timeMs, 10, 10 * 1000), 10);
           configStore.setSlowTargetBoxTimeMs(timeMs);
-        }
-      })
+        },
+      }),
     });
 
     return {
       state,
-      levelDataList
+      levelDataList,
     };
-  }
+  },
 });
 </script>
 

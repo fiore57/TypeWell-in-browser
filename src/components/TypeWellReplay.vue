@@ -1,34 +1,38 @@
 <template>
   <div class="typewell-replay">
-    <h3>リプレイ</h3>
-    <div class="replay-timer">Time: {{ state.elapsedTimeMs }}</div>
+    <div class="replay-header">
+      <h3 class="title">リプレイ (β)</h3>
+      <TypeWellButton
+        @click="startReplay"
+        text="PLAY"
+        :isValid="!state.isRunning"
+        :keyList="['R']"
+      />
+      <div class="timer">Time: {{ state.displayTime }}</div>
+      <TypeWellMissCount :missCount="state.missCount" />
+    </div>
 
-    <div class="replay">
-      <!--
-    <div
-      :v-if="state.isRunning"
-      class="roman-line"
-      v-for="romanLine in state.romanDataList"
-      :key="romanLine.key"
-    >
-    -->
-      <div
-        class="roman-line"
-        v-for="romanLine in state.romanDataList"
-        :key="romanLine.key"
-      >
+    <div class="roman-and-lap">
+      <div class="replay-roman">
         <div
-          v-for="roman in romanLine.list"
-          :class="{
-            'roman-char': true,
-            'prev-roman': isPrevRoman(roman.status),
-            'next-roman': isNextRoman(roman.status),
-            'miss-roman': isMissRoman(roman.status),
-          }"
-          :key="roman.key"
-          >{{ roman.char }}</div
+          class="roman-line"
+          v-for="romanLine in state.romanDataList"
+          :key="romanLine.key"
         >
+          <div
+            v-for="roman in romanLine.list"
+            :class="{
+              'roman-char': true,
+              'prev-roman': isPrevRoman(roman.status),
+              'next-roman': isNextRoman(roman.status),
+              'miss-roman': isMissRoman(roman.status),
+            }"
+            :key="roman.key"
+            >{{ roman.char }}</div
+          >
+        </div>
       </div>
+      <TypeWellLapTime :lapTimeMsList="state.lapTimeMsList" />
     </div>
   </div>
 </template>
@@ -42,14 +46,20 @@ import {
   onBeforeMount,
   onBeforeUnmount,
 } from "@vue/composition-api";
+import TypeWellButton from "./TypeWellButton.vue";
+import TypeWellMissCount from "./TypeWellMissCount.vue";
+import TypeWellLapTime from "./TypeWellLapTime.vue";
 import ResultStoreKey from "./result-store-key";
-import { eLogType, typingLogObj } from "@/stores/result-store";
+import { eLogType } from "@/stores/result-store";
+import { eReplayRomanState } from "@/lib/typeWell";
 
-const enum eReplayRomanState {
-  Prev,
-  Next,
-  PrevMiss,
-  NextMiss,
+interface typingLogObj {
+  /** ログの種類 */
+  logType: eLogType;
+  /** タイム（ミリ秒） */
+  timeMs: number;
+  /** その時点でのローマ字 */
+  roman: string;
 }
 
 interface ReplayRomanCharObj {
@@ -64,6 +74,11 @@ interface ReplayRomanLineObj {
 }
 
 export default createComponent({
+  components: {
+    TypeWellButton,
+    TypeWellMissCount,
+    TypeWellLapTime,
+  },
   setup() {
     const resultStore = inject(ResultStoreKey);
     if (!resultStore) {
@@ -76,9 +91,12 @@ export default createComponent({
       // eventIndex が typingLog の範囲外であれば、空のオブジェクトを返す
       curLog: computed(
         (): typingLogObj => {
+          if (state.typingLog.empty()) {
+            return {} as typingLogObj;
+          }
           return state.eventIndex < state.typingLog.length
             ? state.typingLog[state.eventIndex]
-            : ({} as typingLogObj);
+            : state.typingLog.back();
         }
       ),
       roman: computed((): string => {
@@ -90,29 +108,39 @@ export default createComponent({
         Math.max(state.curLog.roman.length - 400, 0)
       ),
       romanDataList: computed((): ReplayRomanLineObj[] => {
-        window.console.log("RomanDataList");
         let ret: ReplayRomanLineObj[] = [];
-        [].forEach.call(state.roman, (c: string, allIndex: number) => {
+        if (state.curLog.roman === undefined) return ret;
+        [].forEach.call(state.curLog.roman, (c: string, allIndex: number) => {
           const showIndex = allIndex - state.additionalRomanCount;
           if (showIndex >= 0) {
             if (showIndex % 50 === 0) {
-              ret.push({ list: [], key: `romanList${allIndex / 50}` });
+              ret.push({ list: [], key: `romanList${showIndex / 50}` });
             }
+
             if (allIndex < state.romanStateList.length) {
+              if (c === " ") c = "_";
               ret.back().list.push({
                 char: c,
                 status: state.romanStateList[allIndex],
-                key: `romanChar${allIndex}`,
+                key: `romanChar${showIndex}`,
               });
             } else {
               ret.back().list.push({
                 char: c,
                 status: eReplayRomanState.Next,
-                key: `romanChar${allIndex}`,
+                key: `romanChar${showIndex}`,
               });
             }
           }
         });
+        return ret;
+      }),
+      lapTimeMsList: computed(() => {
+        let ret: number[] = [];
+        const list = resultStore.lapTimeMsList;
+        for (let lapTimeMs of list) {
+          if (lapTimeMs <= state.elapsedTimeMs) ret.push(lapTimeMs);
+        }
         return ret;
       }),
       romanStateList: [] as eReplayRomanState[],
@@ -120,6 +148,10 @@ export default createComponent({
       isRunning: false,
       startTimeMs: 0,
       elapsedTimeMs: 0,
+      displayTime: computed((): string =>
+        (Math.floor(state.elapsedTimeMs / 100) / 10).toFixed(1)
+      ),
+      missCount: 0,
     });
 
     function startRAFLoop() {
@@ -141,8 +173,6 @@ export default createComponent({
           state.eventIndex < state.typingLog.length &&
           state.elapsedTimeMs >= state.typingLog[state.eventIndex].timeMs
         ) {
-          window.console.log(state.typingLog[state.eventIndex]);
-
           switch (state.typingLog[state.eventIndex].logType) {
             // 正しい入力
             case eLogType.Correct:
@@ -158,6 +188,7 @@ export default createComponent({
               break;
             // ミス
             case eLogType.Miss:
+              ++state.missCount;
               if (
                 state.romanStateList.empty() ||
                 state.romanStateList.back() !== eReplayRomanState.NextMiss
@@ -172,26 +203,26 @@ export default createComponent({
         }
 
         if (state.eventIndex >= state.typingLog.length) {
-          window.console.log("End");
           state.isRunning = false;
         }
       }
     }
 
     function keyInput(event: KeyboardEvent) {
-      window.console.log(event.key);
-      if (event.key === "R") {
-        state.isRunning = !state.isRunning;
-        if (state.isRunning) {
-          if (state.typingLog.length > 0) {
-            startRAFLoop();
-          } else {
-            state.isRunning = false;
-            alert("リプレイファイルがありません");
-          }
-        }
-      } else if (event.key === "Escape") {
+      if (event.key === "Escape") {
         state.isRunning = false;
+      }
+    }
+
+    function startReplay() {
+      state.isRunning = !state.isRunning;
+      if (state.isRunning) {
+        if (state.typingLog.length > 0) {
+          startRAFLoop();
+        } else {
+          state.isRunning = false;
+          alert("リプレイファイルがありません");
+        }
       }
     }
 
@@ -217,6 +248,7 @@ export default createComponent({
 
     return {
       state,
+      startReplay,
       isNextRoman,
       isPrevRoman,
       isMissRoman,
@@ -234,16 +266,31 @@ export default createComponent({
   padding: 1rem;
   margin: 2rem auto 2rem auto;
 }
-.replay-timer {
-  @include white-block;
+.replay-header {
+  @include flex-row-center;
   margin: 1rem;
-  width: 15rem;
-  height: 3rem;
-  font-size: 2rem;
+  .title {
+    margin: 0 auto 0 10rem;
+  }
+  .timer {
+    @include white-block;
+    font-size: 2.2rem;
+    padding: 0.2rem 1rem;
+    margin: 0 2rem 0 auto;
+    width: 14rem;
+  }
+  .miss {
+    margin: 0 10rem 0 2rem;
+    font-size: 1.8rem;
+  }
 }
-.replay {
+.roman-and-lap {
+  @include flex-row-center;
+  margin: 0.5rem auto 0.5rem auto;
+}
+.replay-roman {
   @include white-block;
-  margin: 1rem 10rem 1rem 10rem;
+  margin: 1rem 1rem 1rem 1rem;
   width: 58rem;
   height: $roman-block-height;
   font-size: 1.8rem;

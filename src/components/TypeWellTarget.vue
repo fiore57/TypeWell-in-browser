@@ -18,7 +18,7 @@ import {
   createComponent,
   reactive,
   computed,
-  inject
+  inject,
 } from "@vue/composition-api";
 import ResultStoreKey from "./result-store-key";
 import ConfigStoreKey from "./config-store-key";
@@ -36,7 +36,9 @@ export default createComponent({
     }
 
     const targetGaugeWidth = 20; // 目標ゲージのマスの数
+    /*
     const targetGaugeTimeMs = 200; // 目標ゲージ1マスあたりのタイム
+    */
 
     const state = reactive({
       // 目標タイム
@@ -84,7 +86,7 @@ export default createComponent({
             // 目標なしの場合
             ret.push({
               color: "transparent",
-              key: `gaugeData${i}"`
+              key: `gaugeData${i}"`,
             });
           } else if (state.timeDiff > 0) {
             // 目標より速いペースの場合
@@ -93,7 +95,7 @@ export default createComponent({
                 Math.abs(state.timeDiff) / state.fastTargetBoxTimeMs > i + 1
                   ? "blue"
                   : "transparent",
-              key: `gaugeData${i}`
+              key: `gaugeData${i}`,
             });
           } else {
             // 目標より遅いペースの場合
@@ -104,18 +106,18 @@ export default createComponent({
                     ? "red"
                     : "yellow"
                   : "transparent",
-              key: `gaugeData${i}"`
+              key: `gaugeData${i}"`,
             });
           }
         }
         return ret;
-      })
+      }),
     });
 
     return {
-      state
+      state,
     };
-  }
+  },
 });
 </script>
 

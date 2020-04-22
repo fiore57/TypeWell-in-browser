@@ -18,3 +18,11 @@ $roman-block-height: 21.5rem;
   border-color: gray;
   box-shadow: 0 0.3rem 0.5rem rgba(0, 0, 0, 0.22);
 }
+
+// 子要素を flexbox で横方向に揃える（中央揃え）
+@mixin flex-row-center {
+  display: flex; // 子要素をflexboxで揃える
+  flex-direction: row; // 横方向
+  justify-content: center; // 水平方向中央揃え
+  align-items: center; // 垂直方向中央揃え
+}

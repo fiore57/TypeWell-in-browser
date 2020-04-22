@@ -18,6 +18,11 @@ declare global {
     back(): T;
     empty(): boolean;
   }
+  interface ReadonlyArray<T> {
+    front(): T;
+    back(): T;
+    empty(): boolean;
+  }
 }
 /** 配列の最初の要素を返す */
 (Array.prototype as any).front = function() {

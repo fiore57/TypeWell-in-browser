@@ -15,37 +15,42 @@ import {
   createComponent,
   reactive,
   computed,
-  SetupContext,
   onBeforeMount,
-  onBeforeUnmount
+  onBeforeUnmount,
 } from "@vue/composition-api";
 
 type Props = {
   text: string;
   isValid: boolean;
+  keyList: readonly string[];
 };
 
 export default createComponent({
   props: {
     text: {
       type: String,
-      default: "button"
+      default: "button",
     },
     isValid: {
       type: Boolean,
-      default: true
-    }
+      default: true,
+    },
+    keyList: {
+      type: Array,
+      default: [],
+    },
   },
-  setup(props: Props, context: SetupContext) {
+  setup(props: Props, context) {
     const state = reactive({
       isValid: computed(() => props.isValid),
-      text: computed(() => props.text)
+      text: computed(() => props.text),
+      keyList: computed(() => props.keyList),
     });
 
     function keyInput(event: KeyboardEvent) {
       if (state.isValid) {
-        // Enter or Space で発火
-        for (const key of ["Enter", " "]) {
+        // 指定のショートカットキーで発火
+        for (const key of state.keyList) {
           if (event.key === key) {
             onClick();
             return;
@@ -67,9 +72,9 @@ export default createComponent({
 
     return {
       state,
-      onClick
+      onClick,
     };
-  }
+  },
 });
 </script>
 
