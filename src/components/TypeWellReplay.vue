@@ -156,10 +156,6 @@ export default createComponent({
 
     function startRAFLoop() {
       state.startTimeMs = Date.now();
-      while (!state.romanStateList.empty()) {
-        state.romanStateList.pop();
-      }
-      state.eventIndex = 0;
       window.requestAnimationFrame(loop);
     }
     function loop() {
@@ -218,6 +214,11 @@ export default createComponent({
       state.isRunning = !state.isRunning;
       if (state.isRunning) {
         if (state.typingLog.length > 0) {
+          while (!state.romanStateList.empty()) {
+            state.romanStateList.pop();
+          }
+          state.eventIndex = 0;
+          state.missCount = 0;
           startRAFLoop();
         } else {
           state.isRunning = false;
