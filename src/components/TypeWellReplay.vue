@@ -165,7 +165,7 @@ export default createComponent({
         window.requestAnimationFrame(loop);
 
         // 更新処理
-        if (
+        while (
           state.eventIndex < state.typingLog.length &&
           state.elapsedTimeMs >= state.typingLog[state.eventIndex].timeMs
         ) {
