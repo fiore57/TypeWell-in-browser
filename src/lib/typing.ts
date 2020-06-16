@@ -233,7 +233,7 @@ class ChunkPattern {
     ["ん", [["n"], ["nn"], ["n'"], ["xn"]]],
     ["ゎ", [["lwa"], ["xwa"]]],
     ["　", [[" "]]],
-    ["ー", [["-"]]]
+    ["ー", [["-"]]],
   ]);
   private static _initialize = (() => {
     for (const chunkPattern of ChunkPattern.list) {
@@ -244,7 +244,7 @@ class ChunkPattern {
           if (multiPattern.length === 0) {
             multiPattern = ChunkPattern.list.get(c)!;
           } else {
-            let tmp: string[][] = [];
+            const tmp: string[][] = [];
             for (const p1 of multiPattern) {
               for (const p2 of ChunkPattern.list.get(c)!) {
                 tmp.push(p1.concat(p2));
@@ -261,7 +261,7 @@ class ChunkPattern {
 
 // かなをチャンクに分割
 function devideIntoChunk(kana: string): Chunk[] {
-  let ret: Chunk[] = [];
+  const ret: Chunk[] = [];
   for (let i = 0; i < kana.length; ++i) {
     // 最後の1文字の場合、必ずその文字が1チャンク
     if (i >= kana.length - 1) {
@@ -387,7 +387,7 @@ class TypePatternList {
 
   public constructor(romanLists: string[][]) {
     this._typePatternList = romanLists.map(
-      romanList => new TypePattern(romanList)
+      (romanList) => new TypePattern(romanList)
     );
   }
 
@@ -482,7 +482,7 @@ class Chunk {
         // 「っ」を除いた場合のパターン
         const curPatterns: string[][] = ChunkPattern.list.get(kana.substr(1))!;
 
-        let newPatterns: string[][] = [];
+        const newPatterns: string[][] = [];
 
         // 子音の繰り返し
         for (const roman of curPatterns) {
@@ -506,7 +506,7 @@ class Chunk {
         // 「ん」を除いた場合のパターン
         const curPatterns: string[][] = ChunkPattern.list.get(kana.substr(1))!;
 
-        let newPatterns: string[][] = [];
+        const newPatterns: string[][] = [];
 
         const xnPatterns: string[][] = ChunkPattern.list.get("ん")!;
         // 「n」をつける場合
@@ -769,10 +769,10 @@ export default class TypingGame {
     const missFlag = this._missFlag;
     const invalidTextIndex = this._invalidTextIndex;
 
-    let prevTextList: string[] = [];
-    let curTextList: string[] = [];
-    let nextTextList: string[] = [];
-    let invalidTextList: string[] = [];
+    const prevTextList: string[] = [];
+    const curTextList: string[] = [];
+    const nextTextList: string[] = [];
+    const invalidTextList: string[] = [];
     let isCurText: boolean = true;
 
     for (let i = 0, kanaCount = 0; i < text.length; ++i) {
@@ -812,7 +812,7 @@ export default class TypingGame {
       invalidTextList[invalidTextList.length - 1] += "　";
     }
 
-    let ret: {}[] = [];
+    const ret: {}[] = [];
     for (let i = 0; i < prevTextList.length; ++i) {
       ret.push({
         prev: prevTextList[i],
@@ -820,7 +820,7 @@ export default class TypingGame {
         next: nextTextList[i],
         invalid: invalidTextList[i],
         missFlag: missFlag,
-        key: `textDataList${i}`
+        key: `textDataList${i}`,
       });
     }
     return ret;
@@ -832,9 +832,9 @@ export default class TypingGame {
     const roman = this.roman;
     const missFlag = this._missFlag;
 
-    let prevRomanList: string[] = [];
-    let curRomanList: string[] = [];
-    let nextRomanList: string[] = [];
+    const prevRomanList: string[] = [];
+    const curRomanList: string[] = [];
+    const nextRomanList: string[] = [];
     for (
       let i = this._additionalRomanCountSum;
       i < this.romanLength + this._additionalRomanCountSum;
@@ -858,14 +858,14 @@ export default class TypingGame {
       }
     }
 
-    let ret: {}[] = [];
+    const ret: {}[] = [];
     for (let i = 0; i < this._romanLineNum; ++i) {
       ret.push({
         prev: prevRomanList[i],
         cur: curRomanList[i],
         next: nextRomanList[i],
         missFlag: missFlag,
-        key: `romanDataList${i}`
+        key: `romanDataList${i}`,
       });
     }
     return ret;
