@@ -18,7 +18,7 @@
         <select v-model="state.targetLevel">
           <option disabled value="">目標レベル</option>
           <option v-for="levelData in levelDataList" :key="levelData.key">{{
-            levelData.string
+            levelData.value
           }}</option>
         </select>
       </li>

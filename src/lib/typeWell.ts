@@ -1,3 +1,5 @@
+import { KeyValue, addKey } from "./utils";
+
 export const enum eMode {
   Khjy,
   Ktkn,
@@ -87,13 +89,18 @@ export function convertLevelToString(level: eLevel): string {
   return level === eLevel.None ? "なし" : eLevel[level];
 }
 
-export const levelDataList = Object.keys(eLevel).reduce((acc: {}[], cur) => {
-  if (isNaN(Number(cur))) {
-    if (cur === "None") cur = "なし";
-    acc.push({ string: cur, key: `eLevel${cur}` });
-  }
-  return acc;
-}, []);
+export const levelDataList = Object.keys(eLevel).reduce(
+  (acc: KeyValue<string>[], cur) => {
+    if (isNaN(Number(cur))) {
+      if (cur === "None") cur = "なし";
+      const curObj = addKey(cur, "eLevel", convertLevelToEnum(cur));
+      acc.push(curObj);
+    }
+    console.log(acc);
+    return acc;
+  },
+  []
+);
 
 /** タイムからレベルを取得 */
 export function getLevel(timeMs: number): eLevel {

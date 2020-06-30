@@ -58,7 +58,7 @@ export function step(val: number, step: number): number {
   return Math.floor(val / step) * step;
 }
 
-interface KeyValue<T> {
+export interface KeyValue<T> {
   key: string;
   value: T;
 }
