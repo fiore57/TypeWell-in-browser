@@ -37,18 +37,22 @@ declare global {
   return this.length === 0;
 };
 
-/** val を [low, high] に収める */
+/** val を [low, high] に収める
+ *
+ * @param val 値
+ * @param low 下端の値
+ * @param high 上端の値
+ */
 export function clamp(val: number, low: number, high: number): number {
   return Math.min(Math.max(val, low), high);
 }
 
 /**
- * val を超えない最小の step の倍数を返す
- *
  * 引数は整数にすること！！！
  *
  * @param val 整数
  * @param step 整数
+ * @return valを越えない最小のstepの倍数を返す
  */
 export function step(val: number, step: number): number {
   return Math.floor(val / step) * step;
