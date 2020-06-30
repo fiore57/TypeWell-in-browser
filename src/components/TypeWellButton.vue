@@ -12,7 +12,7 @@
 
 <script lang="ts">
 import {
-  createComponent,
+  defineComponent,
   reactive,
   computed,
   onBeforeMount,
@@ -25,7 +25,7 @@ type Props = {
   keyList: readonly string[];
 };
 
-export default createComponent({
+export default defineComponent({
   props: {
     text: {
       type: String,

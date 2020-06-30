@@ -7,18 +7,18 @@
 </template>
 
 <script lang="ts">
-import { createComponent, reactive, computed } from "@vue/composition-api";
+import { defineComponent, reactive, computed } from "@vue/composition-api";
 
 type Props = {
   lapTimeMsList: number[];
 };
 
-export default createComponent({
+export default defineComponent({
   props: {
     lapTimeMsList: {
       type: Array,
-      default: []
-    }
+      default: [],
+    },
   },
   setup(props: Props) {
     const state = reactive({
@@ -37,17 +37,17 @@ export default createComponent({
           }
           ret.push({
             timeMs: curLapStr,
-            key: `lapTimeMsList${i}`
+            key: `lapTimeMsList${i}`,
           });
         }
         return ret;
-      })
+      }),
     });
 
     return {
-      state
+      state,
     };
-  }
+  },
 });
 </script>
 

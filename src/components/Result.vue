@@ -19,7 +19,7 @@
 
 <script lang="ts">
 import {
-  createComponent,
+  defineComponent,
   reactive,
   computed,
   inject,
@@ -32,7 +32,7 @@ type Props = {
   timeMs: number;
 };
 
-export default createComponent({
+export default defineComponent({
   props: {
     timeMs: {
       type: Boolean,

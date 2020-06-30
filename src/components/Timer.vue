@@ -4,7 +4,7 @@
 
 <script lang="ts">
 import {
-  createComponent,
+  defineComponent,
   reactive,
   computed,
   watch,
@@ -17,7 +17,7 @@ type Props = {
   timerStatus: eTimerStatus;
 };
 
-export default createComponent({
+export default defineComponent({
   props: {
     timerStatus: {
       type: Number,

@@ -15,7 +15,7 @@
 
 <script lang="ts">
 import {
-  createComponent,
+  defineComponent,
   reactive,
   computed,
   inject,
@@ -24,7 +24,7 @@ import ResultStoreKey from "./result-store-key";
 import ConfigStoreKey from "./config-store-key";
 import { eLevel, convertLevelToString } from "@/lib/typeWell";
 
-export default createComponent({
+export default defineComponent({
   setup() {
     const resultStore = inject(ResultStoreKey);
     if (!resultStore) {

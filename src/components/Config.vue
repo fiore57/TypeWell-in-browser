@@ -61,7 +61,7 @@
 
 <script lang="ts">
 import {
-  createComponent,
+  defineComponent,
   reactive,
   computed,
   inject,
@@ -70,7 +70,7 @@ import { eLevel, convertLevelToEnum, levelDataList } from "@/lib/typeWell";
 import ConfigStoreKey from "./config-store-key";
 import { clamp, step } from "@/lib/utils";
 
-export default createComponent({
+export default defineComponent({
   setup() {
     const configStore = inject(ConfigStoreKey);
     if (!configStore) {

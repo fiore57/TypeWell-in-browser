@@ -84,9 +84,9 @@
 </template>
 
 <script lang="ts">
-import { createComponent } from "@vue/composition-api";
+import { defineComponent } from "@vue/composition-api";
 
-export default createComponent({});
+export default defineComponent({});
 </script>
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->

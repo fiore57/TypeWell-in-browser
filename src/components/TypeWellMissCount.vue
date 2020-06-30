@@ -3,13 +3,13 @@
 </template>
 
 <script lang="ts">
-import { createComponent, reactive, computed } from "@vue/composition-api";
+import { defineComponent, reactive, computed } from "@vue/composition-api";
 
 type Props = {
   missCount: number;
 };
 
-export default createComponent({
+export default defineComponent({
   props: {
     missCount: {
       type: Number,

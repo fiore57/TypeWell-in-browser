@@ -12,13 +12,13 @@
 </template>
 
 <script lang="ts">
-import { createComponent, reactive, computed } from "@vue/composition-api";
+import { defineComponent, reactive, computed } from "@vue/composition-api";
 
 type Props = {
   textDataList: {}[];
 };
 
-export default createComponent({
+export default defineComponent({
   props: {
     textDataList: {
       type: Array,

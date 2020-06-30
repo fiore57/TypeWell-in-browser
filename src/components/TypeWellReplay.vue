@@ -39,7 +39,7 @@
 
 <script lang="ts">
 import {
-  createComponent,
+  defineComponent,
   reactive,
   computed,
   inject,
@@ -73,7 +73,7 @@ interface ReplayRomanLineObj {
   key: string;
 }
 
-export default createComponent({
+export default defineComponent({
   components: {
     TypeWellButton,
     TypeWellMissCount,

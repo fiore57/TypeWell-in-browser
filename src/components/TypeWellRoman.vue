@@ -16,10 +16,10 @@
 
 <script lang="ts">
 import {
-  createComponent,
+  defineComponent,
   reactive,
   computed,
-  inject
+  inject,
 } from "@vue/composition-api";
 import ResultStoreKey from "./result-store-key";
 
@@ -27,12 +27,12 @@ type Props = {
   romanDataList: [{}];
 };
 
-export default createComponent({
+export default defineComponent({
   props: {
     romanDataList: {
       type: Array,
-      default: []
-    }
+      default: [],
+    },
   },
   setup(props: Props) {
     const resultStore = inject(ResultStoreKey);
@@ -41,13 +41,13 @@ export default createComponent({
     }
 
     const state = reactive({
-      romanDataList: computed(() => props.romanDataList)
+      romanDataList: computed(() => props.romanDataList),
     });
 
     return {
-      state
+      state,
     };
-  }
+  },
 });
 </script>
 
