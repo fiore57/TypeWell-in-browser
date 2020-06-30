@@ -17,9 +17,11 @@
         目標設定：
         <select v-model="state.targetLevel">
           <option disabled value="">目標レベル</option>
-          <option v-for="levelData in levelDataList" :key="levelData.key">{{
-            levelData.value
-          }}</option>
+          <option
+            v-for="levelData in state.levelDataList"
+            :key="levelData.key"
+            >{{ levelData.value }}</option
+          >
         </select>
       </li>
       <li>
@@ -68,7 +70,7 @@ import {
 } from "@vue/composition-api";
 import { eLevel, convertLevelToEnum, levelDataList } from "@/lib/typeWell";
 import ConfigStoreKey from "./config-store-key";
-import { clamp, step } from "@/lib/utils";
+import { clamp, step, addKey } from "@/lib/utils";
 
 export default defineComponent({
   setup() {
@@ -132,11 +134,11 @@ export default defineComponent({
           configStore.setSlowTargetBoxTimeMs(timeMs);
         },
       }),
+      levelDataList: computed(() => addKey(levelDataList, "levelData")),
     });
 
     return {
       state,
-      levelDataList,
     };
   },
 });

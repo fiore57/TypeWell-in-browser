@@ -68,6 +68,10 @@ export interface KeyValue<T> {
  * @param keyName keyの名前
  * @param index オブジェクトのindex
  */
-export function addKey<T>(val: T, keyName: string, index: number): KeyValue<T> {
+function addKeyImpl<T>(val: T, keyName: string, index: number): KeyValue<T> {
   return { key: keyName + index, value: val };
+}
+
+export function addKey<T>(array: T[], keyName: string): KeyValue<T>[] {
+  return array.map((e, index) => addKeyImpl(e, keyName, index));
 }

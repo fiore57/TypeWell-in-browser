@@ -90,13 +90,11 @@ export function convertLevelToString(level: eLevel): string {
 }
 
 export const levelDataList = Object.keys(eLevel).reduce(
-  (acc: KeyValue<string>[], cur) => {
+  (acc: string[], cur) => {
     if (isNaN(Number(cur))) {
       if (cur === "None") cur = "なし";
-      const curObj = addKey(cur, "eLevel", convertLevelToEnum(cur));
-      acc.push(curObj);
+      acc.push(cur);
     }
-    console.log(acc);
     return acc;
   },
   []
