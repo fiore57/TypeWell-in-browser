@@ -57,3 +57,17 @@ export function clamp(val: number, low: number, high: number): number {
 export function step(val: number, step: number): number {
   return Math.floor(val / step) * step;
 }
+
+interface KeyValue<T> {
+  key: string;
+  value: T;
+}
+
+/**
+ * @param val keyを付与したいオブジェクト
+ * @param keyName keyの名前
+ * @param index オブジェクトのindex
+ */
+export function addKey<T>(val: T, keyName: string, index: number): KeyValue<T> {
+  return { key: keyName + index, value: val };
+}
