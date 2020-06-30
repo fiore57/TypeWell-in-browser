@@ -67,11 +67,48 @@ export interface KeyValue<T> {
  * @param val keyを付与したいオブジェクト
  * @param keyName keyの名前
  * @param index オブジェクトのindex
+ * @return keyが付与されたオブジェクト
  */
 function addKeyImpl<T>(val: T, keyName: string, index: number): KeyValue<T> {
   return { key: keyName + index, value: val };
 }
 
+/**
+ * @param array keyを付与したい配列
+ * @param keyName keyの名前
+ * @return 各要素にkeyが付与された配列
+ */
 export function addKey<T>(array: T[], keyName: string): KeyValue<T>[] {
   return array.map((e, index) => addKeyImpl(e, keyName, index));
+}
+
+/**
+ * @param date Date.now()で取得した整数
+ * @return yyyy/mm/dd hh:mm:ss 形式の文字列
+ */
+export function convertDateToString(dateNum: number) {
+  const date = new Date();
+  date.setTime(dateNum);
+  const y = date
+    .getFullYear()
+    .toString()
+    .padStart(4, "0");
+  const m = (date.getMonth() + 1).toString().padStart(2, "0");
+  const d = date
+    .getDate()
+    .toString()
+    .padStart(2, "0");
+  const hr = date
+    .getHours()
+    .toString()
+    .padStart(2, "0");
+  const min = date
+    .getMinutes()
+    .toString()
+    .padStart(2, "0");
+  const sec = date
+    .getSeconds()
+    .toString()
+    .padStart(2, "0");
+  return `${y}/${m}/${d} ${hr}:${min}:${sec}`;
 }

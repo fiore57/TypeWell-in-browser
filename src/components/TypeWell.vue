@@ -33,12 +33,14 @@
     <TypeWellReplay v-if="state.inResult" />
 
     <Config v-if="state.isReady" />
+
+    <Ranking v-if="!state.inGame" />
   </div>
 </template>
 
 <script lang="ts">
 import {
-  createComponent,
+  defineComponent,
   reactive,
   computed,
   inject,
@@ -56,12 +58,14 @@ import TypeWellLapTime from "./TypeWellLapTime.vue";
 import Config from "./Config.vue";
 import Result from "./Result.vue";
 import TypeWellReplay from "./TypeWellReplay.vue";
+import Ranking from "./Ranking.vue";
 import { eMode } from "@/lib/typeWell";
 import ResultStoreKey from "./result-store-key";
 import ConfigStoreKey from "./config-store-key";
+import RankingStoreKey from "./ranking-store-key";
 import { eStatus, eTimerStatus } from "@/lib/typeWell";
 
-export default createComponent({
+export default defineComponent({
   components: {
     TypeWellButton,
     Timer,
@@ -73,6 +77,7 @@ export default createComponent({
     Config,
     Result,
     TypeWellReplay,
+    Ranking,
   },
   setup() {
     const resultStore = inject(ResultStoreKey);
@@ -82,6 +87,10 @@ export default createComponent({
     const configStore = inject(ConfigStoreKey);
     if (!configStore) {
       throw new Error(`${ConfigStoreKey} is not provided`);
+    }
+    const rankingStore = inject(RankingStoreKey);
+    if (!rankingStore) {
+      throw new Error(`${RankingStoreKey} is not provided`);
     }
 
     const storeTimeMs = computed(() => resultStore.timeMs);
@@ -242,6 +251,16 @@ export default createComponent({
         if (state.m_typingGame.isFinished()) {
           resultStore.setRoman(state.m_typingGame.roman);
           resultStore.lock(); // resultStore をロック
+          const data = {
+            timeMs: resultStore.timeMs,
+            lapTimeMsList: resultStore.lapTimeMsList,
+            missCount: resultStore.missCount,
+            date: Date.now(),
+          };
+          if (!rankingStore) {
+            throw new Error(`${RankingStoreKey} is not provided`);
+          }
+          rankingStore.add(state.m_mode, data);
           state.m_status = eStatus.Result;
         }
       } else {
