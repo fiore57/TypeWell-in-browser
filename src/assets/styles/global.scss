@@ -1,0 +1,14 @@
+// 全体に適用するCSS
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+body {
+  font-family: system-ui, sans-serif;
+  color: #111; // 文字色等の黒を真っ黒より少しだけ弱める
+}
+a {
+  color: #2563eb; // 少しだけ落ち着いた青
+}

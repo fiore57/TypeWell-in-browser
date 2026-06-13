@@ -1,47 +1,47 @@
 <script setup lang="ts">
-import HelloWorld from './components/HelloWorld.vue'
-import TheWelcome from './components/TheWelcome.vue'
+import { onBeforeMount, onBeforeUnmount } from 'vue'
+import TypeWell from './components/TypeWell.vue'
+import TypeWellProvider from './components/TypeWellProvider.vue'
+import TypeWellHelp from './components/TypeWellHelp.vue'
+
+function keyInput(event: KeyboardEvent) {
+  const ignoreKeyList: string[] = [' ', 'F1', 'F2', 'F3', 'F4']
+  for (const ignoreKey of ignoreKeyList) {
+    if (event.key === ignoreKey) {
+      event.preventDefault() // デフォルトアクションを止める
+    }
+  }
+}
+
+onBeforeMount(() => {
+  window.addEventListener('keydown', keyInput, true)
+})
+onBeforeUnmount(() => {
+  window.removeEventListener('keydown', keyInput, true)
+})
 </script>
 
 <template>
-  <header>
-    <img alt="Vue logo" class="logo" src="./assets/logo.svg" width="125" height="125" />
-
-    <div class="wrapper">
-      <HelloWorld msg="You did it!" />
-    </div>
+  <header class="app-header">
+    <h1>ブラウザ版 タイプウェル国語R</h1>
+    <p class="warn">※このアプリは非公式です</p>
   </header>
 
-  <main>
-    <TheWelcome />
+  <main class="app">
+    <TypeWellProvider>
+      <TypeWell msg="test" />
+    </TypeWellProvider>
+
+    <TypeWellHelp />
   </main>
 </template>
 
-<style scoped>
-header {
-  line-height: 1.5;
+<style scoped lang="scss">
+.app-header {
+  text-align: center;
 }
-
-.logo {
-  display: block;
-  margin: 0 auto 2rem;
-}
-
-@media (min-width: 1024px) {
-  header {
-    display: flex;
-    place-items: center;
-    padding-right: calc(var(--section-gap) / 2);
-  }
-
-  .logo {
-    margin: 0 2rem 0 0;
-  }
-
-  header .wrapper {
-    display: flex;
-    place-items: flex-start;
-    flex-wrap: wrap;
-  }
+.warn {
+  color: red;
+  font-weight: bold;
 }
 </style>

@@ -1,0 +1,43 @@
+// 複数のコンポーネントで共有する変数
+
+$font-timer: 1.8rem;
+$font-miss-count: 1.7rem;
+$font-roman: 1.5rem;
+$font-text: 1.4rem;
+$font-help: 1.2rem;
+
+// 再利用するコード
+
+// 白背景・グレー枠線
+@mixin white-block {
+  border: 0.1rem solid;
+  border-color: gray;
+  background: white;
+}
+
+// 薄灰色背景・グレー枠線・影付き
+@mixin gray-block-shadow {
+  background: whitesmoke;
+  border: 0.1rem solid;
+  border-color: gray;
+  box-shadow: 0 0.3rem 0.5rem rgba(0, 0, 0, 0.22);
+}
+
+// 子要素を flexbox で横方向に揃える（中央揃え）
+@mixin flex-row-center {
+  display: flex; // 子要素をflexboxで揃える
+  flex-direction: row; // 横方向
+  justify-content: center; // 水平方向中央揃え
+  align-items: center; // 垂直方向中央揃え
+}
+
+@mixin roman {
+  @include white-block;
+  margin: auto 1rem;
+  font-size: $font-roman;
+  font-family: 'Noto Sans Mono', monospace;
+  padding: 0.1em 0.3em;
+  display: flex; // 子要素をflexboxで揃える
+  flex-direction: column; // 縦方向
+  justify-content: space-between; // 縦方向に広げて配置
+}
