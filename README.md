@@ -1,24 +1,14 @@
-# typewell-in-browser
+# ブラウザ版 タイプウェル国語R
 
-This template should help get you started developing with Vue 3 in Vite.
+[ブラウザ版 タイプウェル国語R](https://typewell-in-browser.com)
 
-## Recommended IDE Setup
+**このアプリは非公式です。このアプリに関する不具合報告・要望・苦情等は、オリジナル作者にしないようお願いいたします。**
 
-[VS Code](https://code.visualstudio.com/) + [Vue (Official)](https://marketplace.visualstudio.com/items?itemName=Vue.volar) (and disable Vetur).
+## 概要
 
-## Recommended Browser Setup
+「ブラウザ版 タイプウェル国語 R」は、GANGAS 様制作「タイプウェル国語 R」風のタイピング練習アプリです。
 
-- Chromium-based browsers (Chrome, Edge, Brave, etc.):
-  - [Vue.js devtools](https://chromewebstore.google.com/detail/vuejs-devtools/nhdogjmejiglipccpnnnanhbledajbpd)
-  - [Turn on Custom Object Formatter in Chrome DevTools](http://bit.ly/object-formatters)
-
-## Type Support for `.vue` Imports in TS
-
-TypeScript cannot handle type information for `.vue` imports by default, so we replace the `tsc` CLI with `vue-tsc` for type checking. In editors, we need [Volar](https://marketplace.visualstudio.com/items?itemName=Vue.volar) to make the TypeScript language service aware of `.vue` types.
-
-## Customize configuration
-
-See [Vite Configuration Reference](https://vite.dev/config/).
+本家と比べるとかなり機能は少ないです（タイムとレベルを計測できる程度で、詳細結果やランキングといった機能はありません）。
 
 ## Project Setup
 
