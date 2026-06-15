@@ -628,7 +628,6 @@ export default class TypingGame {
 
   /** 初期化処理を行う */
   public init(mode: Mode) {
-    console.log('init')
     this.initVariables()
 
     this._generateWords(mode)
@@ -666,7 +665,6 @@ export default class TypingGame {
   }
 
   private _generateWords(mode: Mode) {
-    console.log('_generateWords')
     // ローマ字が400字ジャストのときは、もう1単語追加する
     for (let romanCount: number = 0; romanCount <= ROMAN_LENGTH; ) {
       const word = TypingWords.getWord(mode)
@@ -682,7 +680,6 @@ export default class TypingGame {
       this._text += text
       this._kana += kanaStr
     }
-    console.log(`this._text: ${this._text}`)
   }
 
   /**

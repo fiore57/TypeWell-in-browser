@@ -101,7 +101,6 @@ function startCountdown() {
 }
 
 function gameStart() {
-  console.log('gameStart()')
   state.m_typingGame.init(state.m_mode)
   state.m_status = eStatus.Game
   if (!resultStore) {
@@ -119,7 +118,6 @@ function resetGame() {
 
 // 入力を処理
 function keyInput(event: KeyboardEvent) {
-  // window.console.log(event.key);
   // Escapeで中断
   if (event.key === 'Escape') {
     resetGame()
