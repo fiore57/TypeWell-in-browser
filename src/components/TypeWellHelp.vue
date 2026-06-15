@@ -40,7 +40,7 @@
             <a href="https://www.pc-gear.com" target="_blank">blog</a>（Contactからお願いします）
           </li>
           <li>
-            <a href="https://github.com/fiore57/TypeWell-in-browser" target="_blank">GitHub</a
+            <a href="https://github.com/fiore57/typewell-in-browser" target="_blank">GitHub</a
             >（開発者向け）
           </li>
         </ul>
@@ -49,7 +49,7 @@
       <h3>ライセンス</h3>
       <p>
         「ブラウザ版 タイプウェル国語R」は、MITライセンスのもとで公開されています。詳しくは、<a
-          href="https://github.com/fiore57/TypeWell-in-browser"
+          href="https://github.com/fiore57/typewell-in-browser"
           target="_blank"
           >GitHub</a
         >のLICENSEをご覧ください。
